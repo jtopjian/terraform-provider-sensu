@@ -1,5 +1,8 @@
 # terraform-provider-sensu
 
+[![Build Status](https://travis-ci.org/jtopjian/terraform-provider-sensu.svg?branch=master)](https://travis-ci.org/jtopjian/terraform-provider-sensu)
+
+
 Sensu 2.0 resource provider for Terraform
 
 > Sensu 2.0 and the Sensu 2.0 API are still in beta stages.
