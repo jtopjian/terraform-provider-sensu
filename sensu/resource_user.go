@@ -118,15 +118,20 @@ func resourceUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	if d.HasChange("disabled") {
-		disabled := d.Get("disabled").(bool)
-		if disabled {
-		} else {
-			if err := config.client.ReinstateUser(name); err != nil {
-				return fmt.Errorf("Unable to reinstate user %s: %s", name, err)
+	/*
+		if d.HasChange("disabled") {
+			disabled := d.Get("disabled").(bool)
+			if disabled {
+				if err := config.client.DisableUser(name); err != nil {
+					return fmt.Errorf("Unable to disable user %s: %s", name, err)
+				}
+			} else {
+				if err := config.client.ReinstateUser(name); err != nil {
+					return fmt.Errorf("Unable to reinstate user %s: %s", name, err)
+				}
 			}
 		}
-	}
+	*/
 
 	return resourceUserRead(d, meta)
 }
