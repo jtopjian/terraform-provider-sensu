@@ -55,12 +55,11 @@ func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 	filters := expandStringList(d.Get("filters").([]interface{}))
 
 	asset := &types.Asset{
-		Name:         name,
-		Organization: config.organization,
-		Sha512:       d.Get("sha512").(string),
-		URL:          d.Get("url").(string),
-		Metadata:     metadata,
-		Filters:      filters,
+		Name:     name,
+		Sha512:   d.Get("sha512").(string),
+		URL:      d.Get("url").(string),
+		Metadata: metadata,
+		Filters:  filters,
 	}
 
 	log.Printf("[DEBUG] Creating asset %s: %#v", name, asset)

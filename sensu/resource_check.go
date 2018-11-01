@@ -186,8 +186,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 
 	check := &types.CheckConfig{
 		Name:                 name,
-		Environment:          config.environment,
-		Organization:         config.organization,
+		Namespace:            config.namespace,
 		Command:              d.Get("command").(string),
 		Subscriptions:        subscriptions,
 		Cron:                 cron,
@@ -221,8 +220,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(name)
 
-	d.SetPartial("environment")
-	d.SetPartial("organization")
+	d.SetPartial("namespace")
 	d.SetPartial("command")
 	d.SetPartial("subscriptions")
 	d.SetPartial("cron")
@@ -465,8 +463,7 @@ func resourceCheckDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve check %s: %s", name, err)
 	}
 
-	check.Environment = config.environment
-	check.Organization = config.organization
+	check.Namespace = config.namespace
 
 	if err := config.client.DeleteCheck(check); err != nil {
 		return fmt.Errorf("Unable to delete check %s: %s", name, err)

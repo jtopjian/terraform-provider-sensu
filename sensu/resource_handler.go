@@ -99,16 +99,15 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 
 	handler := &types.Handler{
-		Name:         name,
-		Environment:  config.environment,
-		Organization: config.organization,
-		Command:      d.Get("command").(string),
-		EnvVars:      envVars,
-		Handlers:     handlers,
-		Filters:      filters,
-		Mutator:      d.Get("mutator").(string),
-		Timeout:      uint32(d.Get("timeout").(int)),
-		Type:         d.Get("type").(string),
+		Name:      name,
+		Namespace: config.namespace,
+		Command:   d.Get("command").(string),
+		EnvVars:   envVars,
+		Handlers:  handlers,
+		Filters:   filters,
+		Mutator:   d.Get("mutator").(string),
+		Timeout:   uint32(d.Get("timeout").(int)),
+		Type:      d.Get("type").(string),
 	}
 
 	if v, ok := d.GetOk("socket"); ok {

@@ -6,15 +6,15 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 )
 
-func TestAccImportEnvironment_basic(t *testing.T) {
-	resourceName := "sensu_environment.environment_1"
+func TestAccImportNamespace_basic(t *testing.T) {
+	resourceName := "sensu_namespace.namespace_1"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccResourceEnvironment_basic,
+				Config: testAccResourceNamespace_basic,
 			},
 
 			resource.TestStep{

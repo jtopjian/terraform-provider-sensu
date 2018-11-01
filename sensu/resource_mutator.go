@@ -46,12 +46,11 @@ func resourceMutatorCreate(d *schema.ResourceData, meta interface{}) error {
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 
 	mutator := &types.Mutator{
-		Name:         name,
-		Environment:  config.environment,
-		Organization: config.organization,
-		Command:      d.Get("command").(string),
-		EnvVars:      envVars,
-		Timeout:      uint32(d.Get("timeout").(int)),
+		Name:      name,
+		Namespace: config.namespace,
+		Command:   d.Get("command").(string),
+		EnvVars:   envVars,
+		Timeout:   uint32(d.Get("timeout").(int)),
 	}
 
 	log.Printf("[DEBUG] Creating mutator %s: %#v", name, mutator)

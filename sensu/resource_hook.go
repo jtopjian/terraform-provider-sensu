@@ -47,12 +47,11 @@ func resourceHookCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	hook := &types.HookConfig{
-		Name:         name,
-		Environment:  config.environment,
-		Organization: config.organization,
-		Command:      d.Get("command").(string),
-		Timeout:      uint32(d.Get("timeout").(int)),
-		Stdin:        d.Get("stdin").(bool),
+		Name:      name,
+		Namespace: config.namespace,
+		Command:   d.Get("command").(string),
+		Timeout:   uint32(d.Get("timeout").(int)),
+		Stdin:     d.Get("stdin").(bool),
 	}
 
 	log.Printf("[DEBUG] Creating hook %s: %#v", name, hook)

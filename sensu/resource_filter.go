@@ -49,12 +49,11 @@ func resourceFilterCreate(d *schema.ResourceData, meta interface{}) error {
 	when := expandTimeWindows(d.Get("when").(*schema.Set).List())
 
 	filter := &types.EventFilter{
-		Environment:  config.environment,
-		Organization: config.organization,
-		Name:         name,
-		Action:       d.Get("action").(string),
-		Statements:   statements,
-		When:         &when,
+		Namespace:  config.namespace,
+		Name:       name,
+		Action:     d.Get("action").(string),
+		Statements: statements,
+		When:       &when,
 	}
 
 	log.Printf("[DEBUG] Creating filter %s: %#v", name, filter)

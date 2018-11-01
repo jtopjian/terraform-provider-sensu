@@ -22,11 +22,8 @@ type Config struct {
 	// edition is the sensu edition.
 	edition string
 
-	// environment is the sensu environment.
-	environment string
-
-	// organization is the sensu organization.
-	organization string
+	// namespace is the sensu namespace.
+	namespace string
 
 	// Tokens
 	tokens *types.Tokens
@@ -83,18 +80,18 @@ func (c *Config) SaveEdition(edition string) error {
 	return nil
 }
 
-// Environment implements the Environment method for the config.Config interface.
-func (c *Config) Environment() string {
-	if c.environment == "" {
-		return config.DefaultEnvironment
+// Namespace implements the Namespace method for the config.Config interface.
+func (c *Config) Namespace() string {
+	if c.namespace == "" {
+		return config.DefaultNamespace
 	}
 
-	return c.environment
+	return c.namespace
 }
 
-// SaveEnvironment implements the SaveEnvironment method for the config.Config interface.
-func (c *Config) SaveEnvironment(environment string) error {
-	c.environment = environment
+// SaveNamespace implements the SaveNamespace method for the config.Config interface.
+func (c *Config) SaveNamespace(namespace string) error {
+	c.namespace = namespace
 	return nil
 }
 
@@ -105,21 +102,6 @@ func (c *Config) Format() string {
 
 // SaveFormat implements the SaveFormat method of the config.Config interface.
 func (c *Config) SaveFormat(format string) error {
-	return nil
-}
-
-// Organization implements the Organization method for the config.Config interface.
-func (c *Config) Organization() string {
-	if c.organization == "" {
-		return config.DefaultOrganization
-	}
-
-	return c.organization
-}
-
-// SaveOrganization implements the SaveOrganization method for the config.Config interface.
-func (c *Config) SaveOrganization(organization string) error {
-	c.organization = organization
 	return nil
 }
 

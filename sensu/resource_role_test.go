@@ -43,8 +43,7 @@ const testAccResourceRole_basic = `
 
     rule {
       type = "checks"
-      environment = "*"
-      organization = "*"
+      namespace = "*"
       permissions = ["read"]
     }
   }
@@ -56,15 +55,13 @@ const testAccResourceRole_update = `
 
     rule {
       type = "checks"
-      environment = "*"
-      organization = "*"
+      namespace = "*"
       permissions = ["read"]
     }
 
     rule {
       type = "*"
-      environment = "*"
-      organization = "*"
+      namespace = "*"
       permissions = ["create", "read"]
     }
   }

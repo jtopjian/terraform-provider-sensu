@@ -242,11 +242,7 @@ var resourceRulesSchema = &schema.Schema{
 				Required:     true,
 				ValidateFunc: validation.StringInSlice(types.AllTypes, false),
 			},
-			"environment": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"organization": &schema.Schema{
+			"namespace": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -268,11 +264,7 @@ var dataSourceRulesSchema = &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"environment": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"organization": &schema.Schema{
+			"namespace": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -296,12 +288,8 @@ func expandRules(v []interface{}) []types.Rule {
 			rule.Type = raw.(string)
 		}
 
-		if raw, ok := ruleData["environment"]; ok {
-			rule.Environment = raw.(string)
-		}
-
-		if raw, ok := ruleData["organization"]; ok {
-			rule.Organization = raw.(string)
+		if raw, ok := ruleData["namespace"]; ok {
+			rule.Namespace = raw.(string)
 		}
 
 		if raw, ok := ruleData["permissions"]; ok {
@@ -324,8 +312,7 @@ func flattenRules(v []types.Rule) []map[string]interface{} {
 	for _, v := range v {
 		rule := make(map[string]interface{})
 		rule["type"] = v.Type
-		rule["environment"] = v.Environment
-		rule["organization"] = v.Organization
+		rule["namespace"] = v.Namespace
 		rule["permissions"] = v.Permissions
 
 		rules = append(rules, rule)
