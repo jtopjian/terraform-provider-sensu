@@ -145,7 +145,6 @@ func dataSourceEntityRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("class", entity.Class)
 	d.Set("last_seen", entity.LastSeen)
 	d.Set("deregister", entity.Deregister)
-	d.Set("keepalive_timeout", entity.KeepaliveTimeout)
 	d.Set("user", entity.User)
 
 	deregistration := flattenEntityDeregistration(entity.Deregistration)
