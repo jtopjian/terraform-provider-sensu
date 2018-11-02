@@ -108,6 +108,25 @@ type TransportCredentials interface {
 	OverrideServerName(string) error
 }
 
+// Bundle is a combination of TransportCredentials and PerRPCCredentials.
+//
+// It also contains a mode switching method, so it can be used as a combination
+// of different credential policies.
+//
+// Bundle cannot be used together with individual TransportCredentials.
+// PerRPCCredentials from Bundle will be appended to other PerRPCCredentials.
+//
+// This API is experimental.
+type Bundle interface {
+	TransportCredentials() TransportCredentials
+	PerRPCCredentials() PerRPCCredentials
+	// NewWithMode should make a copy of Bundle, and switch mode. Modifying the
+	// existing Bundle may cause races.
+	//
+	// NewWithMode returns nil if the requested mode is not supported.
+	NewWithMode(mode string) (Bundle, error)
+}
+
 // TLSInfo contains the auth information for a TLS authenticated connection.
 // It implements the AuthInfo interface.
 type TLSInfo struct {
@@ -266,6 +285,15 @@ type OtherChannelzSecurityValue struct {
 
 func (*OtherChannelzSecurityValue) isChannelzSecurityValue() {}
 
+// tlsConn keeps reference of rawConn to support syscall.Conn for channelz.
+// SyscallConn() (the method in interface syscall.Conn) is explicitly
+// implemented on this type,
+//
+// Interface syscall.Conn is implemented by most net.Conn implementations (e.g.
+// TCPConn, UnixConn), but is not part of net.Conn interface. So wrapper conns
+// that embed net.Conn don't implement syscall.Conn. (Side note: tls.Conn
+// doesn't embed net.Conn, so even if syscall.Conn is part of net.Conn, it won't
+// help here).
 type tlsConn struct {
 	*tls.Conn
 	rawConn net.Conn
@@ -290,4 +318,24 @@ var cipherSuiteLookup = map[uint16]string{
 	tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:   "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
 	tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384: "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
 	tls.TLS_FALLBACK_SCSV:                       "TLS_FALLBACK_SCSV",
+	tls.TLS_RSA_WITH_AES_128_CBC_SHA256:         "TLS_RSA_WITH_AES_128_CBC_SHA256",
+	tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256: "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+	tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256:   "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+	tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305:    "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+	tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305:  "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
+}
+
+// cloneTLSConfig returns a shallow clone of the exported
+// fields of cfg, ignoring the unexported sync.Once, which
+// contains a mutex and must not be copied.
+//
+// If cfg is nil, a new zero tls.Config is returned.
+//
+// TODO: inline this function if possible.
+func cloneTLSConfig(cfg *tls.Config) *tls.Config {
+	if cfg == nil {
+		return &tls.Config{}
+	}
+
+	return cfg.Clone()
 }

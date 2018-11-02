@@ -15,6 +15,9 @@ const (
 
 	// EntityProxyClass is the name of the class given to proxy entities.
 	EntityProxyClass = "proxy"
+
+	// EntityBackendClass is the name of the class given to backend entities.
+	EntityBackendClass = "backend"
 )
 
 // Validate returns an error if the entity is invalid.
@@ -27,12 +30,8 @@ func (e *Entity) Validate() error {
 		return errors.New("entity class " + err.Error())
 	}
 
-	if e.Environment == "" {
-		return errors.New("environment must be set")
-	}
-
-	if e.Organization == "" {
-		return errors.New("organization must be set")
+	if e.Namespace == "" {
+		return errors.New("namespace must be set")
 	}
 
 	return nil
@@ -74,12 +73,10 @@ func GetEntitySubscription(entityID string) string {
 // FixtureEntity returns a testing fixture for an Entity object.
 func FixtureEntity(id string) *Entity {
 	return &Entity{
-		ID:               id,
-		Class:            "host",
-		Subscriptions:    []string{"linux"},
-		Environment:      "default",
-		Organization:     "default",
-		KeepaliveTimeout: 120,
+		ID:            id,
+		Class:         "host",
+		Subscriptions: []string{"linux"},
+		Namespace:     "default",
 	}
 }
 
