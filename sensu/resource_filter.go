@@ -30,13 +30,16 @@ func resourceFilter() *schema.Resource {
 					[]string{"allow", "deny"}, false),
 			},
 
-			"statements": &schema.Schema{
+			"expressions": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
 			"when": resourceTimeWindowsSchema,
+
+			// Optional
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
@@ -45,15 +48,17 @@ func resourceFilterCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	name := d.Get("name").(string)
 
-	statements := expandStringList(d.Get("statements").([]interface{}))
+	expressions := expandStringList(d.Get("expressions").([]interface{}))
 	when := expandTimeWindows(d.Get("when").(*schema.Set).List())
 
 	filter := &types.EventFilter{
-		Namespace:  config.namespace,
-		Name:       name,
-		Action:     d.Get("action").(string),
-		Statements: statements,
-		When:       &when,
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
+		Action:      d.Get("action").(string),
+		Expressions: expressions,
+		When:        &when,
 	}
 
 	log.Printf("[DEBUG] Creating filter %s: %#v", name, filter)
@@ -73,6 +78,7 @@ func resourceFilterCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	filter, err := config.client.FetchFilter(name)
@@ -83,8 +89,9 @@ func resourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved filter %s: %#v", name, filter)
 
 	d.Set("name", name)
+	d.Set("namespace", filter.ObjectMeta.Namespace)
 	d.Set("action", filter.Action)
-	d.Set("statements", filter.Statements)
+	d.Set("expressions", filter.Expressions)
 
 	when := flattenTimeWindows(filter.When)
 	if err := d.Set("when", when); err != nil {
@@ -96,6 +103,7 @@ func resourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceFilterUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	filter, err := config.client.FetchFilter(name)
@@ -109,9 +117,9 @@ func resourceFilterUpdate(d *schema.ResourceData, meta interface{}) error {
 		filter.Action = d.Get("action").(string)
 	}
 
-	if d.HasChange("statements") {
-		statements := expandStringList(d.Get("statements").([]interface{}))
-		filter.Statements = statements
+	if d.HasChange("expressions") {
+		expressions := expandStringList(d.Get("expressions").([]interface{}))
+		filter.Expressions = expressions
 	}
 
 	if d.HasChange("when") {
@@ -134,6 +142,7 @@ func resourceFilterUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceFilterDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	filter, err := config.client.FetchFilter(name)

@@ -19,6 +19,9 @@ func dataSourceEntity() *schema.Resource {
 				Required: true,
 			},
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"class": &schema.Schema{
 				Type:     schema.TypeString,
@@ -132,6 +135,7 @@ func dataSourceEntity() *schema.Resource {
 
 func dataSourceEntityRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	entity, err := config.client.FetchEntity(name)
@@ -141,8 +145,9 @@ func dataSourceEntityRead(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Retrieved entity %s: %#v", name, entity)
 
-	d.SetId(entity.ID)
-	d.Set("class", entity.Class)
+	d.SetId(entity.Name)
+	d.Set("namespace", entity.ObjectMeta.Namespace)
+	d.Set("class", entity.EntityClass)
 	d.Set("last_seen", entity.LastSeen)
 	d.Set("deregister", entity.Deregister)
 	d.Set("user", entity.User)

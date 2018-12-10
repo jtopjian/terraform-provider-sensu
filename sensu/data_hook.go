@@ -15,13 +15,15 @@ func dataSourceHook() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"command": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			// Optional
 			"timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -37,6 +39,7 @@ func dataSourceHook() *schema.Resource {
 
 func dataSourceHookRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	hook, err := config.client.FetchHook(name)
@@ -47,6 +50,7 @@ func dataSourceHookRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved hook %s: %#v", name, hook)
 
 	d.SetId(hook.Name)
+	d.Set("namespace", hook.ObjectMeta.Namespace)
 	d.Set("command", hook.Command)
 	d.Set("timeout", hook.Timeout)
 	d.Set("stdin", hook.Stdin)

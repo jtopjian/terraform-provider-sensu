@@ -2,7 +2,7 @@
 
 Manages a Sensu User.
 
-For full documentation on Sensu Users, see [here](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#user).
+For full documentation on Sensu Users, see [here](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
 
 _Note_: When Terraform deletes a user, the user is only disabled.
 This prevents Terraform from creating another user with the same
@@ -14,7 +14,7 @@ username.
 resource "sensu_user" "user_1" {
   name = "my_user"
   password = "abcd1234"
-  roles = ["admin"]
+  groups = ["admin"]
 }
 ```
 
@@ -22,9 +22,9 @@ resource "sensu_user" "user_1" {
 
 * `name` - *Required* - The username of the Sensu user.
 
-* `password` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#user).
+* `password` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
 
-* `roles` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#user).
+* `groups` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
 
 ## Attribute Reference
 

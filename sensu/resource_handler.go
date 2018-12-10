@@ -80,6 +80,8 @@ func resourceHandler() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
@@ -99,15 +101,17 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 
 	handler := &types.Handler{
-		Name:      name,
-		Namespace: config.namespace,
-		Command:   d.Get("command").(string),
-		EnvVars:   envVars,
-		Handlers:  handlers,
-		Filters:   filters,
-		Mutator:   d.Get("mutator").(string),
-		Timeout:   uint32(d.Get("timeout").(int)),
-		Type:      d.Get("type").(string),
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
+		Command:  d.Get("command").(string),
+		EnvVars:  envVars,
+		Handlers: handlers,
+		Filters:  filters,
+		Mutator:  d.Get("mutator").(string),
+		Timeout:  uint32(d.Get("timeout").(int)),
+		Type:     d.Get("type").(string),
 	}
 
 	if v, ok := d.GetOk("socket"); ok {
@@ -131,8 +135,9 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
+
 	handler, err := config.client.FetchHandler(name)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve handler %s: %s", name, err)
@@ -141,6 +146,7 @@ func resourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved handler %s: %#v", name, handler)
 
 	d.Set("name", name)
+	d.Set("namespace", handler.ObjectMeta.Namespace)
 	d.Set("command", handler.Command)
 	d.Set("filters", handler.Filters)
 	d.Set("handlers", handler.Handlers)
@@ -163,8 +169,9 @@ func resourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceHandlerUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
+
 	handler, err := config.client.FetchHandler(name)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve handler %s: %s", name, err)
@@ -219,9 +226,10 @@ func resourceHandlerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceHandlerDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
-	handler := &types.Handler{Name: name}
+
+	handler := &types.Handler{ObjectMeta: types.ObjectMeta{Name: name}}
 
 	if err := config.client.DeleteHandler(handler); err != nil {
 		return fmt.Errorf("Unable to delete handler %s: %s", name, err)

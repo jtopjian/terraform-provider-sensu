@@ -12,7 +12,6 @@ func resourceNamespace() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceNamespaceCreate,
 		Read:   resourceNamespaceRead,
-		Update: resourceNamespaceUpdate,
 		Delete: resourceNamespaceDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -62,26 +61,6 @@ func resourceNamespaceRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", name)
 
 	return nil
-}
-
-func resourceNamespaceUpdate(d *schema.ResourceData, meta interface{}) error {
-	config := meta.(*Config)
-	name := d.Id()
-
-	namespace, err := config.client.FetchNamespace(name)
-	if err != nil {
-		return fmt.Errorf("Unable to retrieve namespace %s: %s", name, err)
-	}
-
-	if err := config.client.UpdateNamespace(namespace); err != nil {
-		return fmt.Errorf("Unable to delete namespace %s: %s", name, err)
-	}
-
-	if err := namespace.Validate(); err != nil {
-		return fmt.Errorf("Invalid namespace %s: %s", name, err)
-	}
-
-	return resourceNamespaceRead(d, meta)
 }
 
 func resourceNamespaceDelete(d *schema.ResourceData, meta interface{}) error {

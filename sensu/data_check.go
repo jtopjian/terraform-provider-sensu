@@ -14,6 +14,9 @@ func dataSourceCheck() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"command": &schema.Schema{
 				Type:     schema.TypeString,
@@ -76,7 +79,7 @@ func dataSourceCheck() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"proxy_entity_id": &schema.Schema{
+			"proxy_entity_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -150,6 +153,7 @@ func dataSourceCheck() *schema.Resource {
 
 func dataSourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 
 	name := d.Get("name").(string)
 	check, err := config.client.FetchCheck(name)
@@ -160,13 +164,14 @@ func dataSourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved check %s: %#v", name, check)
 
 	d.SetId(check.Name)
+	d.Set("namespace", check.ObjectMeta.Namespace)
 	d.Set("command", check.Command)
 	d.Set("cron", check.Cron)
 	d.Set("high_flap_threshold", check.HighFlapThreshold)
 	d.Set("interval", check.Interval)
 	d.Set("low_flap_threshold", check.LowFlapThreshold)
 	d.Set("output_metric_format", check.OutputMetricFormat)
-	d.Set("proxy_entity_id", check.ProxyEntityID)
+	d.Set("proxy_entity_name", check.ProxyEntityName)
 	d.Set("publish", check.Publish)
 	d.Set("round_robin", check.RoundRobin)
 	d.Set("stdin", check.Stdin)

@@ -3,12 +3,11 @@
 [![Build Status](https://travis-ci.org/jtopjian/terraform-provider-sensu.svg?branch=master)](https://travis-ci.org/jtopjian/terraform-provider-sensu)
 
 
-Sensu 2.0 resource provider for Terraform
+Sensu Go resource provider for Terraform
 
-> Sensu 2.0 and the Sensu 2.0 API are still in beta stages.
->
-> This provider should not be considered stable nor does it
-> guarantee any type of backwards compatibility.
+> This provider is still in early stages and has not seen
+> a lot of production use. Backwards compatibility is not
+> guaranteed at this time.
 
 ## Prerequisites
 
@@ -18,11 +17,10 @@ Sensu 2.0 resource provider for Terraform
 
 ```hcl
 provider "sensu" {
-	api_url      = "http://127.0.0.1:8080"
-	username     = "admin"
-	password     = "password"
-	environment  = "default"
-	organization = "default"
+	api_url   = "http://127.0.0.1:8080"
+	username  = "admin"
+	password  = "password"
+	namespace = "default"
 }
 
 resource "sensu_check" "check_1" {

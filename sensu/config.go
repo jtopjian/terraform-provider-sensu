@@ -3,6 +3,8 @@ package sensu
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform/helper/schema"
+
 	"github.com/sensu/sensu-go/cli/client"
 	"github.com/sensu/sensu-go/cli/client/config"
 	"github.com/sensu/sensu-go/types"
@@ -114,4 +116,13 @@ func (c *Config) Tokens() *types.Tokens {
 func (c *Config) SaveTokens(tokens *types.Tokens) error {
 	c.tokens = tokens
 	return nil
+}
+
+// determineNamespace will figure out the right namespace setting to use.
+func (c *Config) determineNamespace(d *schema.ResourceData) string {
+	if v, ok := d.Get("namespace").(string); ok && v != "" {
+		return v
+	}
+
+	return c.Namespace()
 }

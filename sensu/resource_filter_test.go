@@ -19,7 +19,7 @@ func TestAccResourceFilter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_filter.filter_1", "action", "allow"),
 					resource.TestCheckResourceAttr(
-						"sensu_filter.filter_1", "statements.#", "1"),
+						"sensu_filter.filter_1", "expressions.#", "1"),
 					resource.TestCheckResourceAttr(
 						"sensu_filter.filter_1", "when.#", "1"),
 					resource.TestCheckResourceAttr(
@@ -34,7 +34,7 @@ func TestAccResourceFilter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_filter.filter_1", "action", "deny"),
 					resource.TestCheckResourceAttr(
-						"sensu_filter.filter_1", "statements.#", "2"),
+						"sensu_filter.filter_1", "expressions.#", "2"),
 					resource.TestCheckResourceAttr(
 						"sensu_filter.filter_1", "when.#", "1"),
 					resource.TestCheckResourceAttr(
@@ -49,7 +49,7 @@ const testAccResourceFilter_basic = `
   resource "sensu_filter" "filter_1" {
     name = "filter_1"
     action = "allow"
-    statements = [
+    expressions = [
       "event.Check.Team == 'ops'",
     ]
 
@@ -65,7 +65,7 @@ const testAccResourceFilter_update = `
   resource "sensu_filter" "filter_1" {
     name = "filter_1"
     action = "deny"
-    statements = [
+    expressions = [
       "event.Check.Team == 'ops'",
       "event.Check.Team == 'dev'",
     ]

@@ -20,7 +20,7 @@ func TestAccDataSourceFilter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"data.sensu_filter.filter_1", "action", "allow"),
 					resource.TestCheckResourceAttr(
-						"sensu_filter.filter_1", "statements.#", "1"),
+						"sensu_filter.filter_1", "expressions.#", "1"),
 					resource.TestCheckResourceAttr(
 						"sensu_filter.filter_1", "when.#", "1"),
 					resource.TestCheckResourceAttr(

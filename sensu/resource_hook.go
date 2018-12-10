@@ -38,6 +38,8 @@ func resourceHook() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
@@ -47,11 +49,13 @@ func resourceHookCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	hook := &types.HookConfig{
-		Name:      name,
-		Namespace: config.namespace,
-		Command:   d.Get("command").(string),
-		Timeout:   uint32(d.Get("timeout").(int)),
-		Stdin:     d.Get("stdin").(bool),
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
+		Command: d.Get("command").(string),
+		Timeout: uint32(d.Get("timeout").(int)),
+		Stdin:   d.Get("stdin").(bool),
 	}
 
 	log.Printf("[DEBUG] Creating hook %s: %#v", name, hook)
@@ -71,6 +75,7 @@ func resourceHookCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceHookRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	hook, err := config.client.FetchHook(name)
@@ -81,6 +86,7 @@ func resourceHookRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved hook %s: %#v", name, hook)
 
 	d.Set("name", name)
+	d.Set("namespace", hook.ObjectMeta.Namespace)
 	d.Set("command", hook.Command)
 	d.Set("timeout", hook.Timeout)
 	d.Set("stdin", hook.Stdin)
@@ -90,6 +96,7 @@ func resourceHookRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceHookUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	hook, err := config.client.FetchHook(name)
@@ -122,6 +129,7 @@ func resourceHookUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceHookDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	hook, err := config.client.FetchHook(name)

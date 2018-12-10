@@ -9,11 +9,9 @@ import (
 )
 
 var (
-	SENSU_API_URL      = os.Getenv("SENSU_API_URL")
-	SENSU_USERNAME     = os.Getenv("SENSU_USERNAME")
-	SENSU_PASSWORD     = os.Getenv("SENSU_PASSWORD")
-	SENSU_ENVIRONMENT  = os.Getenv("SENSU_ENVIRONMENT")
-	SENSU_ORGANIZATION = os.Getenv("SENSU_ORGANIZATION")
+	SENSU_API_URL  = os.Getenv("SENSU_API_URL")
+	SENSU_USERNAME = os.Getenv("SENSU_USERNAME")
+	SENSU_PASSWORD = os.Getenv("SENSU_PASSWORD")
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
@@ -37,14 +35,6 @@ func testAccPreCheckRequiredEnvVars(t *testing.T) {
 
 	if SENSU_PASSWORD == "" {
 		t.Fatal("SENSU_PASSWORD must be set for acceptance tests")
-	}
-
-	if SENSU_ENVIRONMENT == "" {
-		t.Fatal("SENSU_ENVIRONMENT must be set for acceptance tests")
-	}
-
-	if SENSU_ORGANIZATION == "" {
-		t.Fatal("SENSU_ORGANIZATION must be set for acceptance tests")
 	}
 }
 

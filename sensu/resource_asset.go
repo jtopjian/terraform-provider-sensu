@@ -39,10 +39,7 @@ func resourceAsset() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"metadata": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-			},
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
@@ -51,15 +48,16 @@ func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	name := d.Get("name").(string)
 
-	metadata := expandAssetMetadata(d.Get("metadata").(map[string]interface{}))
 	filters := expandStringList(d.Get("filters").([]interface{}))
 
 	asset := &types.Asset{
-		Name:     name,
-		Sha512:   d.Get("sha512").(string),
-		URL:      d.Get("url").(string),
-		Metadata: metadata,
-		Filters:  filters,
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
+		Sha512:  d.Get("sha512").(string),
+		URL:     d.Get("url").(string),
+		Filters: filters,
 	}
 
 	log.Printf("[DEBUG] Creating asset %s: %#v", name, asset)
@@ -83,6 +81,8 @@ func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
+
 	name := d.Id()
 
 	asset, err := config.client.FetchAsset(name)
@@ -93,6 +93,7 @@ func resourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved asset %s: %#v", name, asset)
 
 	d.Set("name", name)
+	d.Set("namespace", asset.ObjectMeta.Namespace)
 	d.Set("sha512", asset.Sha512)
 	d.Set("url", asset.URL)
 
@@ -100,15 +101,13 @@ func resourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error setting %s.filter: %s", name, err)
 	}
 
-	if err := d.Set("metadata", asset.Metadata); err != nil {
-		return fmt.Errorf("Error setting %s.metadata: %s", name, err)
-	}
-
 	return nil
 }
 
 func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
+
 	name := d.Id()
 
 	asset, err := config.client.FetchAsset(name)
@@ -129,11 +128,6 @@ func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("filter") {
 		filters := expandStringList(d.Get("filter").([]interface{}))
 		asset.Filters = filters
-	}
-
-	if d.HasChange("metadata") {
-		metadata := expandAssetMetadata(d.Get("metadata").(map[string]interface{}))
-		asset.Metadata = metadata
 	}
 
 	if err := asset.Validate(); err != nil {
@@ -164,15 +158,3 @@ func resourceAssetDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 */
-
-func expandAssetMetadata(v map[string]interface{}) map[string]string {
-	metadata := make(map[string]string)
-
-	for key, value := range v {
-		if v, ok := value.(string); ok {
-			metadata[key] = v
-		}
-	}
-
-	return metadata
-}

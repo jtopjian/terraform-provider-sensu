@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -27,6 +28,14 @@ var dataSourceNameSchema = &schema.Schema{
 	ValidateFunc: validation.StringMatch(
 		regexp.MustCompile(`\A[\w\.\-]+\z`),
 		"Invalid name"),
+}
+
+// Namespace
+var resourceNamespaceSchema = &schema.Schema{
+	Type:     schema.TypeString,
+	Optional: true,
+	Computed: true,
+	ForceNew: true,
 }
 
 // Environment Variables
@@ -232,23 +241,32 @@ func flattenTimeWindows(v *types.TimeWindowWhen) []map[string]interface{} {
 }
 
 // RBAC Rules
+var allVerbs = []string{
+	"get", "list", "create", "update", "delete", "*",
+}
+
 var resourceRulesSchema = &schema.Schema{
 	Type:     schema.TypeList,
 	Required: true,
+	ForceNew: true,
 	Elem: &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"type": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validation.StringInSlice(types.AllTypes, false),
-			},
-			"namespace": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"permissions": &schema.Schema{
+			"verbs": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"resources": &schema.Schema{
+				Type:     schema.TypeList,
+				Required: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"resource_names": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
@@ -260,17 +278,19 @@ var dataSourceRulesSchema = &schema.Schema{
 	Computed: true,
 	Elem: &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"type": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"namespace": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"permissions": &schema.Schema{
+			"verbs": &schema.Schema{
 				Type:     schema.TypeList,
-				Computed: true,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"resources": &schema.Schema{
+				Type:     schema.TypeList,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"resource_names": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
@@ -284,16 +304,22 @@ func expandRules(v []interface{}) []types.Rule {
 		rule := new(types.Rule)
 		ruleData := v.(map[string]interface{})
 
-		if raw, ok := ruleData["type"]; ok {
-			rule.Type = raw.(string)
+		if raw, ok := ruleData["verbs"]; ok {
+			for _, verb := range raw.([]interface{}) {
+				rule.Verbs = append(rule.Verbs, verb.(string))
+			}
 		}
 
-		if raw, ok := ruleData["namespace"]; ok {
-			rule.Namespace = raw.(string)
+		if raw, ok := ruleData["resources"]; ok {
+			for _, resource := range raw.([]interface{}) {
+				rule.Resources = append(rule.Resources, resource.(string))
+			}
 		}
 
-		if raw, ok := ruleData["permissions"]; ok {
-			rule.Permissions = expandStringList(raw.([]interface{}))
+		if raw, ok := ruleData["resource_names"]; ok {
+			for _, resourceNames := range raw.([]interface{}) {
+				rule.ResourceNames = append(rule.ResourceNames, resourceNames.(string))
+			}
 		}
 
 		rules = append(rules, *rule)
@@ -311,9 +337,9 @@ func flattenRules(v []types.Rule) []map[string]interface{} {
 
 	for _, v := range v {
 		rule := make(map[string]interface{})
-		rule["type"] = v.Type
-		rule["namespace"] = v.Namespace
-		rule["permissions"] = v.Permissions
+		rule["verbs"] = v.Verbs
+		rule["resources"] = v.Resources
+		rule["resource_names"] = v.ResourceNames
 
 		rules = append(rules, rule)
 

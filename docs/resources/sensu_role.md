@@ -2,7 +2,7 @@
 
 Manages a Sensu Role.
 
-For full documentation on Sensu Roles, see [here](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#role).
+For full documentation on Sensu Roles, see [here](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#role).
 
 ## Basic Example
 
@@ -18,19 +18,21 @@ resource "sensu_role" "role_1" {
 
 * `name` - *Required* - The rolename of the Sensu role.
 
-* `rule` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#role).
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
+
+* `rule` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#role).
 
 ### rule
 
 The `rule` block supports:
 
-* `type` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#rule).
+* `verbs` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#rule).
 
-* `environment` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#rule).
+* `resources` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#rule).
 
-* `organization` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#rule).
-
-* `permissions` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#rule).
+* `resource_names` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#rule).
 
 ## Attribute Reference
 

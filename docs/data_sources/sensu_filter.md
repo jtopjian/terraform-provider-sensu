@@ -2,7 +2,7 @@
 
 Get information about a Sensu Filter
 
-For full documentation on Sensu Filters, see [here](https://docs.sensu.io/sensu-core/2.0/reference/filters).
+For full documentation on Sensu Filters, see [here](https://docs.sensu.io/sensu-go/5.0/reference/filters).
 
 ## Basic Example
 
@@ -16,14 +16,18 @@ data "sensu_filter" "filter_1" {
 
 * `name` - *Required* - The name of the Sensu filter.
 
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
+
 ## Attribute Reference
 
-* `action` - See the [Sensu filter reference](https://docs.sensu.io/sensu-core/2.0/reference/filters/#filter-attributes).
+* `action` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
   Valid values are `allow` and `deny`.
 
-* `statements` - See the [Sensu filter reference](https://docs.sensu.io/sensu-core/2.0/reference/filters/#filter-attributes).
+* `expressions` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
 
-* `when` - See the [Sensu filter reference](https://docs.sensu.io/sensu-core/2.0/reference/filters/#filter-attributes).
+* `when` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
 
 ### when
 

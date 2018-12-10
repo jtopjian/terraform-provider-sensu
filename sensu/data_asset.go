@@ -15,6 +15,9 @@ func dataSourceAsset() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"sha512": &schema.Schema{
 				Type:     schema.TypeString,
@@ -31,17 +34,13 @@ func dataSourceAsset() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-
-			"metadata": &schema.Schema{
-				Type:     schema.TypeMap,
-				Computed: true,
-			},
 		},
 	}
 }
 
 func dataSourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	asset, err := config.client.FetchAsset(name)
@@ -54,13 +53,10 @@ func dataSourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(asset.Name)
 	d.Set("sha512", asset.Sha512)
 	d.Set("url", asset.URL)
+	d.Set("namespace", asset.ObjectMeta.Namespace)
 
 	if err := d.Set("filters", asset.Filters); err != nil {
 		return fmt.Errorf("Error setting %s.filter: %s", name, err)
-	}
-
-	if err := d.Set("metadata", asset.Metadata); err != nil {
-		return fmt.Errorf("Error setting %s.metadata: %s", name, err)
 	}
 
 	return nil

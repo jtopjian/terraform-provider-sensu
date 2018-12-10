@@ -13,7 +13,7 @@ env:
     - SENSU_ENVIRONMENT=default
     - SENSU_ORGANIZATION=default
   matrix:
-    - SENSU_VERSION="2.0.0-beta.4"
+    - SENSU_VERSION="5.0.0"
     - SENSU_VERSION="master"
 
 go:
@@ -21,6 +21,8 @@ go:
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - env: SENSU_VERSION="master"
 
 before_install:
   - docker pull sensu/sensu:${SENSU_VERSION}

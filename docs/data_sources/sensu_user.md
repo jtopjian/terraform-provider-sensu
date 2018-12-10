@@ -2,12 +2,12 @@
 
 Get information about a Sensu User.
 
-For full documentation on Sensu Users, see [here](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#user).
+For full documentation on Sensu Users, see [here](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
 
 ## Basic Example
 
 ```hcl
-resource "sensu_user" "user_1" {
+data "sensu_user" "user_1" {
   name = "my_user"
 }
 ```
@@ -18,4 +18,4 @@ resource "sensu_user" "user_1" {
 
 ## Attribute Reference
 
-* `roles` - See the [Sensu rbac reference](https://docs.sensu.io/sensu-core/2.0/reference/rbac/#user).
+* `groups` - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).

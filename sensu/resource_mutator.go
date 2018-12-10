@@ -35,22 +35,27 @@ func resourceMutator() *schema.Resource {
 				Optional: true,
 				Default:  60,
 			},
+
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
 
 func resourceMutatorCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 
 	mutator := &types.Mutator{
-		Name:      name,
-		Namespace: config.namespace,
-		Command:   d.Get("command").(string),
-		EnvVars:   envVars,
-		Timeout:   uint32(d.Get("timeout").(int)),
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
+		Command: d.Get("command").(string),
+		EnvVars: envVars,
+		Timeout: uint32(d.Get("timeout").(int)),
 	}
 
 	log.Printf("[DEBUG] Creating mutator %s: %#v", name, mutator)
@@ -70,6 +75,7 @@ func resourceMutatorCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	mutator, err := config.client.FetchMutator(name)
@@ -80,6 +86,7 @@ func resourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved mutator %s: %#v", name, mutator)
 
 	d.Set("name", name)
+	d.Set("namespace", mutator.ObjectMeta.Namespace)
 	d.Set("command", mutator.Command)
 	d.Set("timeout", mutator.Timeout)
 
@@ -93,6 +100,7 @@ func resourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceMutatorUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	mutator, err := config.client.FetchMutator(name)
@@ -126,6 +134,7 @@ func resourceMutatorUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceMutatorDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	mutator, err := config.client.FetchMutator(name)

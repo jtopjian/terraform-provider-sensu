@@ -21,7 +21,7 @@ func TestAccResourceUser_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_user.user_1", "name", username),
 					resource.TestCheckResourceAttr(
-						"sensu_user.user_1", "roles.#", "1"),
+						"sensu_user.user_1", "groups.#", "1"),
 				),
 			},
 			resource.TestStep{
@@ -30,7 +30,7 @@ func TestAccResourceUser_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_user.user_1", "name", username),
 					resource.TestCheckResourceAttr(
-						"sensu_user.user_1", "roles.#", "2"),
+						"sensu_user.user_1", "groups.#", "2"),
 				),
 			},
 		},
@@ -67,7 +67,7 @@ func testAccResourceUser_basic(username string) string {
 		resource "sensu_user" "user_1" {
 			name = "%s"
 			password = "abcd1234"
-			roles = ["admin"]
+			groups = ["admin"]
 		}
 	`, username)
 }
@@ -77,7 +77,7 @@ func testAccResourceUser_update(username string) string {
 		resource "sensu_user" "user_1" {
 			name = "%s"
 			password = "abcd1234"
-			roles = ["admin", "read-only"]
+			groups = ["admin", "read-only"]
 		}
 	`, username)
 }
@@ -87,7 +87,7 @@ func testAccResourceUser_password_1(username string) string {
 		resource "sensu_user" "user_1" {
 			name = "%s"
 			password = "abcd1234"
-			roles = ["admin"]
+			groups = ["admin"]
 		}
 	`, username)
 }
@@ -97,7 +97,7 @@ func testAccResourceUser_password_2(username string) string {
 		resource "sensu_user" "user_1" {
 			name = "%s"
 			password = "1234abcd"
-			roles = ["admin"]
+			groups = ["admin"]
 		}
 	`, username)
 }

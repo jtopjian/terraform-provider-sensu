@@ -15,6 +15,9 @@ func dataSourceMutator() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"command": &schema.Schema{
 				Type:     schema.TypeString,
@@ -33,6 +36,7 @@ func dataSourceMutator() *schema.Resource {
 
 func dataSourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	mutator, err := config.client.FetchMutator(name)
@@ -42,7 +46,8 @@ func dataSourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Retrieved mutator %s: %#v", name, mutator)
 
-	d.Set("name", name)
+	d.SetId(name)
+	d.Set("namespace", mutator.ObjectMeta.Namespace)
 	d.Set("command", mutator.Command)
 	d.Set("timeout", mutator.Timeout)
 
@@ -50,8 +55,6 @@ func dataSourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("env_vars", envVars); err != nil {
 		return fmt.Errorf("Unable to set %s.env_vars: %s", name, err)
 	}
-
-	d.SetId(name)
 
 	return nil
 }

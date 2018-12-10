@@ -2,7 +2,7 @@
 
 Manages a Sensu Check.
 
-For full documentation on Sensu Checks, see [here](https://docs.sensu.io/sensu-core/2.0/reference/checks).
+For full documentation on Sensu Checks, see [here](https://docs.sensu.io/sensu-go/5.0/reference/checks).
 
 ## Basic Example
 
@@ -23,39 +23,43 @@ resource "sensu_check" "check_1" {
 
 * `name` - *Required* - The name of the Sensu check.
 
-* `command` - *Required* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
 
-* `subscriptions` - *Required* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `command` - *Required* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `check_hook` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `subscriptions` - *Required* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
+
+* `check_hook` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
   Also see the `check_hook` section below for details on this block.
 
-* `cron` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `cron` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `handlers` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `handlers` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `interval` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `interval` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `high_flap_threshold` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `high_flap_threshold` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `low_flap_threshold` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `low_flap_threshold` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `proxy_entity_id` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `proxy_entity_name` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `publish` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `publish` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `round_robin` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `round_robin` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `runtime_assets` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `runtime_assets` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `stdin` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `stdin` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `subdue` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `subdue` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
   Also see the `subdue` section below for details on this block.
 
-* `timeout` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `timeout` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
-* `ttl` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-core/2.0/reference/checks/#check-attributes).
+* `ttl` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
 ### check_hook
 
