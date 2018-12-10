@@ -47,4 +47,4 @@ deploy:
   on:
     repo: jtopjian/terraform-provider-sensu
     tags: true
-    condition: $SENSU_VERSION = "2.0.0-beta.4"
+    condition: $SENSU_VERSION = "5.0.0"
