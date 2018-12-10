@@ -17,20 +17,11 @@ func TestAccResourceRole_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_role.role_1", "name", "role_1"),
 					resource.TestCheckResourceAttr(
-						"sensu_role.role_1", "rule.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sensu_role.role_1", "rule.0.type", "checks"),
-				),
-			},
-			resource.TestStep{
-				Config: testAccResourceRole_update,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sensu_role.role_1", "name", "role_1"),
-					resource.TestCheckResourceAttr(
 						"sensu_role.role_1", "rule.#", "2"),
 					resource.TestCheckResourceAttr(
-						"sensu_role.role_1", "rule.1.type", "*"),
+						"sensu_role.role_1", "rule.0.verbs.0", "*"),
+					resource.TestCheckResourceAttr(
+						"sensu_role.role_1", "rule.1.verbs.1", "list"),
 				),
 			},
 		},
@@ -42,30 +33,14 @@ const testAccResourceRole_basic = `
     name = "role_1"
 
     rule {
-      type = "checks"
-      environment = "*"
-      organization = "*"
-      permissions = ["read"]
-    }
-  }
-`
-
-const testAccResourceRole_update = `
-  resource "sensu_role" "role_1" {
-    name = "role_1"
-
-    rule {
-      type = "checks"
-      environment = "*"
-      organization = "*"
-      permissions = ["read"]
+      verbs = ["*"]
+      resources = ["checks"]
     }
 
     rule {
-      type = "*"
-      environment = "*"
-      organization = "*"
-      permissions = ["create", "read"]
+      verbs = ["get", "list"]
+      resources = ["assets"]
     }
+
   }
 `

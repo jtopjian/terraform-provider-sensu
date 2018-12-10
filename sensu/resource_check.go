@@ -29,7 +29,7 @@ func resourceCheck() *schema.Resource {
 
 			"subscriptions": &schema.Schema{
 				Type:     schema.TypeList,
-				Optional: true,
+				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
@@ -92,7 +92,7 @@ func resourceCheck() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"proxy_entity_id": &schema.Schema{
+			"proxy_entity_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -154,6 +154,8 @@ func resourceCheck() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
@@ -185,9 +187,10 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.Partial(true)
 
 	check := &types.CheckConfig{
-		Name:                 name,
-		Environment:          config.environment,
-		Organization:         config.organization,
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
 		Command:              d.Get("command").(string),
 		Subscriptions:        subscriptions,
 		Cron:                 cron,
@@ -198,7 +201,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 		LowFlapThreshold:     uint32(d.Get("low_flap_threshold").(int)),
 		OutputMetricFormat:   d.Get("output_metric_format").(string),
 		OutputMetricHandlers: outputMetricHandlers,
-		ProxyEntityID:        d.Get("proxy_entity_id").(string),
+		ProxyEntityName:      d.Get("proxy_entity_name").(string),
 		//ProxyRequests:        &proxyRequests,
 		Publish:       d.Get("publish").(bool),
 		RoundRobin:    d.Get("round_robin").(bool),
@@ -221,8 +224,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(name)
 
-	d.SetPartial("environment")
-	d.SetPartial("organization")
+	d.SetPartial("namespace")
 	d.SetPartial("command")
 	d.SetPartial("subscriptions")
 	d.SetPartial("cron")
@@ -233,7 +235,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("low_flap_threshold")
 	d.SetPartial("output_metric_format")
 	d.SetPartial("output_metric_handlers")
-	d.SetPartial("proxy_entity_id")
+	d.SetPartial("proxy_entity_name")
 	//d.SetPartial("proxy_requests")
 	d.SetPartial("publish")
 	d.SetPartial("round_robin")
@@ -241,6 +243,8 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("stdin")
 	d.SetPartial("timeout")
 	d.SetPartial("ttl")
+
+	config.SaveNamespace(config.determineNamespace(d))
 
 	check, err := config.client.FetchCheck(name)
 	if err != nil {
@@ -266,6 +270,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 
 	name := d.Id()
 	check, err := config.client.FetchCheck(name)
@@ -276,13 +281,14 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved check %s: %#v", name, check)
 
 	d.Set("name", name)
+	d.Set("namespace", check.ObjectMeta.Namespace)
 	d.Set("command", check.Command)
 	d.Set("cron", check.Cron)
 	d.Set("high_flap_threshold", check.HighFlapThreshold)
 	d.Set("interval", check.Interval)
 	d.Set("low_flap_threshold", check.LowFlapThreshold)
 	d.Set("output_metric_format", check.OutputMetricFormat)
-	d.Set("proxy_entity_id", check.ProxyEntityID)
+	d.Set("proxy_entity_name", check.ProxyEntityName)
 	d.Set("publish", check.Publish)
 	d.Set("round_robin", check.RoundRobin)
 	d.Set("stdin", check.Stdin)
@@ -332,6 +338,7 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 
 	name := d.Id()
 	check, err := config.client.FetchCheck(name)
@@ -373,8 +380,8 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 		check.OutputMetricHandlers = metricHandlers
 	}
 
-	if d.HasChange("proxy_entity_id") {
-		check.ProxyEntityID = d.Get("proxy_entity_id").(string)
+	if d.HasChange("proxy_entity_name") {
+		check.ProxyEntityName = d.Get("proxy_entity_name").(string)
 	}
 
 	/*
@@ -458,6 +465,7 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceCheckDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 
 	name := d.Id()
 	check, err := config.client.FetchCheck(name)
@@ -465,8 +473,7 @@ func resourceCheckDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve check %s: %s", name, err)
 	}
 
-	check.Environment = config.environment
-	check.Organization = config.organization
+	check.Namespace = config.namespace
 
 	if err := config.client.DeleteCheck(check); err != nil {
 		return fmt.Errorf("Unable to delete check %s: %s", name, err)

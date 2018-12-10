@@ -1,9 +1,9 @@
 package client
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/go-resty/resty"
@@ -47,19 +47,6 @@ func New(config config.Config) *RestClient {
 
 	// Check that Access-Token has not expired
 	restyInst.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
-		// Pass the organization and environment as query parameters, except when
-		// we are creating or updating an object, since we will use the object
-		// attributes to determine the org & env
-		if r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodPatch {
-			if param := r.QueryParam.Get("env"); param == "" {
-				r.SetQueryParam("env", config.Environment())
-			}
-
-			if param := r.QueryParam.Get("org"); param == "" {
-				r.SetQueryParam("org", config.Organization())
-			}
-		}
-
 		// Guard against requests that are not sending auth details
 		if c.Token == "" || r.UserInfo != nil {
 			return nil
@@ -147,6 +134,11 @@ func (client *RestClient) R() *resty.Request {
 	request := client.resty.R()
 
 	return request
+}
+
+// SetTLSClientConfig assigns client TLS config
+func (client *RestClient) SetTLSClientConfig(c *tls.Config) {
+	client.resty.SetTLSClientConfig(c)
 }
 
 // Reset client so that it reconfigure on next request

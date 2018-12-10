@@ -15,7 +15,7 @@ func dataSourceUser() *schema.Resource {
 			"name": dataSourceNameSchema,
 
 			// Computed
-			"roles": &schema.Schema{
+			"groups": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -35,7 +35,7 @@ func dataSourceUserRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved user %s: %#v", name, user)
 
 	d.Set("name", name)
-	d.Set("roles", user.Roles)
+	d.Set("groups", user.Groups)
 
 	d.SetId(name)
 

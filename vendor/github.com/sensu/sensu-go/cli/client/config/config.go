@@ -5,23 +5,30 @@ import (
 )
 
 const (
-	// DefaultEdition represents the default Sensu edition
+	// DefaultEdition is the default Sensu edition
 	DefaultEdition = types.CoreEdition
-	// DefaultEnvironment represents the default environment
-	DefaultEnvironment = "default"
-	// DefaultFormat represents the default format output when displaying objects
-	DefaultFormat = "tabular"
-	// DefaultOrganization represents the default organization
-	DefaultOrganization = "default"
-	// FormatTabular represents the string for tabular format
+
+	// DefaultNamespace represents the default namespace
+	DefaultNamespace = "default"
+
+	// DefaultFormat is the default format output for printers.
+	DefaultFormat = FormatTabular
+
+	// FormatTabular indicates tabular format for printers.
 	FormatTabular = "tabular"
-	// FormatJSON represents the string for JSON format
+
+	// FormatJSON indicates JSON format for printers.
 	FormatJSON = "json"
-	// FormatWrappedJSON represents the string for wrapped JSON format
+
+	// FormatWrappedJSON indicates wrapped JSON format for printers.
 	FormatWrappedJSON = "wrapped-json"
+
+	// FormatYAML indicates YAML format for printers. It has the same layout
+	// as wrapped JSON.
+	FormatYAML = "yaml"
 )
 
-// Config represents an abstracted configuration
+// Config is an abstract configuration
 type Config interface {
 	Read
 	Write
@@ -31,9 +38,8 @@ type Config interface {
 type Read interface {
 	APIUrl() string
 	Edition() string
-	Environment() string
 	Format() string
-	Organization() string
+	Namespace() string
 	Tokens() *types.Tokens
 }
 
@@ -41,8 +47,7 @@ type Read interface {
 type Write interface {
 	SaveAPIUrl(string) error
 	SaveEdition(string) error
-	SaveEnvironment(string) error
 	SaveFormat(string) error
-	SaveOrganization(string) error
+	SaveNamespace(string) error
 	SaveTokens(*types.Tokens) error
 }

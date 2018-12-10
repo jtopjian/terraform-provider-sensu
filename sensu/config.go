@@ -3,6 +3,8 @@ package sensu
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform/helper/schema"
+
 	"github.com/sensu/sensu-go/cli/client"
 	"github.com/sensu/sensu-go/cli/client/config"
 	"github.com/sensu/sensu-go/types"
@@ -22,11 +24,8 @@ type Config struct {
 	// edition is the sensu edition.
 	edition string
 
-	// environment is the sensu environment.
-	environment string
-
-	// organization is the sensu organization.
-	organization string
+	// namespace is the sensu namespace.
+	namespace string
 
 	// Tokens
 	tokens *types.Tokens
@@ -83,18 +82,18 @@ func (c *Config) SaveEdition(edition string) error {
 	return nil
 }
 
-// Environment implements the Environment method for the config.Config interface.
-func (c *Config) Environment() string {
-	if c.environment == "" {
-		return config.DefaultEnvironment
+// Namespace implements the Namespace method for the config.Config interface.
+func (c *Config) Namespace() string {
+	if c.namespace == "" {
+		return config.DefaultNamespace
 	}
 
-	return c.environment
+	return c.namespace
 }
 
-// SaveEnvironment implements the SaveEnvironment method for the config.Config interface.
-func (c *Config) SaveEnvironment(environment string) error {
-	c.environment = environment
+// SaveNamespace implements the SaveNamespace method for the config.Config interface.
+func (c *Config) SaveNamespace(namespace string) error {
+	c.namespace = namespace
 	return nil
 }
 
@@ -108,21 +107,6 @@ func (c *Config) SaveFormat(format string) error {
 	return nil
 }
 
-// Organization implements the Organization method for the config.Config interface.
-func (c *Config) Organization() string {
-	if c.organization == "" {
-		return config.DefaultOrganization
-	}
-
-	return c.organization
-}
-
-// SaveOrganization implements the SaveOrganization method for the config.Config interface.
-func (c *Config) SaveOrganization(organization string) error {
-	c.organization = organization
-	return nil
-}
-
 // Tokens implements the Tokens method for the config.Config interface.
 func (c *Config) Tokens() *types.Tokens {
 	return c.tokens
@@ -132,4 +116,13 @@ func (c *Config) Tokens() *types.Tokens {
 func (c *Config) SaveTokens(tokens *types.Tokens) error {
 	c.tokens = tokens
 	return nil
+}
+
+// determineNamespace will figure out the right namespace setting to use.
+func (c *Config) determineNamespace(d *schema.ResourceData) string {
+	if v, ok := d.Get("namespace").(string); ok && v != "" {
+		return v
+	}
+
+	return c.Namespace()
 }

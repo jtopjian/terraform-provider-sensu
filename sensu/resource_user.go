@@ -29,7 +29,7 @@ func resourceUser() *schema.Resource {
 			},
 
 			// Optional
-			"roles": &schema.Schema{
+			"groups": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -42,11 +42,11 @@ func resourceUserCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	name := d.Get("name").(string)
 
-	roles := expandStringList(d.Get("roles").([]interface{}))
+	groups := expandStringList(d.Get("groups").([]interface{}))
 	user := &types.User{
 		Username: name,
 		Password: d.Get("password").(string),
-		Roles:    roles,
+		Groups:   groups,
 	}
 
 	log.Printf("[DEBUG] Creating user %s: %#v", name, user)
@@ -75,7 +75,7 @@ func resourceUserRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved user %s: %#v", name, user)
 
 	d.Set("name", name)
-	d.Set("roles", user.Roles)
+	d.Set("groups", user.Groups)
 
 	return nil
 }
@@ -89,24 +89,24 @@ func resourceUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if d.HasChange("roles") {
-		o, n := d.GetChange("roles")
-		oldRoles := expandStringList(o.([]interface{}))
-		newRoles := expandStringList(n.([]interface{}))
+	if d.HasChange("groups") {
+		o, n := d.GetChange("groups")
+		oldGroups := expandStringList(o.([]interface{}))
+		newGroups := expandStringList(n.([]interface{}))
 
-		// first remove all old roles
-		for _, oldRole := range oldRoles {
-			err := config.client.RemoveRoleFromUser(name, oldRole)
+		// first remove all old groups
+		for _, oldGroup := range oldGroups {
+			err := config.client.RemoveGroupFromUser(name, oldGroup)
 			if err != nil {
-				return fmt.Errorf("Unable to remove role %s from user %s: %s", oldRole, name, err)
+				return fmt.Errorf("Unable to remove group %s from user %s: %s", oldGroup, name, err)
 			}
 		}
 
-		// next add all roles
-		for _, newRole := range newRoles {
-			err := config.client.AddRoleToUser(name, newRole)
+		// next add all groups
+		for _, newGroup := range newGroups {
+			err := config.client.AddGroupToUser(name, newGroup)
 			if err != nil {
-				return fmt.Errorf("Unable to add role %s to user %s: %s", newRole, name, err)
+				return fmt.Errorf("Unable to add group %s to user %s: %s", newGroup, name, err)
 			}
 		}
 	}

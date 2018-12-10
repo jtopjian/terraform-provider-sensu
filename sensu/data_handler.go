@@ -15,6 +15,9 @@ func dataSourceHandler() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"type": &schema.Schema{
 				Type:     schema.TypeString,
@@ -73,6 +76,7 @@ func dataSourceHandler() *schema.Resource {
 
 func dataSourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 
 	name := d.Get("name").(string)
 	handler, err := config.client.FetchHandler(name)
@@ -83,6 +87,7 @@ func dataSourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved handler %s: %#v", name, handler)
 
 	d.SetId(name)
+	d.Set("namespace", handler.ObjectMeta.Namespace)
 	d.Set("command", handler.Command)
 	d.Set("filters", handler.Filters)
 	d.Set("handlers", handler.Handlers)

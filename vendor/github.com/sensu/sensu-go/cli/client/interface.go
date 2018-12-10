@@ -10,8 +10,9 @@ type APIClient interface {
 	AuthenticationAPIClient
 	AssetAPIClient
 	CheckAPIClient
+	ClusterRoleAPIClient
+	ClusterRoleBindingAPIClient
 	EntityAPIClient
-	EnvironmentAPIClient
 	EventAPIClient
 	ExtensionAPIClient
 	FilterAPIClient
@@ -19,8 +20,9 @@ type APIClient interface {
 	HealthAPIClient
 	HookAPIClient
 	MutatorAPIClient
-	OrganizationAPIClient
+	NamespaceAPIClient
 	RoleAPIClient
+	RoleBindingAPIClient
 	UserAPIClient
 	SilencedAPIClient
 	GenericClient
@@ -62,6 +64,22 @@ type CheckAPIClient interface {
 	RemoveCheckHook(check *types.CheckConfig, checkHookType string, hookName string) error
 }
 
+// ClusterRoleAPIClient client methods for cluster roles
+type ClusterRoleAPIClient interface {
+	CreateClusterRole(*types.ClusterRole) error
+	DeleteClusterRole(string) error
+	FetchClusterRole(string) (*types.ClusterRole, error)
+	ListClusterRoles() ([]types.ClusterRole, error)
+}
+
+// ClusterRoleBindingAPIClient client methods for cluster role bindings
+type ClusterRoleBindingAPIClient interface {
+	CreateClusterRoleBinding(*types.ClusterRoleBinding) error
+	DeleteClusterRoleBinding(string) error
+	FetchClusterRoleBinding(string) (*types.ClusterRoleBinding, error)
+	ListClusterRoleBindings() ([]types.ClusterRoleBinding, error)
+}
+
 // EntityAPIClient client methods for entities
 type EntityAPIClient interface {
 	CreateEntity(entity *types.Entity) error
@@ -80,15 +98,6 @@ type FilterAPIClient interface {
 	UpdateFilter(*types.EventFilter) error
 }
 
-// EnvironmentAPIClient client methods for environments
-type EnvironmentAPIClient interface {
-	CreateEnvironment(string, *types.Environment) error
-	DeleteEnvironment(string, string) error
-	ListEnvironments(string) ([]types.Environment, error)
-	FetchEnvironment(string) (*types.Environment, error)
-	UpdateEnvironment(*types.Environment) error
-}
-
 // EventAPIClient client methods for events
 type EventAPIClient interface {
 	FetchEvent(string, string) (*types.Event, error)
@@ -96,14 +105,15 @@ type EventAPIClient interface {
 
 	// DeleteEvent deletes the event identified by entity, check.
 	DeleteEvent(entity, check string) error
+	UpdateEvent(*types.Event) error
 	ResolveEvent(*types.Event) error
 }
 
 // ExtensionAPIClient client methods for extensions
 type ExtensionAPIClient interface {
-	ListExtensions(org string) ([]types.Extension, error)
+	ListExtensions(namespace string) ([]types.Extension, error)
 	RegisterExtension(*types.Extension) error
-	DeregisterExtension(name, org string) error
+	DeregisterExtension(name, namespace string) error
 }
 
 // HandlerAPIClient client methods for handlers
@@ -117,7 +127,7 @@ type HandlerAPIClient interface {
 
 // HealthAPIClient client methods for health api
 type HealthAPIClient interface {
-	Health() ([]*types.ClusterHealth, error)
+	Health() (*types.HealthResponse, error)
 }
 
 // HookAPIClient client methods for hooks
@@ -138,35 +148,43 @@ type MutatorAPIClient interface {
 	UpdateMutator(*types.Mutator) error
 }
 
-// OrganizationAPIClient client methods for organizations
-type OrganizationAPIClient interface {
-	CreateOrganization(*types.Organization) error
-	UpdateOrganization(*types.Organization) error
-	DeleteOrganization(string) error
-	ListOrganizations() ([]types.Organization, error)
-	FetchOrganization(string) (*types.Organization, error)
+// NamespaceAPIClient client methods for namespaces
+type NamespaceAPIClient interface {
+	CreateNamespace(*types.Namespace) error
+	UpdateNamespace(*types.Namespace) error
+	DeleteNamespace(string) error
+	ListNamespaces() ([]types.Namespace, error)
+	FetchNamespace(string) (*types.Namespace, error)
 }
 
 // UserAPIClient client methods for users
 type UserAPIClient interface {
-	AddRoleToUser(string, string) error
+	AddGroupToUser(string, string) error
 	CreateUser(*types.User) error
 	DisableUser(string) error
+	FetchUser(string) (*types.User, error)
 	ListUsers() ([]types.User, error)
 	ReinstateUser(string) error
-	RemoveRoleFromUser(string, string) error
+	RemoveGroupFromUser(string, string) error
+	RemoveAllGroupsFromUser(string) error
+	SetGroupsForUser(string, []string) error
 	UpdatePassword(string, string) error
 }
 
-// RoleAPIClient client methods for role
+// RoleAPIClient client methods for roles
 type RoleAPIClient interface {
 	CreateRole(*types.Role) error
 	DeleteRole(string) error
 	FetchRole(string) (*types.Role, error)
-	ListRoles() ([]types.Role, error)
+	ListRoles(string) ([]types.Role, error)
+}
 
-	AddRule(role string, rule *types.Rule) error
-	RemoveRule(role string, ruleType string) error
+// RoleBindingAPIClient client methods for role bindings
+type RoleBindingAPIClient interface {
+	CreateRoleBinding(*types.RoleBinding) error
+	DeleteRoleBinding(string) error
+	FetchRoleBinding(string) (*types.RoleBinding, error)
+	ListRoleBindings(string) ([]types.RoleBinding, error)
 }
 
 // SilencedAPIClient client methods for silenced
@@ -179,7 +197,7 @@ type SilencedAPIClient interface {
 
 	// ListSilenceds lists all silenced entries, optionally constraining by
 	// subscription or check.
-	ListSilenceds(org, subscription, check string) ([]types.Silenced, error)
+	ListSilenceds(namespace, subscription, check string) ([]types.Silenced, error)
 
 	// FetchSilenced fetches the silenced entry by ID.
 	FetchSilenced(id string) (*types.Silenced, error)

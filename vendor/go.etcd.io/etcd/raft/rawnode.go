@@ -47,18 +47,15 @@ func (rn *RawNode) commitReady(rd Ready) {
 	if !IsEmptyHardState(rd.HardState) {
 		rn.prevHardSt = rd.HardState
 	}
-	if rn.prevHardSt.Commit != 0 {
-		// In most cases, prevHardSt and rd.HardState will be the same
-		// because when there are new entries to apply we just sent a
-		// HardState with an updated Commit value. However, on initial
-		// startup the two are different because we don't send a HardState
-		// until something changes, but we do send any un-applied but
-		// committed entries (and previously-committed entries may be
-		// incorporated into the snapshot, even if rd.CommittedEntries is
-		// empty). Therefore we mark all committed entries as applied
-		// whether they were included in rd.HardState or not.
-		rn.raft.raftLog.appliedTo(rn.prevHardSt.Commit)
+
+	// If entries were applied (or a snapshot), update our cursor for
+	// the next Ready. Note that if the current HardState contains a
+	// new Commit index, this does not mean that we're also applying
+	// all of the new entries due to commit pagination by size.
+	if index := rd.appliedCursor(); index > 0 {
+		rn.raft.raftLog.appliedTo(index)
 	}
+
 	if len(rd.Entries) > 0 {
 		e := rd.Entries[len(rd.Entries)-1]
 		rn.raft.raftLog.stableTo(e.Index, e.Term)
@@ -201,6 +198,7 @@ func (rn *RawNode) Step(m pb.Message) error {
 func (rn *RawNode) Ready() Ready {
 	rd := rn.newReady()
 	rn.raft.msgs = nil
+	rn.raft.reduceUncommittedSize(rd.CommittedEntries)
 	return rd
 }
 
@@ -236,6 +234,39 @@ func (rn *RawNode) Advance(rd Ready) {
 func (rn *RawNode) Status() *Status {
 	status := getStatus(rn.raft)
 	return &status
+}
+
+// StatusWithoutProgress returns a Status without populating the Progress field
+// (and returns the Status as a value to avoid forcing it onto the heap). This
+// is more performant if the Progress is not required. See WithProgress for an
+// allocation-free way to introspect the Progress.
+func (rn *RawNode) StatusWithoutProgress() Status {
+	return getStatusWithoutProgress(rn.raft)
+}
+
+// ProgressType indicates the type of replica a Progress corresponds to.
+type ProgressType byte
+
+const (
+	// ProgressTypePeer accompanies a Progress for a regular peer replica.
+	ProgressTypePeer ProgressType = iota
+	// ProgressTypeLearner accompanies a Progress for a learner replica.
+	ProgressTypeLearner
+)
+
+// WithProgress is a helper to introspect the Progress for this node and its
+// peers.
+func (rn *RawNode) WithProgress(visitor func(id uint64, typ ProgressType, pr Progress)) {
+	for id, pr := range rn.raft.prs {
+		pr := *pr
+		pr.ins = nil
+		visitor(id, ProgressTypePeer, pr)
+	}
+	for id, pr := range rn.raft.learnerPrs {
+		pr := *pr
+		pr.ins = nil
+		visitor(id, ProgressTypeLearner, pr)
+	}
 }
 
 // ReportUnreachable reports the given node is not reachable for the last send.

@@ -2,12 +2,12 @@
 
 Get information about a Sensu Asset.
 
-For full documentation on Sensu Hooks, see [here](https://docs.sensu.io/sensu-core/2.0/reference/assets).
+For full documentation on Sensu Hooks, see [here](https://docs.sensu.io/sensu-go/5.0/reference/assets).
 
 ## Basic Example
 
 ```hcl
-resource "sensu_asset" "asset_1" {
+data "sensu_asset" "asset_1" {
   name = "my_asset"
 }
 ```
@@ -16,12 +16,15 @@ resource "sensu_asset" "asset_1" {
 
 * `name` - *Required* - The name of the Sensu asset.
 
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
+
+
 ## Attribute Reference
 
-* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets/).
+* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
 
-* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets/).
+* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
 
-* `filter` - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets/).
-
-* `metadata` - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets/).
+* `filter` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).

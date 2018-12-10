@@ -18,9 +18,11 @@ func TestAccDataSourceRole_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"data.sensu_role.role_1", "name", "role_1"),
 					resource.TestCheckResourceAttr(
-						"data.sensu_role.role_1", "rule.#", "1"),
+						"data.sensu_role.role_1", "rule.#", "2"),
 					resource.TestCheckResourceAttr(
-						"data.sensu_role.role_1", "rule.0.type", "checks"),
+						"sensu_role.role_1", "rule.0.verbs.0", "*"),
+					resource.TestCheckResourceAttr(
+						"sensu_role.role_1", "rule.1.verbs.1", "list"),
 				),
 			},
 		},

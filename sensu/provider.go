@@ -28,16 +28,10 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("SENSU_PASSWORD", ""),
 			},
 
-			"environment": &schema.Schema{
+			"namespace": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SENSU_ENVIRONMENT", ""),
-			},
-
-			"organization": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SENSU_ORGANIZATION", ""),
+				DefaultFunc: schema.EnvDefaultFunc("SENSU_NAMESPACE", ""),
 			},
 
 			"edition": &schema.Schema{
@@ -51,26 +45,26 @@ func Provider() terraform.ResourceProvider {
 			"sensu_asset":        dataSourceAsset(),
 			"sensu_check":        dataSourceCheck(),
 			"sensu_entity":       dataSourceEntity(),
-			"sensu_environment":  dataSourceEnvironment(),
 			"sensu_filter":       dataSourceFilter(),
 			"sensu_handler":      dataSourceHandler(),
 			"sensu_hook":         dataSourceHook(),
 			"sensu_mutator":      dataSourceMutator(),
-			"sensu_organization": dataSourceOrganization(),
+			"sensu_namespace":    dataSourceNamespace(),
 			"sensu_role":         dataSourceRole(),
+			"sensu_role_binding": dataSourceRoleBinding(),
 			"sensu_user":         dataSourceUser(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"sensu_asset":        resourceAsset(),
 			"sensu_check":        resourceCheck(),
-			"sensu_environment":  resourceEnvironment(),
 			"sensu_filter":       resourceFilter(),
 			"sensu_handler":      resourceHandler(),
 			"sensu_hook":         resourceHook(),
 			"sensu_mutator":      resourceMutator(),
-			"sensu_organization": resourceOrganization(),
+			"sensu_namespace":    resourceNamespace(),
 			"sensu_role":         resourceRole(),
+			"sensu_role_binding": resourceRoleBinding(),
 			"sensu_user":         resourceUser(),
 		},
 
@@ -80,12 +74,11 @@ func Provider() terraform.ResourceProvider {
 
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		apiUrl:       d.Get("api_url").(string),
-		username:     d.Get("username").(string),
-		password:     d.Get("password").(string),
-		edition:      d.Get("edition").(string),
-		environment:  d.Get("environment").(string),
-		organization: d.Get("organization").(string),
+		apiUrl:    d.Get("api_url").(string),
+		username:  d.Get("username").(string),
+		password:  d.Get("password").(string),
+		edition:   d.Get("edition").(string),
+		namespace: d.Get("namespace").(string),
 	}
 
 	if err := config.LoadAndValidate(); err != nil {

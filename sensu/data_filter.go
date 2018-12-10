@@ -15,12 +15,16 @@ func dataSourceFilter() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
+			// Computed
 			"action": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"statements": &schema.Schema{
+			"expressions": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -33,6 +37,7 @@ func dataSourceFilter() *schema.Resource {
 
 func dataSourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	filter, err := config.client.FetchFilter(name)
@@ -43,8 +48,9 @@ func dataSourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved filter %s: %#v", name, filter)
 
 	d.Set("name", name)
+	d.Set("namespace", filter.ObjectMeta.Namespace)
 	d.Set("action", filter.Action)
-	d.Set("statements", filter.Statements)
+	d.Set("expressions", filter.Expressions)
 
 	when := flattenTimeWindows(filter.When)
 	if err := d.Set("when", when); err != nil {

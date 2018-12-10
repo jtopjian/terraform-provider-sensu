@@ -1,5 +1,13 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 TARGETS=darwin linux windows
+SENSU_VERSION=5.0.0
+
+docker:
+	rm -rf /var/lib/sensu
+	for i in $$(docker ps -q); do docker rm -f $$i; done
+	docker pull sensu/sensu:$(SENSU_VERSION)
+	docker run -v /var/lib/sensu:/var/lib/sensu -d --name sensu-backend -p 2380:2380 -p 3000:3000 -p 8080:8080 -p 8081:8081 sensu/sensu:$(SENSU_VERSION) sensu-backend start
+	docker run -v /var/lib/sensu:/var/lib/sensu -d --name sensu-agent sensu/sensu:$(SENSU_VERSION) sensu-agent start --backend-url ws://localhost:8081 --subscriptions webserver,system --cache-dir /var/lib/sensu
 
 testacc:
 	go test $(TEST) -v $(TESTARGS) -timeout 120m

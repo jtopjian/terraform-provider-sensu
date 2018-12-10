@@ -2,7 +2,7 @@
 
 Manages a Sensu Asset.
 
-For full documentation on Sensu Assets, see [here](https://docs.sensu.io/sensu-core/2.0/reference/assets).
+For full documentation on Sensu Assets, see [here](https://docs.sensu.io/sensu-go/5.0/reference/assets).
 
 _Note_: The Sensu API currently cannot delete Assets.
 
@@ -18,11 +18,6 @@ resource "sensu_asset" "asset_1" {
     "System.OS=='linux'",
     "System.Arch=='amd64'",
   ]
-
-  metadata {
-    Content-Type = "application/zip"
-    X-Intended-Distribution = "trusty-14"
-  }
 }
 ```
 
@@ -30,13 +25,15 @@ resource "sensu_asset" "asset_1" {
 
 * `name` - *Required* - The name of the Sensu asset.
 
-* `sha512` - *Required* - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets).
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
 
-* `url` - *Required* - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets).
+* `sha512` - *Required* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets).
 
-* `filters` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets).
+* `url` - *Required* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets).
 
-* `metadata` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-core/2.0/reference/assets).
+* `filters` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets).
 
 ## Attribute Reference
 

@@ -12,7 +12,6 @@ func resourceRole() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceRoleCreate,
 		Read:   resourceRoleRead,
-		Update: resourceRoleUpdate,
 		Delete: resourceRoleDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -23,6 +22,9 @@ func resourceRole() *schema.Resource {
 			"name": resourceNameSchema,
 
 			"rule": resourceRulesSchema,
+
+			// Optional
+			"namespace": resourceNamespaceSchema,
 		},
 	}
 }
@@ -34,7 +36,10 @@ func resourceRoleCreate(d *schema.ResourceData, meta interface{}) error {
 	rules := expandRules(d.Get("rule").([]interface{}))
 
 	role := &types.Role{
-		Name:  name,
+		ObjectMeta: types.ObjectMeta{
+			Name:      name,
+			Namespace: config.determineNamespace(d),
+		},
 		Rules: rules,
 	}
 
@@ -55,6 +60,7 @@ func resourceRoleCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceRoleRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	role, err := config.client.FetchRole(name)
@@ -67,47 +73,15 @@ func resourceRoleRead(d *schema.ResourceData, meta interface{}) error {
 	rules := flattenRules(role.Rules)
 
 	d.Set("name", name)
+	d.Set("namespace", role.ObjectMeta.Namespace)
 	d.Set("rule", rules)
 
 	return nil
 }
 
-func resourceRoleUpdate(d *schema.ResourceData, meta interface{}) error {
-	config := meta.(*Config)
-	name := d.Id()
-
-	_, err := config.client.FetchRole(name)
-	if err != nil {
-		return fmt.Errorf("Unable to retrieve role %s: %s", name, err)
-	}
-
-	if d.HasChange("rule") {
-		o, n := d.GetChange("rule")
-		oldRules := expandRules(o.([]interface{}))
-		newRules := expandRules(n.([]interface{}))
-
-		// first remove all old rules
-		for _, oldRule := range oldRules {
-			err := config.client.RemoveRule(name, oldRule.Type)
-			if err != nil {
-				return fmt.Errorf("Unable to remove rule %s from role %s: %s", oldRule.Type, name, err)
-			}
-		}
-
-		// next add all roles
-		for _, newRule := range newRules {
-			err := config.client.AddRule(name, &newRule)
-			if err != nil {
-				return fmt.Errorf("Unable to add rule %s to role %s: %s", newRule.Type, name, err)
-			}
-		}
-	}
-
-	return resourceRoleRead(d, meta)
-}
-
 func resourceRoleDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
 	_, err := config.client.FetchRole(name)

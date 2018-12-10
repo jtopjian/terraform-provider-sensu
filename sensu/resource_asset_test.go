@@ -47,11 +47,6 @@ const testAccResourceAsset_basic = `
       "System.OS=='linux'",
       "System.Arch=='amd64'",
     ]
-
-    metadata {
-      Content-Type = "application/zip"
-      X-Intended-Distribution = "trusty-14"
-    }
   }
 `
 
@@ -65,10 +60,5 @@ const testAccResourceAsset_update = `
       "System.OS=='linux'",
       "System.Arch=='amd64'",
     ]
-
-    metadata {
-      Content-Type = "application/zip"
-      X-Intended-Distribution = "xenial-16"
-    }
   }
 `

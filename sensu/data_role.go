@@ -15,6 +15,9 @@ func dataSourceRole() *schema.Resource {
 			// Required
 			"name": dataSourceNameSchema,
 
+			// Optional
+			"namespace": resourceNamespaceSchema,
+
 			// Computed
 			"rule": dataSourceRulesSchema,
 		},
@@ -23,6 +26,7 @@ func dataSourceRole() *schema.Resource {
 
 func dataSourceRoleRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Get("name").(string)
 
 	role, err := config.client.FetchRole(name)
@@ -34,7 +38,7 @@ func dataSourceRoleRead(d *schema.ResourceData, meta interface{}) error {
 
 	rules := flattenRules(role.Rules)
 
-	d.Set("name", name)
+	d.Set("namespace", role.ObjectMeta.Namespace)
 	d.Set("rule", rules)
 
 	d.SetId(name)

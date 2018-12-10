@@ -2,12 +2,11 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/url"
-	"path"
 
 	"github.com/sensu/sensu-go/types"
 )
+
+var silencedPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "silenced")
 
 // CreateSilenced creates a new silenced  entry.
 func (client *RestClient) CreateSilenced(silenced *types.Silenced) error {
@@ -16,7 +15,8 @@ func (client *RestClient) CreateSilenced(silenced *types.Silenced) error {
 		return err
 	}
 
-	res, err := client.R().SetBody(b).Post("/silenced")
+	path := silencedPath(silenced.Namespace)
+	res, err := client.R().SetBody(b).Post(path)
 	if err != nil {
 		return err
 	}
@@ -30,7 +30,8 @@ func (client *RestClient) CreateSilenced(silenced *types.Silenced) error {
 
 // DeleteSilenced deletes a silenced entry.
 func (client *RestClient) DeleteSilenced(id string) error {
-	res, err := client.R().Delete(fmt.Sprintf("/silenced/%s", url.PathEscape(id)))
+	path := silencedPath(client.config.Namespace(), id)
+	res, err := client.R().Delete(path)
 	if err != nil {
 		return err
 	}
@@ -41,25 +42,25 @@ func (client *RestClient) DeleteSilenced(id string) error {
 }
 
 // ListSilenceds fetches all silenced entries from configured Sensu instance
-func (client *RestClient) ListSilenceds(org, sub, check string) ([]types.Silenced, error) {
+func (client *RestClient) ListSilenceds(namespace, sub, check string) ([]types.Silenced, error) {
 	if sub != "" && check != "" {
-		id, err := types.SilencedID(sub, check)
+		name, err := types.SilencedName(sub, check)
 		if err != nil {
 			return nil, err
 		}
-		silenced, err := client.FetchSilenced(id)
+		silenced, err := client.FetchSilenced(name)
 		if err != nil {
 			return nil, err
 		}
 		return []types.Silenced{*silenced}, nil
 	}
-	endpoint := "/silenced"
+	path := silencedPath(namespace)
 	if sub != "" {
-		endpoint = path.Join(endpoint, "subscriptions", url.PathEscape(sub))
+		path = silencedPath(namespace, "subscriptions", sub)
 	} else if check != "" {
-		endpoint = path.Join(endpoint, "checks", url.PathEscape(check))
+		path = silencedPath(namespace, "checks", check)
 	}
-	resp, err := client.R().SetQueryParam("org", org).Get(endpoint)
+	resp, err := client.R().Get(path)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +74,9 @@ func (client *RestClient) ListSilenceds(org, sub, check string) ([]types.Silence
 }
 
 // FetchSilenced fetches a silenced entry from configured Sensu instance
-func (client *RestClient) FetchSilenced(id string) (*types.Silenced, error) {
-	resp, err := client.R().Get(path.Join("/silenced", url.PathEscape(id)))
+func (client *RestClient) FetchSilenced(name string) (*types.Silenced, error) {
+	path := silencedPath(client.config.Namespace(), name)
+	resp, err := client.R().Get(path)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +93,8 @@ func (client *RestClient) UpdateSilenced(s *types.Silenced) error {
 	if err != nil {
 		return err
 	}
-	resp, err := client.R().SetBody(b).Put(path.Join("/silenced", url.PathEscape(s.ID)))
+	path := silencedPath(s.Namespace, s.Name)
+	resp, err := client.R().SetBody(b).Put(path)
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,7 @@
 
 Manages a Sensu Handler.
 
-For full documentation on Sensu Handlers, see [here](https://docs.sensu.io/sensu-core/2.0/reference/handlers).
+For full documentation on Sensu Handlers, see [here](https://docs.sensu.io/sensu-go/5.0/reference/handlers).
 
 ## Basic Example
 
@@ -18,21 +18,25 @@ resource "sensu_handler" "handler_1" {
 
 * `name` - *Required* - The name of the Sensu handler.
 
-* `type` - *Required* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
 
-* `command` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `type` - *Required* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
-* `env_vars` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `command` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
-* `filters` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `env_vars` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
-* `handlers` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `filters` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
-* `mutator` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `handlers` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
-* `socket` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `mutator` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
-* `timeout` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-core/2.0/reference/handlers/#handler-attributes).
+* `socket` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
+
+* `timeout` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
 ### socket
 

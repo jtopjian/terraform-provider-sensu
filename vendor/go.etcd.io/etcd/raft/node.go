@@ -109,6 +109,19 @@ func (rd Ready) containsUpdates() bool {
 		len(rd.CommittedEntries) > 0 || len(rd.Messages) > 0 || len(rd.ReadStates) != 0
 }
 
+// appliedCursor extracts from the Ready the highest index the client has
+// applied (once the Ready is confirmed via Advance). If no information is
+// contained in the Ready, returns zero.
+func (rd Ready) appliedCursor() uint64 {
+	if n := len(rd.CommittedEntries); n > 0 {
+		return rd.CommittedEntries[n-1].Index
+	}
+	if index := rd.Snapshot.Metadata.Index; index > 0 {
+		return index
+	}
+	return 0
+}
+
 // Node represents a node in a raft cluster.
 type Node interface {
 	// Tick increments the internal logical clock for the Node by a single tick. Election
@@ -116,7 +129,8 @@ type Node interface {
 	Tick()
 	// Campaign causes the Node to transition to candidate state and start campaigning to become leader.
 	Campaign(ctx context.Context) error
-	// Propose proposes that data be appended to the log.
+	// Propose proposes that data be appended to the log. Note that proposals can be lost without
+	// notice, therefore it is user's job to ensure proposal retries.
 	Propose(ctx context.Context, data []byte) error
 	// ProposeConfChange proposes config change.
 	// At most one ConfChange can be in the process of going through consensus.
@@ -161,7 +175,16 @@ type Node interface {
 	Status() Status
 	// ReportUnreachable reports the given node is not reachable for the last send.
 	ReportUnreachable(id uint64)
-	// ReportSnapshot reports the status of the sent snapshot.
+	// ReportSnapshot reports the status of the sent snapshot. The id is the raft ID of the follower
+	// who is meant to receive the snapshot, and the status is SnapshotFinish or SnapshotFailure.
+	// Calling ReportSnapshot with SnapshotFinish is a no-op. But, any failure in applying a
+	// snapshot (for e.g., while streaming it from leader to follower), should be reported to the
+	// leader with SnapshotFailure. When leader sends a snapshot to a follower, it pauses any raft
+	// log probes until the follower can apply the snapshot and advance its state. If the follower
+	// can't do that, for e.g., due to a crash, it could end up in a limbo, never getting any
+	// updates from the leader. Therefore, it is crucial that the application ensures that any
+	// failure in snapshot sending is caught and reported back to the leader; so it can resume raft
+	// log probing in the follower.
 	ReportSnapshot(id uint64, status SnapshotStatus)
 	// Stop performs any necessary termination of the Node.
 	Stop()
@@ -282,6 +305,7 @@ func (n *node) run(r *raft) {
 	var prevLastUnstablei, prevLastUnstablet uint64
 	var havePrevLastUnstablei bool
 	var prevSnapi uint64
+	var applyingToI uint64
 	var rd Ready
 
 	lead := None
@@ -381,13 +405,18 @@ func (n *node) run(r *raft) {
 			if !IsEmptySnap(rd.Snapshot) {
 				prevSnapi = rd.Snapshot.Metadata.Index
 			}
+			if index := rd.appliedCursor(); index != 0 {
+				applyingToI = index
+			}
 
 			r.msgs = nil
 			r.readStates = nil
+			r.reduceUncommittedSize(rd.CommittedEntries)
 			advancec = n.advancec
 		case <-advancec:
-			if prevHardSt.Commit != 0 {
-				r.raftLog.appliedTo(prevHardSt.Commit)
+			if applyingToI != 0 {
+				r.raftLog.appliedTo(applyingToI)
+				applyingToI = 0
 			}
 			if havePrevLastUnstablei {
 				r.raftLog.stableTo(prevLastUnstablei, prevLastUnstablet)
@@ -559,15 +588,6 @@ func newReady(r *raft, prevSoftSt *SoftState, prevHardSt pb.HardState) Ready {
 	}
 	if hardSt := r.hardState(); !isHardStateEqual(hardSt, prevHardSt) {
 		rd.HardState = hardSt
-		// If we hit a size limit when loadaing CommittedEntries, clamp
-		// our HardState.Commit to what we're actually returning. This is
-		// also used as our cursor to resume for the next Ready batch.
-		if len(rd.CommittedEntries) > 0 {
-			lastCommit := rd.CommittedEntries[len(rd.CommittedEntries)-1]
-			if rd.HardState.Commit > lastCommit.Index {
-				rd.HardState.Commit = lastCommit.Index
-			}
-		}
 	}
 	if r.raftLog.unstable.snapshot != nil {
 		rd.Snapshot = *r.raftLog.unstable.snapshot
@@ -575,7 +595,7 @@ func newReady(r *raft, prevSoftSt *SoftState, prevHardSt pb.HardState) Ready {
 	if len(r.readStates) != 0 {
 		rd.ReadStates = r.readStates
 	}
-	rd.MustSync = MustSync(rd.HardState, prevHardSt, len(rd.Entries))
+	rd.MustSync = MustSync(r.hardState(), prevHardSt, len(rd.Entries))
 	return rd
 }
 
