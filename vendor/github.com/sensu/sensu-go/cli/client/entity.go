@@ -2,27 +2,31 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/sensu/sensu-go/types"
 )
 
+var entitiesPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "entities")
+
 // DeleteEntity deletes given entitiy from the configured sensu instance
 func (client *RestClient) DeleteEntity(entity *types.Entity) (err error) {
-	_, err = client.R().Delete("/entities/" + entity.ID)
+	path := entitiesPath(client.config.Namespace(), entity.Name)
+	_, err = client.R().Delete(path)
 	return err
 }
 
 // FetchEntity fetches a specific entity
-func (client *RestClient) FetchEntity(ID string) (*types.Entity, error) {
+func (client *RestClient) FetchEntity(name string) (*types.Entity, error) {
 	var entity *types.Entity
-	res, err := client.R().Get("/entities/" + ID)
+
+	path := entitiesPath(client.config.Namespace(), name)
+	res, err := client.R().Get(path)
 	if err != nil {
 		return entity, err
 	}
 
 	if res.StatusCode() >= 400 {
-		return entity, fmt.Errorf("%v", res.String())
+		return entity, UnmarshalError(res)
 	}
 
 	err = json.Unmarshal(res.Body(), &entity)
@@ -33,13 +37,14 @@ func (client *RestClient) FetchEntity(ID string) (*types.Entity, error) {
 func (client *RestClient) ListEntities(namespace string) ([]types.Entity, error) {
 	var entities []types.Entity
 
-	res, err := client.R().Get("/entities?namespace=" + namespace)
+	path := entitiesPath(namespace)
+	res, err := client.R().Get(path)
 	if err != nil {
 		return entities, err
 	}
 
 	if res.StatusCode() >= 400 {
-		return entities, fmt.Errorf("%v", res.String())
+		return entities, UnmarshalError(res)
 	}
 
 	err = json.Unmarshal(res.Body(), &entities)
@@ -53,7 +58,8 @@ func (client *RestClient) UpdateEntity(entity *types.Entity) (err error) {
 		return err
 	}
 
-	res, err := client.R().SetBody(bytes).Put("/entities/" + entity.ID)
+	path := entitiesPath(entity.Namespace, entity.Name)
+	res, err := client.R().SetBody(bytes).Put(path)
 	if err != nil {
 		return err
 	}
@@ -72,7 +78,8 @@ func (client *RestClient) CreateEntity(entity *types.Entity) (err error) {
 		return err
 	}
 
-	res, err := client.R().SetBody(bytes).Post("/entities")
+	path := entitiesPath(entity.Namespace)
+	res, err := client.R().SetBody(bytes).Post(path)
 	if err != nil {
 		return err
 	}

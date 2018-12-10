@@ -1,9 +1,9 @@
 package client
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/go-resty/resty"
@@ -47,16 +47,6 @@ func New(config config.Config) *RestClient {
 
 	// Check that Access-Token has not expired
 	restyInst.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
-		// Pass the namespace as query parameter, except when we are creating or
-		// updating an object, since we will use the object attributes to determine
-		// the namespace
-		if r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodPatch {
-
-			if param := r.QueryParam.Get("namespace"); param == "" {
-				r.SetQueryParam("namespace", config.Namespace())
-			}
-		}
-
 		// Guard against requests that are not sending auth details
 		if c.Token == "" || r.UserInfo != nil {
 			return nil
@@ -144,6 +134,11 @@ func (client *RestClient) R() *resty.Request {
 	request := client.resty.R()
 
 	return request
+}
+
+// SetTLSClientConfig assigns client TLS config
+func (client *RestClient) SetTLSClientConfig(c *tls.Config) {
+	client.resty.SetTLSClientConfig(c)
 }
 
 // Reset client so that it reconfigure on next request
