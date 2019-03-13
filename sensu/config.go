@@ -67,21 +67,6 @@ func (c *Config) SaveAPIUrl(url string) error {
 	return nil
 }
 
-// Edition implements the Edition method for the config.Config interface.
-func (c *Config) Edition() string {
-	if c.edition == "" {
-		return config.DefaultEdition
-	}
-
-	return c.edition
-}
-
-// SaveEdition implements the SaveEdition method for the config.Config interface.
-func (c *Config) SaveEdition(edition string) error {
-	c.edition = edition
-	return nil
-}
-
 // Namespace implements the Namespace method for the config.Config interface.
 func (c *Config) Namespace() string {
 	if c.namespace == "" {
