@@ -121,8 +121,8 @@ const testAccResourceHandler_basicPipe = `
     type = "pipe"
     command = "/bin/foo"
 
-		env_vars {
-			"FOO" = "bar"
+		env_vars = {
+			FOO = "bar"
 		}
   }
 `
