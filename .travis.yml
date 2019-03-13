@@ -13,7 +13,7 @@ env:
     - SENSU_ENVIRONMENT=default
     - SENSU_ORGANIZATION=default
   matrix:
-    - SENSU_VERSION="5.0.0"
+    - SENSU_VERSION="5.3.0"
     - SENSU_VERSION="master"
 
 go:
@@ -47,4 +47,4 @@ deploy:
   on:
     repo: jtopjian/terraform-provider-sensu
     tags: true
-    condition: $SENSU_VERSION = "5.3.0"
+    condition: $SENSU_VERSION != "master"
