@@ -42,8 +42,8 @@ const testAccResourceMutator_basic = `
     name = "mutator_1"
     command = "/bin/foo"
 
-    env_vars {
-      "FOO" = "bar"
+    env_vars = {
+      FOO = "bar"
     }
   }
 `
@@ -53,8 +53,8 @@ const testAccResourceMutator_update = `
     name = "mutator_1"
     command = "/bin/foo2"
 
-    env_vars {
-      "FOO" = "baz"
+    env_vars = {
+      FOO = "baz"
     }
  }
 `
