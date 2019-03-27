@@ -32,6 +32,8 @@ data "sensu_handler" "handler_1" {
 
 * `handlers` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
+* `runtime_assets` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
+
 * `mutator` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
 * `socket` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).

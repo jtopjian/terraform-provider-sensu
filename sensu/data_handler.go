@@ -43,6 +43,12 @@ func dataSourceHandler() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
+			"runtime_assets": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
 			"mutator": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -91,6 +97,7 @@ func dataSourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("command", handler.Command)
 	d.Set("filters", handler.Filters)
 	d.Set("handlers", handler.Handlers)
+	d.Set("runtime_assets", handler.RuntimeAssets)
 	d.Set("mutator", handler.Mutator)
 	d.Set("timeout", handler.Timeout)
 	d.Set("type", handler.Type)

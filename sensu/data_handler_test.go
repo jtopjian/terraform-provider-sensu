@@ -61,6 +61,24 @@ func TestAccDataSourceHandler_basicSet(t *testing.T) {
 	})
 }
 
+func TestAccDataSourceHandler_runtimeAssets(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccDataSourceHandler_runtimeAssets,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"data.sensu_handler.handler_1", "name", "handler_1"),
+					resource.TestCheckResourceAttr(
+						"data.sensu_handler.handler_1", "runtime_assets.#", "1"),
+				),
+			},
+		},
+	})
+}
+
 var testAccDataSourceHandler_basicPipe = fmt.Sprintf(`
   %s
 
@@ -84,3 +102,11 @@ var testAccDataSourceHandler_basicSet = fmt.Sprintf(`
     name = "${sensu_handler.handler_1.name}"
   }
 `, testAccResourceHandler_basicSet)
+
+var testAccDataSourceHandler_runtimeAssets = fmt.Sprintf(`
+  %s
+
+  data "sensu_handler" "handler_1" {
+    name = "${sensu_handler.handler_1.name}"
+  }
+`, testAccResourceHandler_runtimeAssets_1)
