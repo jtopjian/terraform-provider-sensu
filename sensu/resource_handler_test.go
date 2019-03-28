@@ -1,6 +1,7 @@
 package sensu
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -87,6 +88,33 @@ func TestAccResourceHandler_basicSet(t *testing.T) {
 	})
 }
 
+func TestAccResourceHandler_runtimeAssets(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceHandler_runtimeAssets_1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "name", "handler_1"),
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "runtime_assets.#", "1"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceHandler_runtimeAssets_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "name", "handler_1"),
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "runtime_assets.#", "0"),
+				),
+			},
+		},
+	})
+}
+
 const testAccResourceHandler_basicPipe = `
   resource "sensu_handler" "handler_1" {
     name = "handler_1"
@@ -153,3 +181,27 @@ const testAccResourceHandler_updateSet = `
     ]
   }
 `
+
+var testAccResourceHandler_runtimeAssets_1 = fmt.Sprintf(`
+  %s
+
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+
+    runtime_assets = [
+      "${sensu_asset.asset_1.name}"
+		]
+  }
+`, testAccResourceAsset_basic)
+
+var testAccResourceHandler_runtimeAssets_2 = fmt.Sprintf(`
+  %s
+
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+  }
+`, testAccResourceAsset_basic)

@@ -32,6 +32,8 @@ resource "sensu_handler" "handler_1" {
 
 * `handlers` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
+* `runtime_assets` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
+
 * `mutator` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
 
 * `socket` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/5.0/reference/handlers/#handler-attributes).
@@ -45,6 +47,7 @@ The `socket` block supports:
 * `host` - *Required* The host to connect to.
 
 * `port` - *Required* The port to connect to.
+
 ## Attribute Reference
 
 The resource has no computed fields.

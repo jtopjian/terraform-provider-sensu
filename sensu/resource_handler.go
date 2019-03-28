@@ -52,6 +52,12 @@ func resourceHandler() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
+			"runtime_assets": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
 			"mutator": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -96,6 +102,7 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 	// standard string lists
 	filters := expandStringList(d.Get("filters").([]interface{}))
 	handlers := expandStringList(d.Get("handlers").([]interface{}))
+	runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
 
 	// detailed structures
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
@@ -105,13 +112,14 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 			Name:      name,
 			Namespace: config.determineNamespace(d),
 		},
-		Command:  d.Get("command").(string),
-		EnvVars:  envVars,
-		Handlers: handlers,
-		Filters:  filters,
-		Mutator:  d.Get("mutator").(string),
-		Timeout:  uint32(d.Get("timeout").(int)),
-		Type:     d.Get("type").(string),
+		Command:       d.Get("command").(string),
+		EnvVars:       envVars,
+		Handlers:      handlers,
+		RuntimeAssets: runtimeAssets,
+		Filters:       filters,
+		Mutator:       d.Get("mutator").(string),
+		Timeout:       uint32(d.Get("timeout").(int)),
+		Type:          d.Get("type").(string),
 	}
 
 	if v, ok := d.GetOk("socket"); ok {
@@ -150,6 +158,7 @@ func resourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("command", handler.Command)
 	d.Set("filters", handler.Filters)
 	d.Set("handlers", handler.Handlers)
+	d.Set("runtime_assets", handler.RuntimeAssets)
 	d.Set("mutator", handler.Mutator)
 	d.Set("timeout", handler.Timeout)
 	d.Set("type", handler.Type)
@@ -194,6 +203,11 @@ func resourceHandlerUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("handlers") {
 		handlers := expandStringList(d.Get("handlers").([]interface{}))
 		handler.Handlers = handlers
+	}
+
+	if d.HasChange("runtime_assets") {
+		runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
+		handler.RuntimeAssets = runtimeAssets
 	}
 
 	if d.HasChange("mutator") {
