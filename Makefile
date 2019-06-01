@@ -38,5 +38,5 @@ vet:
 targets: $(TARGETS)
 
 $(TARGETS):
-	GOOS=$@ GOARCH=amd64 go build -o "dist/$@/terraform-provider-sensu_${TRAVIS_TAG}_x4"
+	CGO_ENABLED=0 GOOS=$@ GOARCH=amd64 go build -o "dist/$@/terraform-provider-sensu_${TRAVIS_TAG}_x4"
 	zip -j dist/terraform-provider-sensu_${TRAVIS_TAG}_$@_amd64.zip dist/$@/terraform-provider-sensu_${TRAVIS_TAG}_x4
