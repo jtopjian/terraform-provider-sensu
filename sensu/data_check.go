@@ -23,6 +23,16 @@ func dataSourceCheck() *schema.Resource {
 				Computed: true,
 			},
 
+			"annotations": &schema.Schema{
+				Type:     schema.TypeMap,
+				Computed: true,
+			},
+
+			"labels": &schema.Schema{
+				Type:     schema.TypeMap,
+				Computed: true,
+			},
+
 			"cron": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -166,6 +176,8 @@ func dataSourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(check.Name)
 	d.Set("namespace", check.ObjectMeta.Namespace)
 	d.Set("command", check.Command)
+	d.Set("annotations", check.ObjectMeta.Annotations)
+	d.Set("labels", check.ObjectMeta.Labels)
 	d.Set("cron", check.Cron)
 	d.Set("high_flap_threshold", check.HighFlapThreshold)
 	d.Set("interval", check.Interval)

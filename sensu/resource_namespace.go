@@ -53,7 +53,12 @@ func resourceNamespaceRead(d *schema.ResourceData, meta interface{}) error {
 
 	namespace, err := config.client.FetchNamespace(name)
 	if err != nil {
-		return fmt.Errorf("Unable to retrieve namespace %s: %s", name, err)
+		if err.Error() == "not found" {
+			d.SetId("")
+			return nil
+		} else {
+			return fmt.Errorf("Unable to retrieve namespace %s: %s", name, err)
+		}
 	}
 
 	log.Printf("[DEBUG] Retrieved namespace %s: %#v", name, namespace)
