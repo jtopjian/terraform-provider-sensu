@@ -15,8 +15,11 @@ resource "sensu_user" "user_1" {
   name = "my_user"
   password = "abcd1234"
   groups = ["admin"]
+  disabled = false
 }
 ```
+
+_Note_: if user already exist, it will be re-enabled and updated with resource data.
 
 ## Argument Reference
 
@@ -25,6 +28,8 @@ resource "sensu_user" "user_1" {
 * `password` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
 
 * `groups` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
+
+* `disabled` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
 
 ## Attribute Reference
 

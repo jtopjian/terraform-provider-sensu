@@ -22,6 +22,8 @@ func TestAccResourceUser_basic(t *testing.T) {
 						"sensu_user.user_1", "name", username),
 					resource.TestCheckResourceAttr(
 						"sensu_user.user_1", "groups.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_user.user_1", "disabled", "false"),
 				),
 			},
 			resource.TestStep{
@@ -31,6 +33,8 @@ func TestAccResourceUser_basic(t *testing.T) {
 						"sensu_user.user_1", "name", username),
 					resource.TestCheckResourceAttr(
 						"sensu_user.user_1", "groups.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_user.user_1", "disabled", "false"),
 				),
 			},
 		},
@@ -62,12 +66,31 @@ func TestAccResourceUser_password(t *testing.T) {
 	})
 }
 
+func TestAccResourceUser_disabled(t *testing.T) {
+	username := acctest.RandomWithPrefix("sensu-acctest")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceUser_disabled(username),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_user.user_1", "name", username),
+				),
+			},
+		},
+	})
+}
+
 func testAccResourceUser_basic(username string) string {
 	return fmt.Sprintf(`
 		resource "sensu_user" "user_1" {
 			name = "%s"
 			password = "abcd1234"
 			groups = ["admin"]
+			disabled = "false"
 		}
 	`, username)
 }
@@ -78,6 +101,7 @@ func testAccResourceUser_update(username string) string {
 			name = "%s"
 			password = "abcd1234"
 			groups = ["admin", "read-only"]
+			disabled = "false"
 		}
 	`, username)
 }
@@ -98,6 +122,17 @@ func testAccResourceUser_password_2(username string) string {
 			name = "%s"
 			password = "1234abcd"
 			groups = ["admin"]
+		}
+	`, username)
+}
+
+func testAccResourceUser_disabled(username string) string {
+	return fmt.Sprintf(`
+		resource "sensu_user" "user_1" {
+			name = "%s"
+			password = "1234abcd"
+			groups = ["admin"]
+			disabled = "true"
 		}
 	`, username)
 }

@@ -20,6 +20,8 @@ func TestAccDataSourceUser_basic(t *testing.T) {
 						"data.sensu_user.user_1", "groups.#", "1"),
 					resource.TestCheckResourceAttr(
 						"data.sensu_user.user_1", "groups.0", "cluster-admins"),
+					resource.TestCheckResourceAttr(
+						"data.sensu_user.user_1", "disabled", "false"),
 				),
 			},
 		},
