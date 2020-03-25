@@ -383,11 +383,11 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("annotations") {
-		check.ObjectMeta.Annotations = d.Get("annotations").(map[string]string)
+		check.ObjectMeta.Annotations = expandAnnotations(d.Get("annotations").(map[string]interface{}))
 	}
 
 	if d.HasChange("labels") {
-		check.ObjectMeta.Labels = d.Get("labels").(map[string]string)
+		check.ObjectMeta.Labels = expandLabels(d.Get("labels").(map[string]interface{}))
 	}
 
 	if d.HasChange("high_flap_threshold") {
