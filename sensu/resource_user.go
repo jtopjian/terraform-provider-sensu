@@ -98,48 +98,7 @@ func resourceUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if d.HasChange("groups") {
-		o, n := d.GetChange("groups")
-		oldGroups := expandStringList(o.([]interface{}))
-		newGroups := expandStringList(n.([]interface{}))
-
-		// first remove all old groups
-		for _, oldGroup := range oldGroups {
-			err := config.client.RemoveGroupFromUser(name, oldGroup)
-			if err != nil {
-				return fmt.Errorf("Unable to remove group %s from user %s: %s", oldGroup, name, err)
-			}
-		}
-
-		// next add all groups
-		for _, newGroup := range newGroups {
-			err := config.client.AddGroupToUser(name, newGroup)
-			if err != nil {
-				return fmt.Errorf("Unable to add group %s to user %s: %s", newGroup, name, err)
-			}
-		}
-	}
-
-	if d.HasChange("password") {
-		password := d.Get("password").(string)
-		if err := config.client.UpdatePassword(name, password); err != nil {
-			return fmt.Errorf("Unable to update password for user %s: %s", name, err)
-		}
-	}
-
-
-	if d.HasChange("disabled") {
-		disabled := d.Get("disabled").(bool)
-		if disabled {
-			if err := config.client.DisableUser(name); err != nil {
-				return fmt.Errorf("Unable to disable user %s: %s", name, err)
-			}
-		} else {
-			if err := config.client.ReinstateUser(name); err != nil {
-				return fmt.Errorf("Unable to reinstate user %s: %s", name, err)
-			}
-		}
-	}
+	updateUser(d, meta)
 
 	return resourceUserRead(d, meta)
 }
@@ -188,42 +147,48 @@ func updateUser(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	name := d.Id()
 
-	o, n := d.GetChange("groups")
-	oldGroups := expandStringList(o.([]interface{}))
-	newGroups := expandStringList(n.([]interface{}))
+	if d.HasChange("groups") {
+		o, n := d.GetChange("groups")
+		oldGroups := expandStringList(o.([]interface{}))
+		newGroups := expandStringList(n.([]interface{}))
 
-	// first remove all old groups
-	for _, oldGroup := range oldGroups {
-		err := config.client.RemoveGroupFromUser(name, oldGroup)
-		if err != nil {
-			return fmt.Errorf("Unable to remove group %s from user %s: %s", oldGroup, name, err)
+		// first remove all old groups
+		for _, oldGroup := range oldGroups {
+			err := config.client.RemoveGroupFromUser(name, oldGroup)
+			if err != nil {
+				return fmt.Errorf("Unable to remove group %s from user %s: %s", oldGroup, name, err)
+			}
+		}
+
+		// next add all groups
+		for _, newGroup := range newGroups {
+			err := config.client.AddGroupToUser(name, newGroup)
+			if err != nil {
+				return fmt.Errorf("Unable to add group %s to user %s: %s", newGroup, name, err)
+			}
 		}
 	}
 
-	// next add all groups
-	for _, newGroup := range newGroups {
-		err := config.client.AddGroupToUser(name, newGroup)
-		if err != nil {
-			return fmt.Errorf("Unable to add group %s to user %s: %s", newGroup, name, err)
+	if d.HasChange("password") {
+		password := d.Get("password").(string)
+		if err := config.client.UpdatePassword(name, password); err != nil {
+			return fmt.Errorf("Unable to update password for user %s: %s", name, err)
 		}
 	}
 
-	password := d.Get("password").(string)
-	if err := config.client.UpdatePassword(name, password); err != nil {
-		return fmt.Errorf("Unable to update password for user %s: %s", name, err)
-	}
 
-
-	disabled := d.Get("disabled").(bool)
-	if disabled {
-		if err := config.client.DisableUser(name); err != nil {
-			return fmt.Errorf("Unable to disable user %s: %s", name, err)
-		}
-	} else {
-		if err := config.client.ReinstateUser(name); err != nil {
-			return fmt.Errorf("Unable to reinstate user %s: %s", name, err)
+	if d.HasChange("disabled") {
+		disabled := d.Get("disabled").(bool)
+		if disabled {
+			if err := config.client.DisableUser(name); err != nil {
+				return fmt.Errorf("Unable to disable user %s: %s", name, err)
+			}
+		} else {
+			if err := config.client.ReinstateUser(name); err != nil {
+				return fmt.Errorf("Unable to reinstate user %s: %s", name, err)
+			}
 		}
 	}
 
-	return resourceUserRead(d, meta)
+	return nil
 }

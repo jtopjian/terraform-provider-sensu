@@ -20,6 +20,11 @@ func dataSourceUser() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+
+			"disabled": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -36,6 +41,7 @@ func dataSourceUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("name", name)
 	d.Set("groups", user.Groups)
+	d.Set("disabled", user.Disabled)
 
 	d.SetId(name)
 
