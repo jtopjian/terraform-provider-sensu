@@ -125,6 +125,45 @@ func TestAccResourceCheck_hook(t *testing.T) {
 	})
 }
 
+
+func TestAccResourceCheck_labels(t *testing.T) {
+  resource.Test(t, resource.TestCase{
+    PreCheck:  func() { testAccPreCheck(t) },
+    Providers: testAccProviders,
+    Steps: []resource.TestStep{
+      resource.TestStep{
+        Config: testAccResourceCheck_labels,
+        Check: resource.ComposeTestCheckFunc(
+          resource.TestCheckResourceAttr(
+            "sensu_check.check_1", "labels.label1", "test1"),
+          resource.TestCheckResourceAttr(
+            "sensu_check.check_1",  "labels.label2", "test2"),
+        ),
+      },
+    },
+  })
+}
+
+func TestAccResourceCheck_annotations(t *testing.T) {
+  resource.Test(t, resource.TestCase{
+    PreCheck:  func() { testAccPreCheck(t) },
+    Providers: testAccProviders,
+    Steps: []resource.TestStep{
+      resource.TestStep{
+        Config: testAccResourceCheck_annotations,
+        Check: resource.ComposeTestCheckFunc(
+          resource.TestCheckResourceAttr(
+            "sensu_check.check_1", "annotations.annotation1", "test1"),
+          resource.TestCheckResourceAttr(
+            "sensu_check.check_1",  "annotations.annotation2", "test2"),
+        ),
+      },
+    },
+  })
+}
+
+
+
 const testAccResourceCheck_basic = `
   resource "sensu_check" "check_1" {
     name = "check_1"
@@ -269,6 +308,40 @@ const testAccResourceCheck_hook = `
     check_hook {
       hook = "${sensu_hook.hook_2.name}"
       trigger = "non-zero"
+    }
+  }
+`
+
+const testAccResourceCheck_labels = `
+  resource "sensu_check" "check_1" {
+    name = "check_1"
+    command = "/bin/foo"
+    interval = 60000
+    subscriptions = [
+      "foo",
+      "bar",
+    ]
+
+    labels = {
+      label1 = "test1"
+      label2 = "test2"
+    }
+  }
+`
+
+const testAccResourceCheck_annotations = `
+  resource "sensu_check" "check_1" {
+    name = "check_1"
+    command = "/bin/foo"
+    interval = 60000
+    subscriptions = [
+      "foo",
+      "bar",
+    ]
+
+    annotations = {
+      annotation1 = "test1"
+      annotation2 = "test2"
     }
   }
 `
