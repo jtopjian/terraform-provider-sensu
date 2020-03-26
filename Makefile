@@ -1,6 +1,6 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 TARGETS=darwin linux windows
-SENSU_VERSION=5.3.0
+SENSU_VERSION=5.18.1
 
 docker:
 	rm -rf /var/lib/sensu
