@@ -3,7 +3,7 @@ package sensu
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 func TestAccImportHook_basic(t *testing.T) {
