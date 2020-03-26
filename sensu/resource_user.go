@@ -54,6 +54,7 @@ func resourceUserCreate(d *schema.ResourceData, meta interface{}) error {
 			Username: name,
 			Password: d.Get("password").(string),
 			Groups:   groups,
+			Disabled: d.Get("disabled").(bool),
 		}
 
 		log.Printf("[DEBUG] Creating user %s: %#v", name, user)
@@ -85,6 +86,7 @@ func resourceUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("name", name)
 	d.Set("groups", user.Groups)
+	d.Set("disabled", user.Disabled)
 
 	return nil
 }
@@ -174,7 +176,6 @@ func updateUser(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Unable to update password for user %s: %s", name, err)
 		}
 	}
-
 
 	if d.HasChange("disabled") {
 		disabled := d.Get("disabled").(bool)
