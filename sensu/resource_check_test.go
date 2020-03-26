@@ -58,21 +58,21 @@ func TestAccResourceCheck_basic(t *testing.T) {
 
 /*
 func TestAccResourceCheck_proxyRequests(t *testing.T) {
-  resource.Test(t, resource.TestCase{
-    PreCheck:  func() { testAccPreCheck(t) },
-    Providers: testAccProviders,
-    Steps: []resource.TestStep{
-      resource.TestStep{
-        Config: testAccResourceCheck_proxyRequests,
-        Check: resource.ComposeTestCheckFunc(
-          resource.TestCheckResourceAttr(
-            "sensu_check.check_1", "proxy_requests.0.entity_attributes.0", "entity.Class == \"proxy\""),
-          resource.TestCheckResourceAttr(
-            "sensu_check.check_1", "proxy_requests.0.splay", "true"),
-        ),
-      },
-    },
-  })
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_proxyRequests,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "proxy_requests.0.entity_attributes.0", "entity.Class == \"proxy\""),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "proxy_requests.0.splay", "true"),
+				),
+			},
+		},
+	})
 }
 */
 
@@ -125,223 +125,220 @@ func TestAccResourceCheck_hook(t *testing.T) {
 	})
 }
 
-
 func TestAccResourceCheck_labels(t *testing.T) {
-  resource.Test(t, resource.TestCase{
-    PreCheck:  func() { testAccPreCheck(t) },
-    Providers: testAccProviders,
-    Steps: []resource.TestStep{
-      resource.TestStep{
-        Config: testAccResourceCheck_labels,
-        Check: resource.ComposeTestCheckFunc(
-          resource.TestCheckResourceAttr(
-            "sensu_check.check_1", "labels.label1", "test1"),
-          resource.TestCheckResourceAttr(
-            "sensu_check.check_1",  "labels.label2", "test2"),
-        ),
-      },
-    },
-  })
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_labels,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "labels.label1", "test1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "labels.label2", "test2"),
+				),
+			},
+		},
+	})
 }
 
 func TestAccResourceCheck_annotations(t *testing.T) {
-  resource.Test(t, resource.TestCase{
-    PreCheck:  func() { testAccPreCheck(t) },
-    Providers: testAccProviders,
-    Steps: []resource.TestStep{
-      resource.TestStep{
-        Config: testAccResourceCheck_annotations,
-        Check: resource.ComposeTestCheckFunc(
-          resource.TestCheckResourceAttr(
-            "sensu_check.check_1", "annotations.annotation1", "test1"),
-          resource.TestCheckResourceAttr(
-            "sensu_check.check_1",  "annotations.annotation2", "test2"),
-        ),
-      },
-    },
-  })
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_annotations,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "annotations.annotation1", "test1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "annotations.annotation2", "test2"),
+				),
+			},
+		},
+	})
 }
 
-
-
 const testAccResourceCheck_basic = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-      "baz",
-    ]
-  }
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+	}
 `
 
 const testAccResourceCheck_update_1 = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo2"
-    interval = 60001
-    subscriptions = [
-      "foo",
-      "baz",
-    ]
-  }
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo2"
+		interval = 60001
+		subscriptions = [
+			"foo",
+			"baz",
+		]
+	}
 `
 
 const testAccResourceCheck_update_2 = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo2"
-    cron = "*/20 * * * *"
-    subscriptions = [
-      "foo",
-      "baz",
-    ]
-  }
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo2"
+		cron = "*/20 * * * *"
+		subscriptions = [
+			"foo",
+			"baz",
+		]
+	}
 `
 
 /*
 const testAccResourceCheck_proxyRequests = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-    ]
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
 
-    proxy_requests {
-      entity_attributes = [
-        "entity.Class == \"proxy\"",
-      ]
-      splay = true
-      splay_coverage = 90
-    }
-  }
+		proxy_requests {
+			entity_attributes = [
+				"entity.Class == \"proxy\"",
+			]
+			splay = true
+			splay_coverage = 90
+		}
+	}
 `
 */
 
 const testAccResourceCheck_subdue_1 = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-    ]
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
 
-    subdue {
-      day = "monday"
-      begin = "09:00AM"
-      end = "05:00PM"
-    }
+		subdue {
+			day = "monday"
+			begin = "09:00AM"
+			end = "05:00PM"
+		}
 
-    subdue {
-      day = "monday"
-      begin = "07:00PM"
-      end = "09:00PM"
-    }
+		subdue {
+			day = "monday"
+			begin = "07:00PM"
+			end = "09:00PM"
+		}
 
-    subdue {
-      day = "tuesday"
-      begin = "03:00AM"
-      end = "09:00AM"
-    }
-  }
+		subdue {
+			day = "tuesday"
+			begin = "03:00AM"
+			end = "09:00AM"
+		}
+	}
 `
 
 const testAccResourceCheck_subdue_2 = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-    ]
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
 
-    subdue {
-      day = "monday"
-      begin = "09:00AM"
-      end = "06:00PM"
-    }
+		subdue {
+			day = "monday"
+			begin = "09:00AM"
+			end = "06:00PM"
+		}
 
-    subdue {
-      day = "monday"
-      begin = "07:00PM"
-      end = "09:00PM"
-    }
+		subdue {
+			day = "monday"
+			begin = "07:00PM"
+			end = "09:00PM"
+		}
 
-    subdue {
-      day = "tuesday"
-      begin = "03:00AM"
-      end = "09:00AM"
-    }
-  }
+		subdue {
+			day = "tuesday"
+			begin = "03:00AM"
+			end = "09:00AM"
+		}
+	}
 `
 
 const testAccResourceCheck_hook = `
-  resource "sensu_hook" "hook_1" {
-    name = "hook_1"
-    command = "/bin/foo"
-  }
+	resource "sensu_hook" "hook_1" {
+		name = "hook_1"
+		command = "/bin/foo"
+	}
 
-  resource "sensu_hook" "hook_2" {
-    name = "hook_2"
-    command = "/bin/bar"
-  }
+	resource "sensu_hook" "hook_2" {
+		name = "hook_2"
+		command = "/bin/bar"
+	}
 
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foobar"
-    interval = 6000
-    subscriptions = ["foo", "bar"]
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foobar"
+		interval = 6000
+		subscriptions = ["foo", "bar"]
 
-    check_hook {
-      hook = "${sensu_hook.hook_1.name}"
-      trigger = "non-zero"
-    }
+		check_hook {
+			hook = "${sensu_hook.hook_1.name}"
+			trigger = "non-zero"
+		}
 
-    check_hook {
-      hook = "${sensu_hook.hook_2.name}"
-      trigger = "non-zero"
-    }
-  }
+		check_hook {
+			hook = "${sensu_hook.hook_2.name}"
+			trigger = "non-zero"
+		}
+	}
 `
 
 const testAccResourceCheck_labels = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-    ]
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
 
-    labels = {
-      label1 = "test1"
-      label2 = "test2"
-    }
-  }
+		labels = {
+			label1 = "test1"
+			label2 = "test2"
+		}
+	}
 `
 
 const testAccResourceCheck_annotations = `
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-    ]
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
 
-    annotations = {
-      annotation1 = "test1"
-      annotation2 = "test2"
-    }
-  }
+		annotations = {
+			annotation1 = "test1"
+			annotation2 = "test2"
+		}
+	}
 `
