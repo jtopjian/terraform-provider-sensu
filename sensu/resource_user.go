@@ -3,8 +3,11 @@ package sensu
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
+	"github.com/sensu/sensu-go/cli/client"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -123,14 +126,17 @@ func resourceUserDelete(d *schema.ResourceData, meta interface{}) error {
 func findUser(meta interface{}, name string) (*types.User, error) {
 	config := meta.(*Config)
 
-	users, err := config.client.ListUsers()
+	var header http.Header
+	opts := client.ListOptions{}
+	results := []corev2.User{}
+	err := config.client.List("/api/core/v2/users", &results, &opts, &header)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to list users: %s", err)
 	}
 
 	var user types.User
 	var found bool
-	for _, u := range users {
+	for _, u := range results {
 		if u.Username == name {
 			found = true
 			user = u

@@ -5,6 +5,7 @@ services:
 
 env:
   global:
+    - GO111MODULE=on
     - TF_ACC=1
     - TF_LOG=DEBUG
     - SENSU_API_URL=http://127.0.0.1:8080
@@ -17,7 +18,7 @@ env:
     - SENSU_VERSION="master"
 
 go:
-  - '1.11'
+  - "1.12.x"
 
 matrix:
   fast_finish: true

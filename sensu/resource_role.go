@@ -89,7 +89,7 @@ func resourceRoleDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve role %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteRole(name); err != nil {
+	if err := config.client.DeleteRole(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete role %s: %s", name, err)
 	}
 

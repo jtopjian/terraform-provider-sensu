@@ -174,7 +174,7 @@ func resourceRoleBindingDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve role binding %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteRoleBinding(name); err != nil {
+	if err := config.client.DeleteRoleBinding(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete role binding %s: %s", name, err)
 	}
 

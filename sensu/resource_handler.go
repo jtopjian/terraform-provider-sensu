@@ -243,9 +243,7 @@ func resourceHandlerDelete(d *schema.ResourceData, meta interface{}) error {
 	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
-	handler := &types.Handler{ObjectMeta: types.ObjectMeta{Name: name}}
-
-	if err := config.client.DeleteHandler(handler); err != nil {
+	if err := config.client.DeleteHandler(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete handler %s: %s", name, err)
 	}
 

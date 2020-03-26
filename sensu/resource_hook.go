@@ -132,12 +132,12 @@ func resourceHookDelete(d *schema.ResourceData, meta interface{}) error {
 	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
-	hook, err := config.client.FetchHook(name)
+	_, err := config.client.FetchHook(name)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve hook %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteHook(hook); err != nil {
+	if err := config.client.DeleteHook(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete hook %s: %s", name, err)
 	}
 
