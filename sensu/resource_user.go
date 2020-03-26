@@ -90,7 +90,6 @@ func resourceUserRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceUserUpdate(d *schema.ResourceData, meta interface{}) error {
-	config := meta.(*Config)
 	name := d.Id()
 
 	_, err := findUser(meta, name)
