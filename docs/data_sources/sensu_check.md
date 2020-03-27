@@ -53,6 +53,10 @@ data "sensu_check" "check_1" {
 
 * `ttl` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
+* `annotations` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#metadata-attributes).
+
+* `label` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#metadata-attributes).
+
 ### subdue
 
 The `subdue` block supports:

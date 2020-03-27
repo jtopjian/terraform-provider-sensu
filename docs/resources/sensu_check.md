@@ -61,6 +61,10 @@ resource "sensu_check" "check_1" {
 
 * `ttl` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#check-attributes).
 
+* `annotations` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#metadata-attributes).
+
+* `label` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/5.0/reference/checks/#metadata-attributes).
+
 ### check_hook
 
 The `check_hook` block supports:

@@ -34,6 +34,16 @@ func resourceCheck() *schema.Resource {
 			},
 
 			// Optional
+			"labels": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+
+			"annotations": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+
 			"cron": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -182,14 +192,18 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	//proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
+	annotations := expandAnnotations(d.Get("annotations").(map[string]interface{}))
+	labels := expandLabels(d.Get("labels").(map[string]interface{}))
 
 	// Using partial to resume hook configuration if there's a failure.
 	d.Partial(true)
 
 	check := &types.CheckConfig{
 		ObjectMeta: types.ObjectMeta{
-			Name:      name,
-			Namespace: config.determineNamespace(d),
+			Name:        name,
+			Namespace:   config.determineNamespace(d),
+			Annotations: annotations,
+			Labels:      labels,
 		},
 		Command:              d.Get("command").(string),
 		Subscriptions:        subscriptions,
@@ -229,6 +243,8 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("subscriptions")
 	d.SetPartial("cron")
 	d.SetPartial("env_vars")
+	d.SetPartial("annotations")
+	d.SetPartial("labels")
 	d.SetPartial("handlers")
 	d.SetPartial("high_flap_threshold")
 	d.SetPartial("interval")
@@ -275,7 +291,12 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	check, err := config.client.FetchCheck(name)
 	if err != nil {
-		return fmt.Errorf("Unable to retrieve check %s: %s", name, err)
+		if err.Error() == "not found" {
+			d.SetId("")
+			return nil
+		} else {
+			return fmt.Errorf("Unable to retrieve check %s: %s", name, err)
+		}
 	}
 
 	log.Printf("[DEBUG] Retrieved check %s: %#v", name, check)
@@ -283,6 +304,8 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", name)
 	d.Set("namespace", check.ObjectMeta.Namespace)
 	d.Set("command", check.Command)
+	d.Set("annotations", check.ObjectMeta.Annotations)
+	d.Set("labels", check.ObjectMeta.Labels)
 	d.Set("cron", check.Cron)
 	d.Set("high_flap_threshold", check.HighFlapThreshold)
 	d.Set("interval", check.Interval)
@@ -357,6 +380,14 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("handlers") {
 		handlers := expandStringList(d.Get("handlers").(*schema.Set).List())
 		check.Handlers = handlers
+	}
+
+	if d.HasChange("annotations") {
+		check.ObjectMeta.Annotations = expandAnnotations(d.Get("annotations").(map[string]interface{}))
+	}
+
+	if d.HasChange("labels") {
+		check.ObjectMeta.Labels = expandLabels(d.Get("labels").(map[string]interface{}))
 	}
 
 	if d.HasChange("high_flap_threshold") {

@@ -49,6 +49,26 @@ var dataSourceEnvVarsSchema = &schema.Schema{
 	Computed: true,
 }
 
+func expandAnnotations(v map[string]interface{}) (annotations map[string]string) {
+
+	annotations = make(map[string]string)
+	for key, val := range v {
+		annotations[key] = val.(string)
+	}
+
+	return
+}
+
+func expandLabels(v map[string]interface{}) (labels map[string]string) {
+
+	labels = make(map[string]string)
+	for key, val := range v {
+		labels[key] = val.(string)
+	}
+
+	return
+}
+
 func expandEnvVars(v map[string]interface{}) []string {
 	var envVars []string
 
