@@ -103,7 +103,7 @@ var testAccDataSourceCheck_annotations = fmt.Sprintf(`
   data "sensu_check" "check_1" {
     name = "${sensu_check.check_1.name}"
   }
-`, testAccResourceCheck_annotations)
+`, testAccResourceCheck_annotations_1)
 
 var testAccDataSourceCheck_labels = fmt.Sprintf(`
   %s
@@ -111,4 +111,4 @@ var testAccDataSourceCheck_labels = fmt.Sprintf(`
   data "sensu_check" "check_1" {
     name = "${sensu_check.check_1.name}"
   }
-`, testAccResourceCheck_labels)
+`, testAccResourceCheck_labels_1)
