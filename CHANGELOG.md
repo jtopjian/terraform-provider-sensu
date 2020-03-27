@@ -3,6 +3,8 @@
 IMPROVEMENTS
 
 * Added `disabled` to `sensu_user` [GH-11](https://github.com/jtopjian/terraform-provider-sensu/pull/11)
+* Added `labels` to `sensu_check` [GH-10](https://github.com/jtopjian/terraform-provider-sensu/pull/10)
+* Added `annotations` to `sensu_check` [GH-10](https://github.com/jtopjian/terraform-provider-sensu/pull/10)
 
 ## 0.5.0 (May 31, 2019)
 
