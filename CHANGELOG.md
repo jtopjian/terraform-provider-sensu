@@ -1,4 +1,6 @@
-## 0.6.0 (Unreleased)
+## 0.7.0 (Unreleased)
+
+## 0.6.0 (March 26, 2020)
 
 IMPROVEMENTS
 
