@@ -378,7 +378,7 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("handlers") {
-		handlers := expandStringList(d.Get("handlers").(*schema.Set).List())
+		handlers := expandStringList(d.Get("handlers").([]interface{}))
 		check.Handlers = handlers
 	}
 
