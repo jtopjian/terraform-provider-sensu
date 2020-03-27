@@ -111,18 +111,12 @@ func (c *Config) SaveTokens(tokens *types.Tokens) error {
 
 // InsecureSkipTLSVerify implements the InsecureSkipTLSVerify method for the
 // config.Config interface.
-//
-// Note: this is not actually implemented in this provider. This is only
-// used to satisfy the Sensu client interface.
 func (c *Config) InsecureSkipTLSVerify() bool {
 	return c.insecureSkipTLSVerify
 }
 
 // SaveInsecureSkipTLSVerify implements the SaveInsecureSkipTLSVerify method
 // for the config.Config interface.
-//
-// Note: this is not actually implemented in this provider. This is only
-// used to satisfy the Sensu client interface.
 func (c *Config) SaveInsecureSkipTLSVerify(v bool) error {
 	c.insecureSkipTLSVerify = v
 	return nil
@@ -130,18 +124,12 @@ func (c *Config) SaveInsecureSkipTLSVerify(v bool) error {
 
 // TrustedCAFile implements the TrustedCAFile method for the config.Config
 // interface.
-//
-// Note: this is not actually implemented in this provider. This is only
-// used to satisfy the Sensu client interface.
 func (c *Config) TrustedCAFile() string {
 	return c.trustedCAFile
 }
 
 // SaveTrustedCAFile implements the SaveTrustedCAFile method for the
 // config.Config interface.
-//
-// Note: this is not actually implemented in this provider. This is only
-// used to satisfy the Sensu client interface.
 func (c *Config) SaveTrustedCAFile(v string) error {
 	c.trustedCAFile = v
 	return nil

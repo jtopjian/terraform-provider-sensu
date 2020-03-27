@@ -39,6 +39,18 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SENSU_EDITION", ""),
 			},
+
+			"trusted_ca_file": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SENSU_TRUSTED_CA_FILE", ""),
+			},
+
+			"insecure_skip_tls_verify": &schema.Schema{
+				Type:        schema.TypeBool,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SENSU_INSECURE_SKIP_TLS_VERIFY", false),
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -74,11 +86,13 @@ func Provider() terraform.ResourceProvider {
 
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		apiUrl:    d.Get("api_url").(string),
-		username:  d.Get("username").(string),
-		password:  d.Get("password").(string),
-		edition:   d.Get("edition").(string),
-		namespace: d.Get("namespace").(string),
+		apiUrl:                d.Get("api_url").(string),
+		username:              d.Get("username").(string),
+		password:              d.Get("password").(string),
+		edition:               d.Get("edition").(string),
+		namespace:             d.Get("namespace").(string),
+		trustedCAFile:         d.Get("trusted_ca_file").(string),
+		insecureSkipTLSVerify: d.Get("insecure_skip_tls_verify").(bool),
 	}
 
 	if err := config.LoadAndValidate(); err != nil {
