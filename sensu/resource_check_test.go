@@ -131,12 +131,27 @@ func TestAccResourceCheck_labels(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccResourceCheck_labels,
+				Config: testAccResourceCheck_labels_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sensu_check.check_1", "labels.label1", "test1"),
 					resource.TestCheckResourceAttr(
 						"sensu_check.check_1", "labels.label2", "test2"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_labels_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "labels.label1", "test1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "labels.label2", "test3"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_labels_3,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("sensu_check.check_1", "labels"),
 				),
 			},
 		},
@@ -149,12 +164,27 @@ func TestAccResourceCheck_annotations(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccResourceCheck_annotations,
+				Config: testAccResourceCheck_annotations_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sensu_check.check_1", "annotations.annotation1", "test1"),
 					resource.TestCheckResourceAttr(
 						"sensu_check.check_1", "annotations.annotation2", "test2"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_annotations_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "annotations.annotation1", "test1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "annotations.annotation2", "test3"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_annotations_3,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("sensu_check.check_1", "annotations"),
 				),
 			},
 		},
@@ -309,7 +339,7 @@ const testAccResourceCheck_hook = `
 	}
 `
 
-const testAccResourceCheck_labels = `
+const testAccResourceCheck_labels_1 = `
 	resource "sensu_check" "check_1" {
 		name = "check_1"
 		command = "/bin/foo"
@@ -326,7 +356,36 @@ const testAccResourceCheck_labels = `
 	}
 `
 
-const testAccResourceCheck_annotations = `
+const testAccResourceCheck_labels_2 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
+
+		labels = {
+			label1 = "test1"
+			label2 = "test3"
+		}
+	}
+`
+
+const testAccResourceCheck_labels_3 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
+	}
+`
+
+const testAccResourceCheck_annotations_1 = `
 	resource "sensu_check" "check_1" {
 		name = "check_1"
 		command = "/bin/foo"
@@ -340,5 +399,34 @@ const testAccResourceCheck_annotations = `
 			annotation1 = "test1"
 			annotation2 = "test2"
 		}
+	}
+`
+
+const testAccResourceCheck_annotations_2 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
+
+		annotations = {
+			annotation1 = "test1"
+			annotation2 = "test3"
+		}
+	}
+`
+
+const testAccResourceCheck_annotations_3 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+		]
 	}
 `
