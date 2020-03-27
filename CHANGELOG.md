@@ -6,6 +6,10 @@ IMPROVEMENTS
 * Added `labels` to `sensu_check` [GH-10](https://github.com/jtopjian/terraform-provider-sensu/pull/10)
 * Added `annotations` to `sensu_check` [GH-10](https://github.com/jtopjian/terraform-provider-sensu/pull/10)
 
+BUG FIXES
+
+* Fixed possible panic with `sensu_check.handlers` [GH-13](https://github.com/jtopjian/terraform-provider-sensu/pull/13)
+
 ## 0.5.0 (May 31, 2019)
 
 IMPROVEMENTS
