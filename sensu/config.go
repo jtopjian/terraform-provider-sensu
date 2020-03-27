@@ -3,7 +3,7 @@ package sensu
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/sensu/sensu-go/cli/client"
 	"github.com/sensu/sensu-go/cli/client/config"
@@ -29,6 +29,12 @@ type Config struct {
 
 	// Tokens
 	tokens *types.Tokens
+
+	// insecureSkipTLSVerify will allow self-signed certificates.
+	insecureSkipTLSVerify bool
+
+	// trustedCAFile is the path to a trusted CA.
+	trustedCAFile string
 
 	// client is the sensu client
 	client *client.RestClient
@@ -100,6 +106,44 @@ func (c *Config) Tokens() *types.Tokens {
 // SaveTokens implements the SaveTokens method for the config.Config interface.
 func (c *Config) SaveTokens(tokens *types.Tokens) error {
 	c.tokens = tokens
+	return nil
+}
+
+// InsecureSkipTLSVerify implements the InsecureSkipTLSVerify method for the
+// config.Config interface.
+//
+// Note: this is not actually implemented in this provider. This is only
+// used to satisfy the Sensu client interface.
+func (c *Config) InsecureSkipTLSVerify() bool {
+	return c.insecureSkipTLSVerify
+}
+
+// SaveInsecureSkipTLSVerify implements the SaveInsecureSkipTLSVerify method
+// for the config.Config interface.
+//
+// Note: this is not actually implemented in this provider. This is only
+// used to satisfy the Sensu client interface.
+func (c *Config) SaveInsecureSkipTLSVerify(v bool) error {
+	c.insecureSkipTLSVerify = v
+	return nil
+}
+
+// TrustedCAFile implements the TrustedCAFile method for the config.Config
+// interface.
+//
+// Note: this is not actually implemented in this provider. This is only
+// used to satisfy the Sensu client interface.
+func (c *Config) TrustedCAFile() string {
+	return c.trustedCAFile
+}
+
+// SaveTrustedCAFile implements the SaveTrustedCAFile method for the
+// config.Config interface.
+//
+// Note: this is not actually implemented in this provider. This is only
+// used to satisfy the Sensu client interface.
+func (c *Config) SaveTrustedCAFile(v string) error {
+	c.trustedCAFile = v
 	return nil
 }
 

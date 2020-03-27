@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -499,14 +499,12 @@ func resourceCheckDelete(d *schema.ResourceData, meta interface{}) error {
 	config.SaveNamespace(config.determineNamespace(d))
 
 	name := d.Id()
-	check, err := config.client.FetchCheck(name)
+	_, err := config.client.FetchCheck(name)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve check %s: %s", name, err)
 	}
 
-	check.Namespace = config.namespace
-
-	if err := config.client.DeleteCheck(check); err != nil {
+	if err := config.client.DeleteCheck(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete check %s: %s", name, err)
 	}
 

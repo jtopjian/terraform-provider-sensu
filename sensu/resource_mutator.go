@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -137,12 +137,12 @@ func resourceMutatorDelete(d *schema.ResourceData, meta interface{}) error {
 	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
-	mutator, err := config.client.FetchMutator(name)
+	_, err := config.client.FetchMutator(name)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve mutator %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteMutator(mutator); err != nil {
+	if err := config.client.DeleteMutator(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete mutator %s: %s", name, err)
 	}
 

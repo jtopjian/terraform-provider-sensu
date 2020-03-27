@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	"github.com/sensu/sensu-go/api/core/v2"
 	"github.com/sensu/sensu-go/types"
@@ -174,7 +174,7 @@ func resourceRoleBindingDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve role binding %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteRoleBinding(name); err != nil {
+	if err := config.client.DeleteRoleBinding(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete role binding %s: %s", name, err)
 	}
 

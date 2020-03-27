@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -145,12 +145,12 @@ func resourceFilterDelete(d *schema.ResourceData, meta interface{}) error {
 	config.SaveNamespace(config.determineNamespace(d))
 	name := d.Id()
 
-	filter, err := config.client.FetchFilter(name)
+	_, err := config.client.FetchFilter(name)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve filter %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteFilter(filter); err != nil {
+	if err := config.client.DeleteFilter(config.namespace, name); err != nil {
 		return fmt.Errorf("Unable to delete filter %s: %s", name, err)
 	}
 
