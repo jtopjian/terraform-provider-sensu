@@ -1,4 +1,12 @@
+## 0.6.0 (Unreleased)
+
+IMPROVEMENTS
+
+* Added `disabled` to `sensu_user` [GH-11](https://github.com/jtopjian/terraform-provider-sensu/pull/11)
+
 ## 0.5.0 (May 31, 2019)
+
+IMPROVEMENTS
 
 * Support for Terraform v0.12 [GH-7](https://github.com/jtopjian/terraform-provider-sensu/pull/7)
 * Support for static binaries [GH-7](https://github.com/jtopjian/terraform-provider-sensu/pull/7)
