@@ -2,70 +2,42 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
 
-	"github.com/sensu/sensu-go/types"
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
 
-var handlersPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "handlers")
-
-// ListHandlers fetches all handlers from configured Sensu instance
-func (client *RestClient) ListHandlers(namespace string) ([]types.Handler, error) {
-	var handlers []types.Handler
-
-	path := handlersPath(namespace)
-	res, err := client.R().Get(path)
-	if err != nil {
-		return handlers, err
-	}
-
-	if res.StatusCode() >= 400 {
-		return handlers, UnmarshalError(res)
-	}
-
-	err = json.Unmarshal(res.Body(), &handlers)
-	return handlers, err
-}
+// HandlersPath is the api path for handlers.
+var HandlersPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "handlers")
 
 // CreateHandler creates new handler on configured Sensu instance
-func (client *RestClient) CreateHandler(handler *types.Handler) (err error) {
+func (client *RestClient) CreateHandler(handler *corev2.Handler) (err error) {
 	bytes, err := json.Marshal(handler)
 	if err != nil {
 		return err
 	}
 
-	path := handlersPath(handler.Namespace)
+	path := HandlersPath(handler.Namespace)
 	res, err := client.R().SetBody(bytes).Post(path)
 	if err != nil {
 		return err
 	}
 
 	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
+		return UnmarshalError(res)
 	}
 
 	return nil
 }
 
 // DeleteHandler deletes given handler from the configured Sensu instance
-func (client *RestClient) DeleteHandler(handler *types.Handler) (err error) {
-	path := handlersPath(client.config.Namespace(), handler.Name)
-	res, err := client.R().Delete(path)
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
-	}
-
-	return nil
+func (client *RestClient) DeleteHandler(namespace, name string) (err error) {
+	return client.Delete(HandlersPath(namespace, name))
 }
 
 // FetchHandler fetches a specific handler
-func (client *RestClient) FetchHandler(name string) (*types.Handler, error) {
-	var handler *types.Handler
-	path := handlersPath(client.config.Namespace(), name)
+func (client *RestClient) FetchHandler(name string) (*corev2.Handler, error) {
+	var handler *corev2.Handler
+	path := HandlersPath(client.config.Namespace(), name)
 	res, err := client.R().Get(path)
 	if err != nil {
 		return nil, err
@@ -80,20 +52,20 @@ func (client *RestClient) FetchHandler(name string) (*types.Handler, error) {
 }
 
 // UpdateHandler updates given handler on configured Sensu instance
-func (client *RestClient) UpdateHandler(handler *types.Handler) (err error) {
+func (client *RestClient) UpdateHandler(handler *corev2.Handler) (err error) {
 	bytes, err := json.Marshal(handler)
 	if err != nil {
 		return err
 	}
 
-	path := handlersPath(handler.Namespace, handler.Name)
+	path := HandlersPath(handler.Namespace, handler.Name)
 	res, err := client.R().SetBody(bytes).Put(path)
 	if err != nil {
 		return err
 	}
 
 	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
+		return UnmarshalError(res)
 	}
 
 	return nil

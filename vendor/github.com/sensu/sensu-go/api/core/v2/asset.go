@@ -4,19 +4,39 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"net/url"
 	"path"
 	"regexp"
+	"strings"
 
 	"github.com/sensu/sensu-go/js"
 )
 
-// AssetNameRegexStr used to validate name of asset
-var AssetNameRegexStr = `[a-z0-9\/\_\.\-]+`
+const (
+	// AssetsResource is the name of this resource type
+	AssetsResource = "assets"
+)
 
-// AssetNameRegex used to validate name of asset
-var AssetNameRegex = regexp.MustCompile("^" + AssetNameRegexStr + "$")
+var (
+	// AssetNameRegexStr used to validate name of asset
+	AssetNameRegexStr = `[\w\/\_\.\-\:]+`
+
+	// AssetNameRegex used to validate name of asset
+	AssetNameRegex = regexp.MustCompile("^" + AssetNameRegexStr + "$")
+)
+
+// StorePrefix returns the path prefix to this resource in the store
+func (a *Asset) StorePrefix() string {
+	return AssetsResource
+}
+
+// URIPath returns the path component of an asset URI.
+func (a *Asset) URIPath() string {
+	if a.Namespace == "" {
+		return path.Join(URLPrefix, AssetsResource, url.PathEscape(a.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(a.Namespace), AssetsResource, url.PathEscape(a.Name))
+}
 
 // Validate returns an error if the asset contains invalid values.
 func (a *Asset) Validate() error {
@@ -28,6 +48,43 @@ func (a *Asset) Validate() error {
 		return errors.New("namespace cannot be empty")
 	}
 
+	if len(a.Builds) == 0 {
+		if a.Sha512 == "" {
+			return errors.New("SHA-512 checksum cannot be empty")
+		}
+
+		if len(a.Sha512) < 128 {
+			return errors.New("SHA-512 checksum must be at least 128 characters")
+		}
+
+		if a.URL == "" {
+			return errors.New("URL cannot be empty")
+		}
+
+		if a.URL != "" {
+			u, err := url.Parse(a.URL)
+			if err != nil {
+				return errors.New("invalid URL provided")
+			}
+
+			if u.Scheme != "https" && u.Scheme != "http" {
+				return errors.New("URL must be HTTP or HTTPS")
+			}
+		}
+
+		return js.ParseExpressions(a.Filters)
+	}
+	for _, build := range a.Builds {
+		if err := build.Validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Validate returns an error if the asset contains invalid values.
+func (a *AssetBuild) Validate() error {
 	if a.Sha512 == "" {
 		return errors.New("SHA-512 checksum cannot be empty")
 	}
@@ -40,13 +97,15 @@ func (a *Asset) Validate() error {
 		return errors.New("URL cannot be empty")
 	}
 
-	u, err := url.Parse(a.URL)
-	if err != nil {
-		return errors.New("invalid URL provided")
-	}
+	if a.URL != "" {
+		u, err := url.Parse(a.URL)
+		if err != nil {
+			return errors.New("invalid URL provided")
+		}
 
-	if u.Scheme != "https" && u.Scheme != "http" {
-		return errors.New("URL must be HTTP or HTTPS")
+		if u.Scheme != "https" && u.Scheme != "http" {
+			return errors.New("URL must be HTTP or HTTPS")
+		}
 	}
 
 	return js.ParseExpressions(a.Filters)
@@ -60,7 +119,7 @@ func ValidateAssetName(name string) error {
 
 	if !AssetNameRegex.MatchString(name) {
 		return errors.New(
-			"name must be lowercase and may only contain forward slashes, underscores, dashes and numbers",
+			"name may only contain letters, forward slashes, underscores, dashes and numbers",
 		)
 	}
 
@@ -92,12 +151,31 @@ func FixtureAsset(name string) *Asset {
 	return asset
 }
 
-// URIPath returns the path component of a Asset URI.
-func (a *Asset) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/assets/%s", url.PathEscape(a.Namespace), url.PathEscape(a.Name))
-}
-
 // NewAsset creates a new Asset.
 func NewAsset(meta ObjectMeta) *Asset {
 	return &Asset{ObjectMeta: meta}
+}
+
+// AssetFields returns a set of fields that represent that resource
+func AssetFields(r Resource) map[string]string {
+	resource := r.(*Asset)
+	return map[string]string{
+		"asset.name":      resource.ObjectMeta.Name,
+		"asset.namespace": resource.ObjectMeta.Namespace,
+		"asset.filters":   strings.Join(resource.Filters, ","),
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (a *Asset) SetNamespace(namespace string) {
+	a.Namespace = namespace
+}
+
+func (a *Asset) RBACName() string {
+	return "assets"
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (a *Asset) SetObjectMeta(meta ObjectMeta) {
+	a.ObjectMeta = meta
 }

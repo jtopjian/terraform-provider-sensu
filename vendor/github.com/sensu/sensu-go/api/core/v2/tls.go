@@ -11,7 +11,8 @@ var (
 	// PCI compliance as of Jun 30, 2018: anything under TLS 1.1 must be disabled
 	// we bump this up to TLS 1.2 so we can support the best possible ciphers
 	tlsMinVersion = uint16(tls.VersionTLS12)
-	// disable CBC suites (Lucky13 attack) this means TLS 1.1 can't work (no GCM)
+	// DefaultCipherSuites overrides the default cipher suites in order to disable
+	// CBC suites (Lucky13 attack) this means TLS 1.1 can't work (no GCM)
 	// additionally, we should only use perfect forward secrecy ciphers
 	DefaultCipherSuites = []uint16{
 		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
@@ -37,6 +38,16 @@ var (
 // ToServerTLSConfig should only be used for server TLS configuration. outputs a tls.Config from TLSOptions
 func (t *TLSOptions) ToServerTLSConfig() (*tls.Config, error) {
 	cfg := tls.Config{}
+
+	if t.GetTrustedCAFile() != "" {
+		caCertPool, err := LoadCACerts(t.TrustedCAFile)
+		if err != nil {
+			return nil, err
+		}
+		// client trust store should ONLY consist of specified CAs
+		cfg.ClientCAs = caCertPool
+	}
+
 	if t.GetCertFile() != "" && t.GetKeyFile() != "" {
 		cert, err := tls.LoadX509KeyPair(t.GetCertFile(), t.GetKeyFile())
 		if err != nil {
@@ -56,15 +67,20 @@ func (t *TLSOptions) ToServerTLSConfig() (*tls.Config, error) {
 	// Tell the server to prefer it's own cipher suite ordering over the client's preferred ordering
 	cfg.PreferServerCipherSuites = true
 
+	// Enable TLS client authentication if configured
+	if t.GetClientAuthType() {
+		cfg.ClientAuth = tls.RequireAndVerifyClientCert
+	}
+
 	return &cfg, nil
 }
 
 // ToClientTLSConfig is like ToServerTLSConfig but intended for TLS client config.
 func (t *TLSOptions) ToClientTLSConfig() (*tls.Config, error) {
 	cfg := tls.Config{}
-	cfg.InsecureSkipVerify = t.InsecureSkipVerify
+	cfg.InsecureSkipVerify = t.GetInsecureSkipVerify()
 
-	if t.TrustedCAFile != "" {
+	if t.GetTrustedCAFile() != "" {
 		caCertPool, err := LoadCACerts(t.TrustedCAFile)
 		if err != nil {
 			return nil, err

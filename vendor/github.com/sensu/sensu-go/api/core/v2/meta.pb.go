@@ -3,14 +3,15 @@
 
 package v2
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "github.com/gogo/protobuf/gogoproto"
-
-import bytes "bytes"
-
-import io "io"
+import (
+	bytes "bytes"
+	fmt "fmt"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/golang/protobuf/proto"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -21,9 +22,9 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-// A Metrics is an event metrics payload specification.
+// ObjectMeta is metadata all persisted objects have.
 type ObjectMeta struct {
 	// Name must be unique within a namespace. Name is primarily intended for creation
 	// idempotence and configuration definition.
@@ -36,13 +37,13 @@ type ObjectMeta struct {
 	// substitution.
 	// TODO: Link to Sensu documentation.
 	// More info: http://kubernetes.io/docs/user-guide/labels
-	Labels map[string]string `protobuf:"bytes,3,rep,name=labels" json:"labels,omitempty" yaml: ",labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Labels map[string]string `protobuf:"bytes,3,rep,name=labels,proto3" json:"labels,omitempty" yaml: ",labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Annotations is an unstructured key value map stored with a resource that may be
 	// set by external tools to store and retrieve arbitrary metadata. They are not
 	// queryable and should be preserved when modifying objects.
 	// TODO: Link to Sensu documentation.
 	// More info: http://kubernetes.io/docs/user-guide/annotations
-	Annotations          map[string]string `protobuf:"bytes,4,rep,name=annotations" json:"annotations,omitempty" yaml: "annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Annotations          map[string]string `protobuf:"bytes,4,rep,name=annotations,proto3" json:"annotations,omitempty" yaml: "annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -52,7 +53,7 @@ func (m *ObjectMeta) Reset()         { *m = ObjectMeta{} }
 func (m *ObjectMeta) String() string { return proto.CompactTextString(m) }
 func (*ObjectMeta) ProtoMessage()    {}
 func (*ObjectMeta) Descriptor() ([]byte, []int) {
-	return fileDescriptor_meta_9919e94a8761b94f, []int{0}
+	return fileDescriptor_3b5ea8fe65782bcc, []int{0}
 }
 func (m *ObjectMeta) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -62,15 +63,15 @@ func (m *ObjectMeta) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_ObjectMeta.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
 		return b[:n], nil
 	}
 }
-func (dst *ObjectMeta) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ObjectMeta.Merge(dst, src)
+func (m *ObjectMeta) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ObjectMeta.Merge(m, src)
 }
 func (m *ObjectMeta) XXX_Size() int {
 	return m.Size()
@@ -124,7 +125,7 @@ func (m *TypeMeta) Reset()         { *m = TypeMeta{} }
 func (m *TypeMeta) String() string { return proto.CompactTextString(m) }
 func (*TypeMeta) ProtoMessage()    {}
 func (*TypeMeta) Descriptor() ([]byte, []int) {
-	return fileDescriptor_meta_9919e94a8761b94f, []int{1}
+	return fileDescriptor_3b5ea8fe65782bcc, []int{1}
 }
 func (m *TypeMeta) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -134,15 +135,15 @@ func (m *TypeMeta) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_TypeMeta.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
 		return b[:n], nil
 	}
 }
-func (dst *TypeMeta) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TypeMeta.Merge(dst, src)
+func (m *TypeMeta) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TypeMeta.Merge(m, src)
 }
 func (m *TypeMeta) XXX_Size() int {
 	return m.Size()
@@ -173,6 +174,41 @@ func init() {
 	proto.RegisterMapType((map[string]string)(nil), "sensu.core.v2.ObjectMeta.LabelsEntry")
 	proto.RegisterType((*TypeMeta)(nil), "sensu.core.v2.TypeMeta")
 }
+
+func init() { proto.RegisterFile("meta.proto", fileDescriptor_3b5ea8fe65782bcc) }
+
+var fileDescriptor_3b5ea8fe65782bcc = []byte{
+	// 447 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0xcd, 0x8a, 0xd4, 0x40,
+	0x10, 0xb6, 0x67, 0xe2, 0xe2, 0xd6, 0xa0, 0x0c, 0xed, 0x0f, 0xe3, 0x88, 0xc9, 0xd0, 0x20, 0x2c,
+	0x32, 0xf4, 0x3a, 0x51, 0x16, 0x9d, 0x83, 0xec, 0x0e, 0x78, 0x10, 0x14, 0x97, 0xb0, 0x78, 0xf0,
+	0x22, 0x9d, 0xd0, 0x8e, 0xd1, 0x24, 0x1d, 0x92, 0x4e, 0x20, 0x6f, 0xe0, 0x03, 0x78, 0xf0, 0xe0,
+	0x03, 0xf8, 0x08, 0x3e, 0x82, 0x47, 0x9f, 0x20, 0x68, 0xbc, 0xe5, 0xe8, 0xc9, 0xa3, 0xa4, 0x13,
+	0x4c, 0x67, 0xd0, 0x83, 0xa7, 0x54, 0x7d, 0x55, 0xf5, 0x7d, 0x55, 0x9d, 0x0f, 0x20, 0xe4, 0x92,
+	0xd1, 0x38, 0x11, 0x52, 0xe0, 0x8b, 0x29, 0x8f, 0xd2, 0x8c, 0x7a, 0x22, 0xe1, 0x34, 0xb7, 0xe7,
+	0xf7, 0xb6, 0xbe, 0x7c, 0x9d, 0xb9, 0xd4, 0x13, 0xe1, 0xe1, 0x56, 0x6c, 0xc5, 0xa1, 0xea, 0x72,
+	0xb3, 0x57, 0xc7, 0xf9, 0x8a, 0xda, 0x74, 0xa5, 0x40, 0x85, 0xa9, 0xa8, 0x25, 0x21, 0x1f, 0x0d,
+	0x80, 0x67, 0xee, 0x1b, 0xee, 0xc9, 0xa7, 0x5c, 0x32, 0x7c, 0x0c, 0x46, 0xc4, 0x42, 0x3e, 0x43,
+	0x0b, 0x74, 0xb0, 0xbf, 0x59, 0xd6, 0xa5, 0x75, 0xa9, 0xc9, 0x97, 0x22, 0xf4, 0x25, 0x0f, 0x63,
+	0x59, 0xfc, 0x2c, 0xad, 0x6b, 0x05, 0x0b, 0x83, 0xf5, 0x82, 0x0c, 0x0b, 0xc4, 0x51, 0x93, 0xf8,
+	0x0c, 0xf6, 0x9b, 0x6f, 0x1a, 0x33, 0x8f, 0xcf, 0x46, 0x8a, 0xe6, 0xa8, 0x2e, 0xad, 0xcb, 0x7f,
+	0xc0, 0x01, 0xd7, 0x0d, 0x8d, 0x6b, 0xa7, 0x4a, 0x9c, 0x9e, 0x08, 0xc7, 0xb0, 0x17, 0x30, 0x97,
+	0x07, 0xe9, 0x6c, 0xbc, 0x18, 0x1f, 0x4c, 0xec, 0x5b, 0x74, 0x70, 0x3c, 0xed, 0x4f, 0xa0, 0x4f,
+	0x54, 0xdf, 0xa3, 0x48, 0x26, 0xc5, 0x66, 0x55, 0x97, 0xd6, 0xb4, 0x1d, 0x1c, 0xc8, 0x5e, 0xef,
+	0x64, 0x97, 0xbb, 0x35, 0xe2, 0x74, 0x3a, 0xf8, 0x1d, 0x82, 0x09, 0x8b, 0x22, 0x21, 0x99, 0xf4,
+	0x45, 0x94, 0xce, 0x0c, 0xa5, 0x7b, 0xfb, 0xdf, 0xba, 0x27, 0x7d, 0x73, 0x2b, 0xbe, 0xae, 0x4b,
+	0xeb, 0xaa, 0x46, 0x31, 0xd8, 0xe0, 0x66, 0xb7, 0xc1, 0x5f, 0xeb, 0xc4, 0xd1, 0xa5, 0xe7, 0x0f,
+	0x60, 0xa2, 0x1d, 0x85, 0xa7, 0x30, 0x7e, 0xcb, 0x8b, 0xf6, 0x17, 0x39, 0x4d, 0x88, 0xaf, 0xc0,
+	0xf9, 0x9c, 0x05, 0x59, 0xf7, 0xde, 0x4e, 0x9b, 0xac, 0x47, 0xf7, 0xd1, 0xfc, 0x21, 0x4c, 0x77,
+	0xf7, 0xfa, 0x9f, 0x79, 0xf2, 0x1e, 0xc1, 0x85, 0xb3, 0x22, 0xe6, 0xca, 0x1c, 0x47, 0x60, 0x34,
+	0x71, 0x67, 0x0e, 0x52, 0x97, 0x96, 0x21, 0x8b, 0x98, 0x6b, 0x96, 0x68, 0xd2, 0x81, 0x25, 0x9a,
+	0x7e, 0x7c, 0x0a, 0x70, 0x72, 0xfa, 0xf8, 0x39, 0x4f, 0x52, 0x5f, 0x44, 0x9d, 0x27, 0xee, 0xd4,
+	0xa5, 0x35, 0x61, 0xb1, 0xff, 0x32, 0x6f, 0x61, 0xfd, 0x49, 0x7a, 0x54, 0xe7, 0xd2, 0x38, 0x36,
+	0x8b, 0x5f, 0xdf, 0x4d, 0xf4, 0xa9, 0x32, 0xd1, 0xe7, 0xca, 0x44, 0x5f, 0x2a, 0x13, 0x7d, 0xad,
+	0x4c, 0xf4, 0xad, 0x32, 0xd1, 0x87, 0x1f, 0xe6, 0xb9, 0x17, 0xa3, 0xdc, 0x76, 0xf7, 0x94, 0xbd,
+	0xef, 0xfe, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x88, 0x81, 0x64, 0xfc, 0x31, 0x03, 0x00, 0x00,
+}
+
 func (this *ObjectMeta) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -252,7 +288,7 @@ func (this *TypeMeta) Equal(that interface{}) bool {
 func (m *ObjectMeta) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -260,66 +296,78 @@ func (m *ObjectMeta) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ObjectMeta) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ObjectMeta) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMeta(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if len(m.Namespace) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintMeta(dAtA, i, uint64(len(m.Namespace)))
-		i += copy(dAtA[i:], m.Namespace)
-	}
-	if len(m.Labels) > 0 {
-		for k, _ := range m.Labels {
-			dAtA[i] = 0x1a
-			i++
-			v := m.Labels[k]
-			mapSize := 1 + len(k) + sovMeta(uint64(len(k))) + 1 + len(v) + sovMeta(uint64(len(v)))
-			i = encodeVarintMeta(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintMeta(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintMeta(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
-		}
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.Annotations) > 0 {
-		for k, _ := range m.Annotations {
-			dAtA[i] = 0x22
-			i++
+		for k := range m.Annotations {
 			v := m.Annotations[k]
-			mapSize := 1 + len(k) + sovMeta(uint64(len(k))) + 1 + len(v) + sovMeta(uint64(len(v)))
-			i = encodeVarintMeta(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintMeta(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
 			i = encodeVarintMeta(dAtA, i, uint64(len(v)))
-			i += copy(dAtA[i:], v)
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintMeta(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintMeta(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Labels) > 0 {
+		for k := range m.Labels {
+			v := m.Labels[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintMeta(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintMeta(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintMeta(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x1a
+		}
 	}
-	return i, nil
+	if len(m.Namespace) > 0 {
+		i -= len(m.Namespace)
+		copy(dAtA[i:], m.Namespace)
+		i = encodeVarintMeta(dAtA, i, uint64(len(m.Namespace)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintMeta(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *TypeMeta) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -327,49 +375,59 @@ func (m *TypeMeta) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *TypeMeta) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TypeMeta) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Type) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintMeta(dAtA, i, uint64(len(m.Type)))
-		i += copy(dAtA[i:], m.Type)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if len(m.APIVersion) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.APIVersion)
+		copy(dAtA[i:], m.APIVersion)
 		i = encodeVarintMeta(dAtA, i, uint64(len(m.APIVersion)))
-		i += copy(dAtA[i:], m.APIVersion)
+		i--
+		dAtA[i] = 0x12
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Type) > 0 {
+		i -= len(m.Type)
+		copy(dAtA[i:], m.Type)
+		i = encodeVarintMeta(dAtA, i, uint64(len(m.Type)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintMeta(dAtA []byte, offset int, v uint64) int {
+	offset -= sovMeta(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedObjectMeta(r randyMeta, easy bool) *ObjectMeta {
 	this := &ObjectMeta{}
 	this.Name = string(randStringMeta(r))
 	this.Namespace = string(randStringMeta(r))
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v1 := r.Intn(10)
 		this.Labels = make(map[string]string)
 		for i := 0; i < v1; i++ {
 			this.Labels[randStringMeta(r)] = randStringMeta(r)
 		}
 	}
-	if r.Intn(10) != 0 {
+	if r.Intn(5) != 0 {
 		v2 := r.Intn(10)
 		this.Annotations = make(map[string]string)
 		for i := 0; i < v2; i++ {
@@ -465,6 +523,9 @@ func encodeVarintPopulateMeta(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *ObjectMeta) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -498,6 +559,9 @@ func (m *ObjectMeta) Size() (n int) {
 }
 
 func (m *TypeMeta) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Type)
@@ -515,14 +579,7 @@ func (m *TypeMeta) Size() (n int) {
 }
 
 func sovMeta(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozMeta(x uint64) (n int) {
 	return sovMeta(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -542,7 +599,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -570,7 +627,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -580,6 +637,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthMeta
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -599,7 +659,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -609,6 +669,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthMeta
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -628,7 +691,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -637,6 +700,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthMeta
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -657,7 +723,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					wire |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -674,7 +740,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -684,6 +750,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthMeta
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthMeta
+					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -700,7 +769,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						stringLenmapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -710,6 +779,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthMeta
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthMeta
+					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -746,7 +818,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -755,6 +827,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthMeta
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -775,7 +850,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					wire |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -792,7 +867,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -802,6 +877,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthMeta
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthMeta
+					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -818,7 +896,7 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						stringLenmapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -828,6 +906,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthMeta
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthMeta
+					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -859,6 +940,9 @@ func (m *ObjectMeta) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthMeta
 			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -887,7 +971,7 @@ func (m *TypeMeta) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -915,7 +999,7 @@ func (m *TypeMeta) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -925,6 +1009,9 @@ func (m *TypeMeta) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthMeta
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -944,7 +1031,7 @@ func (m *TypeMeta) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -954,6 +1041,9 @@ func (m *TypeMeta) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthMeta
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMeta
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -966,6 +1056,9 @@ func (m *TypeMeta) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthMeta
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthMeta
 			}
 			if (iNdEx + skippy) > l {
@@ -1035,8 +1128,11 @@ func skipMeta(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthMeta
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthMeta
 			}
 			return iNdEx, nil
@@ -1067,6 +1163,9 @@ func skipMeta(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthMeta
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1085,37 +1184,3 @@ var (
 	ErrInvalidLengthMeta = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowMeta   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() { proto.RegisterFile("meta.proto", fileDescriptor_meta_9919e94a8761b94f) }
-
-var fileDescriptor_meta_9919e94a8761b94f = []byte{
-	// 439 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0xbd, 0xaa, 0xd4, 0x40,
-	0x14, 0x76, 0x76, 0xe3, 0xc5, 0x7b, 0x82, 0xb2, 0x8c, 0x3f, 0xc4, 0x15, 0x93, 0x30, 0x20, 0x5c,
-	0x64, 0xcd, 0xd5, 0x15, 0x2e, 0xba, 0x85, 0x78, 0x17, 0x2c, 0x04, 0xc5, 0x25, 0x2c, 0x16, 0x36,
-	0x32, 0x09, 0xe3, 0x1a, 0x4d, 0x32, 0x21, 0x99, 0x04, 0xf2, 0x06, 0x3e, 0x80, 0x85, 0x85, 0x0f,
-	0xe0, 0x23, 0xf8, 0x08, 0x96, 0x3e, 0x41, 0xd0, 0xd8, 0xa5, 0xb4, 0xb2, 0x94, 0x4c, 0x82, 0x99,
-	0x2c, 0x5a, 0x58, 0xe5, 0x7c, 0xe7, 0xe7, 0xfb, 0xce, 0x99, 0x7c, 0x00, 0x11, 0x13, 0xd4, 0x49,
-	0x52, 0x2e, 0x38, 0x3e, 0x9f, 0xb1, 0x38, 0xcb, 0x1d, 0x9f, 0xa7, 0xcc, 0x29, 0x96, 0xf3, 0x5b,
-	0xbb, 0x40, 0xbc, 0xce, 0x3d, 0xc7, 0xe7, 0xd1, 0xf1, 0x8e, 0xef, 0xf8, 0xb1, 0xec, 0xf2, 0xf2,
-	0x57, 0x12, 0x49, 0x20, 0xa3, 0x6e, 0x9a, 0x7c, 0xd4, 0x00, 0x9e, 0x79, 0x6f, 0x98, 0x2f, 0x9e,
-	0x32, 0x41, 0xf1, 0x43, 0xd0, 0x62, 0x1a, 0x31, 0x03, 0xd9, 0xe8, 0xe8, 0x70, 0xbd, 0x68, 0x2a,
-	0xeb, 0x42, 0x8b, 0x17, 0x3c, 0x0a, 0x04, 0x8b, 0x12, 0x51, 0xfe, 0xac, 0xac, 0x2b, 0x25, 0x8d,
-	0xc2, 0x95, 0x4d, 0xc6, 0x05, 0xe2, 0xca, 0x49, 0xbc, 0x85, 0xc3, 0xf6, 0x9b, 0x25, 0xd4, 0x67,
-	0xc6, 0x44, 0xd2, 0x9c, 0x34, 0x95, 0x75, 0xf1, 0x4f, 0x72, 0xc4, 0x75, 0x4d, 0xe1, 0xda, 0xab,
-	0x12, 0x77, 0x20, 0xc2, 0x09, 0x1c, 0x84, 0xd4, 0x63, 0x61, 0x66, 0x4c, 0xed, 0xe9, 0x91, 0xbe,
-	0xbc, 0xe1, 0x8c, 0xae, 0x76, 0x86, 0x13, 0x9c, 0x27, 0xb2, 0xef, 0x51, 0x2c, 0xd2, 0x72, 0x7d,
-	0xa7, 0xa9, 0xac, 0x59, 0x37, 0x38, 0x92, 0xbd, 0xda, 0xcb, 0x2e, 0xf6, 0x6b, 0xc4, 0xed, 0x75,
-	0xf0, 0x3b, 0x04, 0x3a, 0x8d, 0x63, 0x2e, 0xa8, 0x08, 0x78, 0x9c, 0x19, 0x9a, 0xd4, 0xbd, 0xf9,
-	0x6f, 0xdd, 0xd3, 0xa1, 0xb9, 0x13, 0x5f, 0x35, 0x95, 0x75, 0x59, 0xa1, 0x18, 0x6d, 0x70, 0xbd,
-	0xdf, 0xe0, 0xaf, 0x75, 0xe2, 0xaa, 0xd2, 0xf3, 0xfb, 0xa0, 0x2b, 0x47, 0xe1, 0x19, 0x4c, 0xdf,
-	0xb2, 0xb2, 0xfb, 0x45, 0x6e, 0x1b, 0xe2, 0x4b, 0x70, 0xb6, 0xa0, 0x61, 0xde, 0xbf, 0xb7, 0xdb,
-	0x81, 0xd5, 0xe4, 0x1e, 0x9a, 0x3f, 0x80, 0xd9, 0xfe, 0x5e, 0xff, 0x33, 0x4f, 0xde, 0x23, 0x38,
-	0xb7, 0x2d, 0x13, 0x26, 0xcd, 0x71, 0x02, 0x5a, 0x1b, 0xf7, 0xe6, 0x20, 0x4d, 0x65, 0x69, 0xa2,
-	0x4c, 0x98, 0x62, 0x89, 0x16, 0x8e, 0x2c, 0xd1, 0xf6, 0xe3, 0x0d, 0xc0, 0xe9, 0xe6, 0xf1, 0x73,
-	0x96, 0x66, 0x01, 0x8f, 0x7b, 0x4f, 0xdc, 0x6e, 0x2a, 0x4b, 0xa7, 0x49, 0xf0, 0xb2, 0xe8, 0xd2,
-	0xea, 0x93, 0x0c, 0x59, 0x95, 0x4b, 0xe1, 0x58, 0xdb, 0xbf, 0xbe, 0x9b, 0xe8, 0x53, 0x6d, 0xa2,
-	0xcf, 0xb5, 0x89, 0xbe, 0xd4, 0x26, 0xfa, 0x5a, 0x9b, 0xe8, 0x5b, 0x6d, 0xa2, 0x0f, 0x3f, 0xcc,
-	0x33, 0x2f, 0x26, 0xc5, 0xd2, 0x3b, 0x90, 0xf6, 0xbe, 0xfb, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x46,
-	0x35, 0x2a, 0x1b, 0x2a, 0x03, 0x00, 0x00,
-}

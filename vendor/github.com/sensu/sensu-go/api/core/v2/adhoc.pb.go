@@ -3,14 +3,15 @@
 
 package v2
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "github.com/gogo/protobuf/gogoproto"
-
-import bytes "bytes"
-
-import io "io"
+import (
+	bytes "bytes"
+	fmt "fmt"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/golang/protobuf/proto"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -21,17 +22,17 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type AdhocRequest struct {
 	// Subscriptions is the list of entity subscriptions.
-	Subscriptions []string `protobuf:"bytes,2,rep,name=subscriptions" json:"subscriptions,omitempty"`
+	Subscriptions []string `protobuf:"bytes,2,rep,name=subscriptions,proto3" json:"subscriptions,omitempty"`
 	// Creator is the author of the adhoc request.
 	Creator string `protobuf:"bytes,3,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Reason is used to provide context to the request.
 	Reason string `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	// Metadata contains the name, namespace, labels and annotations of the AdhocCheck
-	ObjectMeta           `protobuf:"bytes,5,opt,name=metadata,embedded=metadata" json:"metadata"`
+	ObjectMeta           `protobuf:"bytes,5,opt,name=metadata,proto3,embedded=metadata" json:"metadata"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -41,7 +42,7 @@ func (m *AdhocRequest) Reset()         { *m = AdhocRequest{} }
 func (m *AdhocRequest) String() string { return proto.CompactTextString(m) }
 func (*AdhocRequest) ProtoMessage()    {}
 func (*AdhocRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adhoc_325b14ba0478b595, []int{0}
+	return fileDescriptor_1998bb58f246ad61, []int{0}
 }
 func (m *AdhocRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -51,15 +52,15 @@ func (m *AdhocRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return xxx_messageInfo_AdhocRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
 		return b[:n], nil
 	}
 }
-func (dst *AdhocRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AdhocRequest.Merge(dst, src)
+func (m *AdhocRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdhocRequest.Merge(m, src)
 }
 func (m *AdhocRequest) XXX_Size() int {
 	return m.Size()
@@ -94,6 +95,30 @@ func (m *AdhocRequest) GetReason() string {
 func init() {
 	proto.RegisterType((*AdhocRequest)(nil), "sensu.core.v2.AdhocRequest")
 }
+
+func init() { proto.RegisterFile("adhoc.proto", fileDescriptor_1998bb58f246ad61) }
+
+var fileDescriptor_1998bb58f246ad61 = []byte{
+	// 272 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4e, 0x4c, 0xc9, 0xc8,
+	0x4f, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x2d, 0x4e, 0xcd, 0x2b, 0x2e, 0xd5, 0x4b,
+	0xce, 0x2f, 0x4a, 0xd5, 0x2b, 0x33, 0x92, 0x32, 0x49, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b,
+	0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0x4f, 0xcf, 0xd7, 0x07, 0xab, 0x4a, 0x2a, 0x4d, 0x73, 0x28, 0x33,
+	0xd4, 0x33, 0xd2, 0x33, 0x04, 0x0b, 0x82, 0xc5, 0xc0, 0x2c, 0x88, 0x21, 0x52, 0x5c, 0xb9, 0xa9,
+	0x25, 0x89, 0x10, 0xb6, 0xd2, 0x51, 0x46, 0x2e, 0x1e, 0x47, 0x90, 0x05, 0x41, 0xa9, 0x85, 0xa5,
+	0xa9, 0xc5, 0x25, 0x42, 0x5a, 0x5c, 0xbc, 0xc5, 0xa5, 0x49, 0xc5, 0xc9, 0x45, 0x99, 0x05, 0x25,
+	0x99, 0xf9, 0x79, 0xc5, 0x12, 0x4c, 0x0a, 0xcc, 0x1a, 0x9c, 0x4e, 0x2c, 0x27, 0xee, 0xc9, 0x33,
+	0x06, 0xa1, 0x4a, 0x09, 0xc9, 0x71, 0xb1, 0x27, 0x17, 0xa5, 0x26, 0x96, 0xe4, 0x17, 0x49, 0x30,
+	0x2b, 0x30, 0xc2, 0x55, 0xc1, 0x04, 0x85, 0x64, 0xb8, 0xd8, 0x8a, 0x52, 0x13, 0x8b, 0xf3, 0xf3,
+	0x24, 0x58, 0x90, 0xa4, 0xa1, 0x62, 0x42, 0xde, 0x5c, 0x1c, 0x20, 0x87, 0xa4, 0x24, 0x96, 0x24,
+	0x4a, 0xb0, 0x2a, 0x30, 0x6a, 0x70, 0x1b, 0x49, 0xea, 0xa1, 0x78, 0x4f, 0xcf, 0x3f, 0x29, 0x2b,
+	0x35, 0xb9, 0xc4, 0x37, 0xb5, 0x24, 0xd1, 0x49, 0xe4, 0xc4, 0x3d, 0x79, 0x86, 0x0b, 0xf7, 0xe4,
+	0x19, 0x5f, 0xdd, 0x93, 0x87, 0x6b, 0x0b, 0x82, 0xb3, 0x9c, 0x14, 0x7e, 0x3c, 0x94, 0x63, 0x5c,
+	0xf1, 0x48, 0x8e, 0x71, 0xc7, 0x23, 0x39, 0xc6, 0x13, 0x8f, 0xe4, 0x18, 0x2f, 0x3c, 0x92, 0x63,
+	0x7c, 0xf0, 0x48, 0x8e, 0x71, 0xc6, 0x63, 0x39, 0x86, 0x28, 0xa6, 0x32, 0xa3, 0x24, 0x36, 0xb0,
+	0x87, 0x8d, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xb2, 0x4c, 0xd3, 0x5f, 0x50, 0x01, 0x00, 0x00,
+}
+
 func (this *AdhocRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -138,7 +163,7 @@ func (this *AdhocRequest) Equal(that interface{}) bool {
 func (m *AdhocRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -146,59 +171,65 @@ func (m *AdhocRequest) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *AdhocRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AdhocRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Subscriptions) > 0 {
-		for _, s := range m.Subscriptions {
-			dAtA[i] = 0x12
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			dAtA[i] = uint8(l)
-			i++
-			i += copy(dAtA[i:], s)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	{
+		size, err := m.ObjectMeta.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = encodeVarintAdhoc(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	if len(m.Reason) > 0 {
+		i -= len(m.Reason)
+		copy(dAtA[i:], m.Reason)
+		i = encodeVarintAdhoc(dAtA, i, uint64(len(m.Reason)))
+		i--
+		dAtA[i] = 0x22
 	}
 	if len(m.Creator) > 0 {
-		dAtA[i] = 0x1a
-		i++
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
 		i = encodeVarintAdhoc(dAtA, i, uint64(len(m.Creator)))
-		i += copy(dAtA[i:], m.Creator)
+		i--
+		dAtA[i] = 0x1a
 	}
-	if len(m.Reason) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintAdhoc(dAtA, i, uint64(len(m.Reason)))
-		i += copy(dAtA[i:], m.Reason)
+	if len(m.Subscriptions) > 0 {
+		for iNdEx := len(m.Subscriptions) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Subscriptions[iNdEx])
+			copy(dAtA[i:], m.Subscriptions[iNdEx])
+			i = encodeVarintAdhoc(dAtA, i, uint64(len(m.Subscriptions[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
 	}
-	dAtA[i] = 0x2a
-	i++
-	i = encodeVarintAdhoc(dAtA, i, uint64(m.ObjectMeta.Size()))
-	n1, err := m.ObjectMeta.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintAdhoc(dAtA []byte, offset int, v uint64) int {
+	offset -= sovAdhoc(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedAdhocRequest(r randyAdhoc, easy bool) *AdhocRequest {
 	this := &AdhocRequest{}
@@ -290,6 +321,9 @@ func encodeVarintPopulateAdhoc(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *AdhocRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Subscriptions) > 0 {
@@ -315,14 +349,7 @@ func (m *AdhocRequest) Size() (n int) {
 }
 
 func sovAdhoc(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozAdhoc(x uint64) (n int) {
 	return sovAdhoc(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -342,7 +369,7 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -370,7 +397,7 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -380,6 +407,9 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAdhoc
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAdhoc
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -399,7 +429,7 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -409,6 +439,9 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAdhoc
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAdhoc
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -428,7 +461,7 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -438,6 +471,9 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAdhoc
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAdhoc
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -457,7 +493,7 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -466,6 +502,9 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAdhoc
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAdhoc
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -480,6 +519,9 @@ func (m *AdhocRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAdhoc
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAdhoc
 			}
 			if (iNdEx + skippy) > l {
@@ -549,8 +591,11 @@ func skipAdhoc(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthAdhoc
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthAdhoc
 			}
 			return iNdEx, nil
@@ -581,6 +626,9 @@ func skipAdhoc(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthAdhoc
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -599,26 +647,3 @@ var (
 	ErrInvalidLengthAdhoc = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowAdhoc   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() { proto.RegisterFile("adhoc.proto", fileDescriptor_adhoc_325b14ba0478b595) }
-
-var fileDescriptor_adhoc_325b14ba0478b595 = []byte{
-	// 264 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x4f, 0x4d, 0x4a, 0xc3, 0x40,
-	0x14, 0xee, 0x6b, 0x6b, 0xd5, 0xa9, 0xdd, 0x04, 0x17, 0xb1, 0xc8, 0x24, 0xb8, 0x2a, 0x82, 0x53,
-	0x88, 0x27, 0x30, 0x5b, 0x11, 0x21, 0x4b, 0x77, 0x93, 0xe9, 0x98, 0x46, 0x68, 0x5e, 0x9d, 0x9f,
-	0x9e, 0xc5, 0x23, 0x78, 0x04, 0x2f, 0x20, 0x64, 0xd9, 0x13, 0x04, 0x1d, 0x77, 0x9e, 0xc0, 0xa5,
-	0x74, 0xaa, 0xa1, 0xdd, 0x7d, 0xbf, 0x8f, 0xf7, 0x91, 0x21, 0x9f, 0xcd, 0x51, 0xb0, 0xa5, 0x42,
-	0x83, 0xc1, 0x48, 0xcb, 0x4a, 0x5b, 0x26, 0x50, 0x49, 0xb6, 0x4a, 0xc6, 0x57, 0x45, 0x69, 0xe6,
-	0x36, 0x67, 0x02, 0x17, 0xd3, 0x02, 0x0b, 0x9c, 0xfa, 0x54, 0x6e, 0x1f, 0x3d, 0xf3, 0xc4, 0xa3,
-	0x6d, 0x7b, 0x4c, 0x16, 0xd2, 0xf0, 0x2d, 0xbe, 0x78, 0x07, 0x72, 0x72, 0xb3, 0xb9, 0x9c, 0xc9,
-	0x67, 0x2b, 0xb5, 0x09, 0x2e, 0xc9, 0x48, 0xdb, 0x5c, 0x0b, 0x55, 0x2e, 0x4d, 0x89, 0x95, 0x0e,
-	0xbb, 0x71, 0x6f, 0x72, 0x9c, 0xf6, 0xeb, 0x26, 0x82, 0x6c, 0xdf, 0x0a, 0x28, 0x39, 0x14, 0x4a,
-	0x72, 0x83, 0x2a, 0xec, 0xc5, 0xd0, 0xa6, 0xfe, 0xc5, 0xe0, 0x9c, 0x0c, 0x94, 0xe4, 0x1a, 0xab,
-	0xb0, 0xbf, 0x63, 0xff, 0x69, 0xc1, 0x2d, 0x39, 0xda, 0x3c, 0x32, 0xe3, 0x86, 0x87, 0x07, 0x31,
-	0x4c, 0x86, 0xc9, 0x19, 0xdb, 0xdb, 0xc5, 0xee, 0xf3, 0x27, 0x29, 0xcc, 0x9d, 0x34, 0x3c, 0x3d,
-	0xad, 0x9b, 0xa8, 0xb3, 0x6e, 0x22, 0xf8, 0x6e, 0xa2, 0xb6, 0x96, 0xb5, 0x28, 0x8d, 0x7f, 0x3e,
-	0x29, 0xbc, 0x3a, 0x0a, 0x6f, 0x8e, 0x42, 0xed, 0x28, 0xac, 0x1d, 0x85, 0x0f, 0x47, 0xe1, 0xe5,
-	0x8b, 0x76, 0x1e, 0xba, 0xab, 0x24, 0x1f, 0xf8, 0xc1, 0xd7, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0xa0, 0x78, 0xca, 0x9c, 0x49, 0x01, 0x00, 0x00,
-}

@@ -1,6 +1,6 @@
 package types
 
-import "github.com/sensu/sensu-go/api/core/v2"
+import v2 "github.com/sensu/sensu-go/api/core/v2"
 
 type (
 	AdhocRequest        = v2.AdhocRequest
@@ -58,7 +58,7 @@ type (
 )
 
 const (
-	// AcceessTokenString is the key name used to retrieve the access token string
+	// AccessTokenString is the key name used to retrieve the access token string
 	AccessTokenString = v2.AccessTokenString
 
 	// AccessTokenClaims contains the key name to retrieve the access token claims
@@ -69,6 +69,12 @@ const (
 
 	// NamespaceKey contains the key name to retrieve the namespace from context
 	NamespaceKey = v2.NamespaceKey
+
+	// PageContinueKey contains the continue token used in pagination
+	PageContinueKey = v2.PageContinueKey
+
+	// PageSizeKey contains the page size used in pagination
+	PageSizeKey = v2.PageSizeKey
 
 	// RefreshTokenClaims contains the key name to retrieve the refresh token claims
 	RefreshTokenClaims = v2.RefreshTokenClaims
@@ -237,6 +243,10 @@ var (
 	SortEntitiesByPredicate     = v2.SortEntitiesByPredicate
 	SortEntitiesByID            = v2.SortEntitiesByID
 	SortEntitiesByLastSeen      = v2.SortEntitiesByLastSeen
+	SortEventFiltersByPredicate = v2.SortEventFiltersByPredicate
+	SortEventFiltersByName      = v2.SortEventFiltersByName
+	SortHandlersByPredicate     = v2.SortHandlersByPredicate
+	SortHandlersByName          = v2.SortHandlersByName
 	SortSilencedByPredicate     = v2.SortSilencedByPredicate
 	SortSilencedByName          = v2.SortSilencedByName
 	SortSilencedByBegin         = v2.SortSilencedByBegin

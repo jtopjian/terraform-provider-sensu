@@ -4,19 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/sensu/sensu-go/types"
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
 
-var checksPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "checks")
+// ChecksPath is the api path for checks.
+var ChecksPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "checks")
 
 // CreateCheck creates new check on configured Sensu instance
-func (client *RestClient) CreateCheck(check *types.CheckConfig) (err error) {
+func (client *RestClient) CreateCheck(check *corev2.CheckConfig) (err error) {
 	bytes, err := json.Marshal(check)
 	if err != nil {
 		return err
 	}
 
-	path := checksPath(check.Namespace)
+	path := ChecksPath(check.Namespace)
 	res, err := client.R().SetBody(bytes).Post(path)
 	if err != nil {
 		return err
@@ -30,13 +31,13 @@ func (client *RestClient) CreateCheck(check *types.CheckConfig) (err error) {
 }
 
 // UpdateCheck updates given check on configured Sensu instance
-func (client *RestClient) UpdateCheck(check *types.CheckConfig) (err error) {
+func (client *RestClient) UpdateCheck(check *corev2.CheckConfig) (err error) {
 	bytes, err := json.Marshal(check)
 	if err != nil {
 		return err
 	}
 
-	path := checksPath(check.Namespace, check.Name)
+	path := ChecksPath(check.Namespace, check.Name)
 	res, err := client.R().SetBody(bytes).Put(path)
 	if err != nil {
 		return err
@@ -50,29 +51,18 @@ func (client *RestClient) UpdateCheck(check *types.CheckConfig) (err error) {
 }
 
 // DeleteCheck deletes check from configured Sensu instance
-func (client *RestClient) DeleteCheck(check *types.CheckConfig) error {
-	path := checksPath(client.config.Namespace(), check.Name)
-	res, err := client.R().Delete(path)
-
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode() >= 400 {
-		return UnmarshalError(res)
-	}
-
-	return nil
+func (client *RestClient) DeleteCheck(namespace, name string) error {
+	return client.Delete(ChecksPath(namespace, name))
 }
 
 // ExecuteCheck sends an execution request with the provided adhoc request
-func (client *RestClient) ExecuteCheck(req *types.AdhocRequest) error {
+func (client *RestClient) ExecuteCheck(req *corev2.AdhocRequest) error {
 	bytes, err := json.Marshal(req)
 	if err != nil {
 		return err
 	}
 
-	path := checksPath(client.config.Namespace(), req.Name, "execute")
+	path := ChecksPath(client.config.Namespace(), req.Name, "execute")
 	res, err := client.R().SetBody(bytes).Post(path)
 
 	if err != nil {
@@ -87,10 +77,10 @@ func (client *RestClient) ExecuteCheck(req *types.AdhocRequest) error {
 }
 
 // FetchCheck fetches a specific check
-func (client *RestClient) FetchCheck(name string) (*types.CheckConfig, error) {
-	var check *types.CheckConfig
+func (client *RestClient) FetchCheck(name string) (*corev2.CheckConfig, error) {
+	var check *corev2.CheckConfig
 
-	path := checksPath(client.config.Namespace(), name)
+	path := ChecksPath(client.config.Namespace(), name)
 	res, err := client.R().Get(path)
 	if err != nil {
 		return nil, fmt.Errorf("GET %q: %s", path, err)
@@ -104,27 +94,9 @@ func (client *RestClient) FetchCheck(name string) (*types.CheckConfig, error) {
 	return check, err
 }
 
-// ListChecks fetches all checks from configured Sensu instance
-func (client *RestClient) ListChecks(namespace string) ([]types.CheckConfig, error) {
-	var checks []types.CheckConfig
-
-	path := checksPath(namespace)
-	res, err := client.R().Get(path)
-	if err != nil {
-		return checks, err
-	}
-
-	if res.StatusCode() >= 400 {
-		return checks, UnmarshalError(res)
-	}
-
-	err = json.Unmarshal(res.Body(), &checks)
-	return checks, err
-}
-
 // AddCheckHook associates an existing hook with an existing check
-func (client *RestClient) AddCheckHook(check *types.CheckConfig, checkHook *types.HookList) error {
-	path := checksPath(check.Namespace, check.Name, "hooks", checkHook.Type)
+func (client *RestClient) AddCheckHook(check *corev2.CheckConfig, checkHook *corev2.HookList) error {
+	path := ChecksPath(check.Namespace, check.Name, "hooks", checkHook.Type)
 	res, err := client.R().SetBody(checkHook).Put(path)
 	if err != nil {
 		return err
@@ -138,8 +110,8 @@ func (client *RestClient) AddCheckHook(check *types.CheckConfig, checkHook *type
 }
 
 // RemoveCheckHook removes an association between an existing hook and an existing check
-func (client *RestClient) RemoveCheckHook(check *types.CheckConfig, checkHookType string, hookName string) error {
-	path := checksPath(check.Namespace, check.Name, "hooks", checkHookType, "hook", hookName)
+func (client *RestClient) RemoveCheckHook(check *corev2.CheckConfig, checkHookType string, hookName string) error {
+	path := ChecksPath(check.Namespace, check.Name, "hooks", checkHookType, "hook", hookName)
 	res, err := client.R().Delete(path)
 	if err != nil {
 		return err

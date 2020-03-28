@@ -4,9 +4,25 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"path"
+	"strings"
+
+	stringsutil "github.com/sensu/sensu-go/util/strings"
 )
 
 const (
+	// ClusterRolesResource is the name of this resource type
+	ClusterRolesResource = "clusterroles"
+
+	// ClusterRoleBindingsResource is the name of this resource type
+	ClusterRoleBindingsResource = "clusterrolebindings"
+
+	// RolesResource is the name of this resource type
+	RolesResource = "roles"
+
+	// RoleBindingsResource is the name of this resource type
+	RoleBindingsResource = "rolebindings"
+
 	// ResourceAll represents all possible resources
 	ResourceAll = "*"
 	// VerbAll represents all possible verbs
@@ -35,6 +51,15 @@ var CommonCoreResources = []string{
 	"hooks",
 	"mutators",
 	"silenced",
+}
+
+var allowedVerbs = []string{
+	VerbAll,
+	"get",
+	"list",
+	"create",
+	"update",
+	"delete",
 }
 
 // FixtureSubject creates a Subject for testing
@@ -99,6 +124,16 @@ func FixtureClusterRoleBinding(name string) *ClusterRoleBinding {
 	}
 }
 
+// StorePrefix returns the path prefix to this resource in the store
+func (r *ClusterRole) StorePrefix() string {
+	return "rbac/" + ClusterRolesResource
+}
+
+// URIPath returns the path component of a cluster role URI.
+func (r *ClusterRole) URIPath() string {
+	return path.Join(URLPrefix, ClusterRolesResource, url.PathEscape(r.Name))
+}
+
 // Validate a ClusterRole
 func (r *ClusterRole) Validate() error {
 	if err := ValidateSubscriptionName(r.Name); err != nil {
@@ -113,12 +148,28 @@ func (r *ClusterRole) Validate() error {
 		return errors.New("ClusterRole cannot have a namespace")
 	}
 
+	for i := range r.Rules {
+		// Split the verbs, resources and resource names
+		r.Rules[i].Verbs = split(r.Rules[i].Verbs)
+		r.Rules[i].Resources = split(r.Rules[i].Resources)
+
+		// Validate the verbs
+		if err := validateVerbs(r.Rules[i].Verbs); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
-// URIPath returns the path component of a ClusterRole URI.
-func (r *ClusterRole) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/clusterroles/%s", url.PathEscape(r.Name))
+// StorePrefix returns the path prefix to this resource in the store
+func (b *ClusterRoleBinding) StorePrefix() string {
+	return "rbac/" + ClusterRoleBindingsResource
+}
+
+// URIPath returns the path component of a cluster role binding URI.
+func (b *ClusterRoleBinding) URIPath() string {
+	return path.Join(URLPrefix, ClusterRoleBindingsResource, url.PathEscape(b.Name))
 }
 
 // Validate a ClusterRoleBinding
@@ -142,9 +193,18 @@ func (b *ClusterRoleBinding) Validate() error {
 	return nil
 }
 
-// URIPath returns the path component of a ClusterRole URI.
-func (b *ClusterRoleBinding) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/clusterrolebindings/%s", url.PathEscape(b.Name))
+// StorePrefix returns the path prefix to this resource in the store
+func (r *Role) StorePrefix() string {
+	return "rbac/" + RolesResource
+}
+
+// URIPath returns the path component of a role URI.
+func (r *Role) URIPath() string {
+	if r.Namespace == "" {
+		return path.Join(URLPrefix, RolesResource, url.PathEscape(r.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(r.Namespace), RolesResource, url.PathEscape(r.Name))
+
 }
 
 // Validate a Role
@@ -161,15 +221,31 @@ func (r *Role) Validate() error {
 		return errors.New("a Role must have at least one rule")
 	}
 
+	for i := range r.Rules {
+		// Split the verbs, resources and resource names
+		r.Rules[i].Verbs = split(r.Rules[i].Verbs)
+		r.Rules[i].Resources = split(r.Rules[i].Resources)
+
+		// Validate the verbs
+		if err := validateVerbs(r.Rules[i].Verbs); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
-// URIPath returns the path component of a Role URI.
-func (r *Role) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/roles/%s",
-		url.PathEscape(r.Namespace),
-		url.PathEscape(r.Name),
-	)
+// StorePrefix returns the path prefix to this resource in the store
+func (b *RoleBinding) StorePrefix() string {
+	return "rbac/" + RoleBindingsResource
+}
+
+// URIPath returns the path component of a role binding URI.
+func (b *RoleBinding) URIPath() string {
+	if b.Namespace == "" {
+		return path.Join(URLPrefix, RoleBindingsResource, url.PathEscape(b.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(b.Namespace), RoleBindingsResource, url.PathEscape(b.Name))
 }
 
 // Validate a RoleBinding
@@ -191,14 +267,6 @@ func (b *RoleBinding) Validate() error {
 	}
 
 	return nil
-}
-
-// URIPath returns the path component of a Role URI.
-func (b *RoleBinding) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/rolebindings/%s",
-		url.PathEscape(b.Namespace),
-		url.PathEscape(b.Name),
-	)
 }
 
 // ResourceMatches returns whether the specified requestedResource matches any
@@ -257,4 +325,119 @@ func NewRole(meta ObjectMeta) *Role {
 // NewRoleBinding creates a new RoleBinding.
 func NewRoleBinding(meta ObjectMeta) *RoleBinding {
 	return &RoleBinding{ObjectMeta: meta}
+}
+
+// ClusterRoleFields returns a set of fields that represent that resource
+func ClusterRoleFields(r Resource) map[string]string {
+	resource := r.(*ClusterRole)
+	return map[string]string{
+		"clusterrole.name": resource.ObjectMeta.Name,
+	}
+}
+
+// ClusterRoleBindingFields returns a set of fields that represent that resource
+func ClusterRoleBindingFields(r Resource) map[string]string {
+	resource := r.(*ClusterRoleBinding)
+	return map[string]string{
+		"clusterrolebinding.name":          resource.ObjectMeta.Name,
+		"clusterrolebinding.role_ref.name": resource.RoleRef.Name,
+		"clusterrolebinding.role_ref.type": resource.RoleRef.Type,
+	}
+}
+
+// RoleFields returns a set of fields that represent that resource
+func RoleFields(r Resource) map[string]string {
+	resource := r.(*Role)
+	return map[string]string{
+		"role.name":      resource.ObjectMeta.Name,
+		"role.namespace": resource.ObjectMeta.Namespace,
+	}
+}
+
+// RoleBindingFields returns a set of fields that represent that resource
+func RoleBindingFields(r Resource) map[string]string {
+	resource := r.(*RoleBinding)
+	return map[string]string{
+		"rolebinding.name":          resource.ObjectMeta.Name,
+		"rolebinding.namespace":     resource.ObjectMeta.Namespace,
+		"rolebinding.role_ref.name": resource.RoleRef.Name,
+		"rolebinding.role_ref.type": resource.RoleRef.Type,
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (r *ClusterRole) SetNamespace(namespace string) {
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (r *ClusterRole) SetObjectMeta(meta ObjectMeta) {
+	r.ObjectMeta = meta
+}
+
+// SetNamespace sets the namespace of the resource.
+func (b *ClusterRoleBinding) SetNamespace(namespace string) {
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (b *ClusterRoleBinding) SetObjectMeta(meta ObjectMeta) {
+	b.ObjectMeta = meta
+}
+
+// SetNamespace sets the namespace of the resource.
+func (r *Role) SetNamespace(namespace string) {
+	r.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (r *Role) SetObjectMeta(meta ObjectMeta) {
+	r.ObjectMeta = meta
+}
+
+// SetNamespace sets the namespace of the resource.
+func (b *RoleBinding) SetNamespace(namespace string) {
+	b.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (b *RoleBinding) SetObjectMeta(meta ObjectMeta) {
+	b.ObjectMeta = meta
+}
+
+func (*ClusterRoleBinding) RBACName() string {
+	return "clusterrolebindings"
+}
+
+func (*RoleBinding) RBACName() string {
+	return "rolebindings"
+}
+
+func (*ClusterRole) RBACName() string {
+	return "clusterroles"
+}
+
+func (*Role) RBACName() string {
+	return "roles"
+}
+
+// split splits each string within a list using the comma seperator
+func split(list []string) []string {
+	var splitted []string
+
+	for _, elem := range list {
+		v := strings.Split(elem, ",")
+		splitted = append(splitted, v...)
+	}
+
+	return splitted
+}
+
+// validateVerbs ensures the provided verbs are valid
+func validateVerbs(verbs []string) error {
+	for _, verb := range verbs {
+		if !stringsutil.InArray(verb, allowedVerbs) {
+			return fmt.Errorf("the verb %q is not valid", verb)
+		}
+	}
+
+	return nil
 }
