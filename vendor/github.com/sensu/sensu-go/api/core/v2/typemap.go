@@ -9,12 +9,18 @@ import (
 
 // typeMap is used to dynamically look up data types from strings.
 var typeMap = map[string]interface{}{
+	"APIKey":                 &APIKey{},
+	"api_key":                &APIKey{},
 	"AdhocRequest":           &AdhocRequest{},
 	"adhoc_request":          &AdhocRequest{},
 	"Any":                    &Any{},
 	"any":                    &Any{},
 	"Asset":                  &Asset{},
 	"asset":                  &Asset{},
+	"AssetBuild":             &AssetBuild{},
+	"asset_build":            &AssetBuild{},
+	"AssetList":              &AssetList{},
+	"asset_list":             &AssetList{},
 	"AuthProviderClaims":     &AuthProviderClaims{},
 	"auth_provider_claims":   &AuthProviderClaims{},
 	"Check":                  &Check{},
@@ -83,6 +89,8 @@ var typeMap = map[string]interface{}{
 	"role_ref":               &RoleRef{},
 	"Rule":                   &Rule{},
 	"rule":                   &Rule{},
+	"Secret":                 &Secret{},
+	"secret":                 &Secret{},
 	"Silenced":               &Silenced{},
 	"silenced":               &Silenced{},
 	"Subject":                &Subject{},
@@ -91,6 +99,8 @@ var typeMap = map[string]interface{}{
 	"system":                 &System{},
 	"TLSOptions":             &TLSOptions{},
 	"tls_options":            &TLSOptions{},
+	"TessenConfig":           &TessenConfig{},
+	"tessen_config":          &TessenConfig{},
 	"TimeWindowDays":         &TimeWindowDays{},
 	"time_window_days":       &TimeWindowDays{},
 	"TimeWindowTimeRange":    &TimeWindowTimeRange{},
@@ -103,6 +113,8 @@ var typeMap = map[string]interface{}{
 	"type_meta":              &TypeMeta{},
 	"User":                   &User{},
 	"user":                   &User{},
+	"Version":                &Version{},
+	"version":                &Version{},
 }
 
 // ResolveResource returns a zero-valued resource, given a name.

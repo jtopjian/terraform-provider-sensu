@@ -1,37 +1,48 @@
 package v2
 
 import (
+	"encoding/json"
 	"errors"
-	fmt "fmt"
+	"fmt"
 	"net/url"
+	"path"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	stringsutil "github.com/sensu/sensu-go/util/strings"
 )
 
-// EventFailingState indicates failing check result status
-const EventFailingState = "failing"
+const (
+	// EventsResource is the name of this resource type
+	EventsResource = "events"
 
-// EventFlappingState indicates a rapid change in check result status
-const EventFlappingState = "flapping"
+	// EventFailingState indicates failing check result status
+	EventFailingState = "failing"
 
-// EventPassingState indicates successful check result status
-const EventPassingState = "passing"
+	// EventFlappingState indicates a rapid change in check result status
+	EventFlappingState = "flapping"
 
-// FixtureEvent returns a testing fixutre for an Event object.
-func FixtureEvent(entityName, checkID string) *Event {
-	return &Event{
-		ObjectMeta: NewObjectMeta("", "default"),
-		Timestamp:  time.Now().Unix(),
-		Entity:     FixtureEntity(entityName),
-		Check:      FixtureCheck(checkID),
-	}
+	// EventPassingState indicates successful check result status
+	EventPassingState = "passing"
+)
+
+// StorePrefix returns the path prefix to this resource in the store
+func (e *Event) StorePrefix() string {
+	return EventsResource
 }
 
-// NewEvent creates a new Event.
-func NewEvent(meta ObjectMeta) *Event {
-	return &Event{ObjectMeta: meta}
+// URIPath returns the path component of an event URI.
+func (e *Event) URIPath() string {
+	if !e.HasCheck() && e.Entity == nil {
+		return path.Join(URLPrefix, EventsResource)
+	}
+	if !e.HasCheck() {
+		return path.Join(URLPrefix, EventsResource, url.PathEscape(e.Entity.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(e.Entity.Namespace), EventsResource, url.PathEscape(e.Entity.Name), url.PathEscape(e.Check.Name))
 }
 
 // Validate returns an error if the event does not pass validation tests.
@@ -62,6 +73,12 @@ func (e *Event) Validate() error {
 
 	if e.Name != "" {
 		return errors.New("events cannot be named")
+	}
+
+	if len(e.ID) > 0 {
+		if _, err := uuid.FromBytes(e.ID); err != nil {
+			return fmt.Errorf("event ID is invalid: %s", err)
+		}
 	}
 
 	return nil
@@ -106,7 +123,7 @@ func (e *Event) IsSilenced() bool {
 	return len(e.Check.Silenced) > 0
 }
 
-// Implements dynamic.SynthesizeExtras
+// SynthesizeExtras implements dynamic.SynthesizeExtras
 func (e *Event) SynthesizeExtras() map[string]interface{} {
 	return map[string]interface{}{
 		"has_check":     e.HasCheck(),
@@ -115,6 +132,23 @@ func (e *Event) SynthesizeExtras() map[string]interface{} {
 		"is_resolution": e.IsResolution(),
 		"is_silenced":   e.IsSilenced(),
 	}
+}
+
+// FixtureEvent returns a testing fixture for an Event object.
+func FixtureEvent(entityName, checkID string) *Event {
+	id := uuid.New()
+	return &Event{
+		ObjectMeta: NewObjectMeta("", "default"),
+		Timestamp:  time.Now().Unix(),
+		Entity:     FixtureEntity(entityName),
+		Check:      FixtureCheck(checkID),
+		ID:         id[:],
+	}
+}
+
+// NewEvent creates a new Event.
+func NewEvent(meta ObjectMeta) *Event {
+	return &Event{ObjectMeta: meta}
 }
 
 //
@@ -274,14 +308,6 @@ func (s *eventSorter) Less(i, j int) bool {
 	return s.byFn(s.events[i], s.events[j])
 }
 
-// URIPath returns the path component of a Event URI.
-func (e *Event) URIPath() string {
-	if !e.HasCheck() {
-		return ""
-	}
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/events/%s/%s", url.PathEscape(e.Entity.Namespace), url.PathEscape(e.Entity.Name), url.PathEscape(e.Check.Name))
-}
-
 // SilencedBy returns the subset of given silences, that silence the event.
 func (e *Event) SilencedBy(entries []*Silenced) []*Silenced {
 	silencedBy := make([]*Silenced, 0, len(entries))
@@ -302,7 +328,7 @@ func (e *Event) SilencedBy(entries []*Silenced) []*Silenced {
 
 // IsSilencedBy returns true if given silence will silence the event.
 func (e *Event) IsSilencedBy(entry *Silenced) bool {
-	if !e.HasCheck() {
+	if !e.HasCheck() || entry == nil {
 		return false
 	}
 
@@ -313,39 +339,147 @@ func (e *Event) IsSilencedBy(entry *Silenced) bool {
 	}
 
 	// Is this event silenced for all subscriptions? (e.g. *:check_cpu)
-	if entry.Name == fmt.Sprintf("*:%s", e.Check.Name) {
+	// Is this event silenced by the entity subscription? (e.g. entity:id:* or entity:id:check_cpu)
+	// This check being explicit here is probably not strictly necessary, as the presence
+	// of the `entity:name` subscription seems to be enforced on entity creation, and
+	// would be handled correctly the the subscription iteration logic below.
+	if entry.Matches(e.Check.Name, GetEntitySubscription(e.Entity.Name)) {
 		return true
 	}
 
-	// Is this event silenced by the entity subscription? (e.g. entity:id:*)
-	if entry.Name == fmt.Sprintf("%s:*", GetEntitySubscription(e.Entity.Name)) {
-		return true
-	}
-
-	// Is this event silenced for this particular entity? (e.g.
-	// entity:id:check_cpu)
-	if entry.Name == fmt.Sprintf("%s:%s", GetEntitySubscription(e.Entity.Name), e.Check.Name) {
-		return true
-	}
-
-	for _, subscription := range e.Check.Subscriptions {
-		// Make sure the entity is subscribed to this specific subscription
-		if !stringsutil.InArray(subscription, e.Entity.Subscriptions) {
-			continue
+	// Alternatively, check whether any of the subscriptions of the entity match the silence.
+	// It is not necessary to check the check subscriptions, because they are expected to
+	// be a subset of the entity subscriptions for proxy entities, and an intersection
+	// of entity and check subscriptions for non-proxy entities.
+	//
+	// Eg a proxy entity may have many subscriptions, but the check config that targets
+	// that entity is likely to only use one of them in order to target the check at
+	// a specific agent.
+	//
+	// Check configs for non-proxy entities on the other hand use their subscriptions to
+	// both target entities and agents (as they are the same thing), and as a result
+	// may have subscriptions present in the check config that are not present in the
+	// entity.
+	// Consider the following example:
+	//    - check has subscriptions `linux` and `windows`
+	//    - silence is for `windows` subscription
+	//    - event is for an entity with the `linux` subscription
+	// In this case, we don't want to match `linux` from the check, because the silence
+	// is targeted at windows machines and the event is for a linux machine.
+	//
+	// To handle both of these cases correctly, we need to rely on the presence of the
+	// event.check.proxy_entity_name field.
+	if e.Check.ProxyEntityName != "" {
+		// Proxy entity
+		for _, subscription := range e.Entity.Subscriptions {
+			if entry.Matches(e.Check.Name, subscription) {
+				return true
+			}
 		}
-
-		// Is this event silenced by one of the check subscription? (e.g.
-		// load-balancer:*)
-		if entry.Name == fmt.Sprintf("%s:*", subscription) {
-			return true
-		}
-
-		// Is this event silenced by one of the check subscription for this
-		// particular check? (e.g. load-balancer:check_cpu)
-		if entry.Name == fmt.Sprintf("%s:%s", subscription, e.Check.Name) {
-			return true
+	} else {
+		// Non-proxy entity
+		for _, subscription := range e.Check.Subscriptions {
+			if !stringsutil.InArray(subscription, e.Entity.Subscriptions) {
+				continue
+			}
+			if entry.Matches(e.Check.Name, subscription) {
+				return true
+			}
 		}
 	}
 
 	return false
+}
+
+// EventFields returns a set of fields that represent that resource
+func EventFields(r Resource) map[string]string {
+	resource := r.(*Event)
+	return map[string]string{
+		"event.name":                 resource.ObjectMeta.Name,
+		"event.namespace":            resource.ObjectMeta.Namespace,
+		"event.check.name":           resource.Check.Name,
+		"event.check.handlers":       strings.Join(resource.Check.Handlers, ","),
+		"event.check.publish":        strconv.FormatBool(resource.Check.Publish),
+		"event.check.round_robin":    strconv.FormatBool(resource.Check.RoundRobin),
+		"event.check.runtime_assets": strings.Join(resource.Check.RuntimeAssets, ","),
+		"event.check.status":         strconv.Itoa(int(resource.Check.Status)),
+		"event.check.subscriptions":  strings.Join(resource.Check.Subscriptions, ","),
+		"event.entity.deregister":    strconv.FormatBool(resource.Entity.Deregister),
+		"event.entity.name":          resource.Entity.ObjectMeta.Name,
+		"event.entity.entity_class":  resource.Entity.EntityClass,
+		"event.entity.subscriptions": strings.Join(resource.Entity.Subscriptions, ","),
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (e *Event) SetNamespace(namespace string) {
+	e.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (e *Event) SetObjectMeta(meta ObjectMeta) {
+	e.ObjectMeta = meta
+}
+
+func (e *Event) RBACName() string {
+	return "events"
+}
+
+// GetUUID parses a UUID from the ID bytes. It does not check errors, assuming
+// that the event has already passed validation.
+func (e *Event) GetUUID() uuid.UUID {
+	id, _ := uuid.FromBytes(e.ID)
+	return id
+}
+
+func (e Event) MarshalJSON() ([]byte, error) {
+	type clone Event
+	b, err := json.Marshal((*clone)(&e))
+	if err != nil {
+		return nil, err
+	}
+	if len(e.ID) == 0 {
+		return b, nil
+	}
+	var msg map[string]*json.RawMessage
+	_ = json.Unmarshal(b, &msg) // error impossible
+	if len(e.ID) > 0 {
+		uid, err := uuid.FromBytes(e.ID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid event ID: %s", err)
+		}
+		idBytes, _ := json.Marshal(uid.String())
+		msg["id"] = (*json.RawMessage)(&idBytes)
+	}
+	return json.Marshal(msg)
+}
+
+func (e *Event) UnmarshalJSON(b []byte) error {
+	type clone Event
+	var msg map[string]*json.RawMessage
+	if err := json.Unmarshal(b, &msg); err != nil {
+		return err
+	}
+	if msg["id"] == nil {
+		return json.Unmarshal(b, (*clone)(e))
+	}
+	var id string
+	if err := json.Unmarshal(*msg["id"], &id); err != nil {
+		return err
+	}
+	if len(id) > 0 {
+		delete(msg, "id")
+		b, _ = json.Marshal(msg)
+	}
+	if err := json.Unmarshal(b, (*clone)(e)); err != nil {
+		return err
+	}
+	if len(id) > 0 {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			return fmt.Errorf("invalid event id: %s", err)
+		}
+		e.ID = uid[:]
+	}
+	return nil
 }

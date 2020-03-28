@@ -4,9 +4,10 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	"github.com/sensu/sensu-go/cli/client/config"
 	"github.com/sirupsen/logrus"
 )
@@ -78,7 +79,7 @@ func New(config config.Config) *RestClient {
 
 		// TODO: Move this into it's own file / package
 		// Request a new access token from the server
-		tokens, err := client.RefreshAccessToken(tokens.Refresh)
+		tokens, err := client.RefreshAccessToken(tokens)
 		if err != nil {
 			return fmt.Errorf(
 				"failed to request new refresh token; client returned '%s'",
@@ -103,12 +104,7 @@ func New(config config.Config) *RestClient {
 		return nil
 	})
 
-	// logging
-	w := logger.Writer()
-	defer func() {
-		_ = w.Close()
-	}()
-	restyInst.SetLogger(w)
+	restyInst.SetLogger(logger)
 
 	return client
 }
@@ -131,7 +127,7 @@ func (client *RestClient) Reset() {
 	client.configured = false
 }
 
-// ClearAuthToken clears the authoization token from the client config
+// ClearAuthToken clears the authorization token from the client config
 func (client *RestClient) ClearAuthToken() {
 	client.configure()
 	client.resty.SetAuthToken("")
@@ -154,4 +150,24 @@ func (client *RestClient) configure() {
 	}
 
 	client.configured = true
+}
+
+// ApplyListOptions mutates the given request to make it carry the semantics of
+// the given options.
+func ApplyListOptions(request *resty.Request, options *ListOptions) {
+	if options.FieldSelector != "" {
+		request.SetQueryParam("fieldSelector", options.FieldSelector)
+	}
+
+	if options.LabelSelector != "" {
+		request.SetQueryParam("labelSelector", options.LabelSelector)
+	}
+
+	if options.ChunkSize > 0 {
+		request.SetQueryParam("limit", strconv.Itoa(options.ChunkSize))
+	}
+
+	if options.ContinueToken != "" {
+		request.SetQueryParam("continue", options.ContinueToken)
+	}
 }

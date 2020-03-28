@@ -4,12 +4,18 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"path"
+	"sort"
+	"strings"
 
 	"github.com/sensu/sensu-go/js"
 	utilstrings "github.com/sensu/sensu-go/util/strings"
 )
 
 const (
+	// EventFiltersResource is the name of this resource type
+	EventFiltersResource = "filters"
+
 	// EventFilterActionAllow is an action to allow events to pass through to the pipeline
 	EventFilterActionAllow = "allow"
 
@@ -28,9 +34,17 @@ var (
 	}
 )
 
-// NewEventFilter creates a new EventFilter.
-func NewEventFilter(meta ObjectMeta) *EventFilter {
-	return &EventFilter{ObjectMeta: meta}
+// StorePrefix returns the path prefix to this resource in the store
+func (f *EventFilter) StorePrefix() string {
+	return "event-filters"
+}
+
+// URIPath returns the path component of an event filter URI.
+func (f *EventFilter) URIPath() string {
+	if f.Namespace == "" {
+		return path.Join(URLPrefix, EventFiltersResource, url.PathEscape(f.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(f.Namespace), EventFiltersResource, url.PathEscape(f.Name))
 }
 
 // Validate returns an error if the filter does not pass validation tests.
@@ -78,6 +92,11 @@ func (f *EventFilter) Update(from *EventFilter, fields ...string) error {
 	return nil
 }
 
+// NewEventFilter creates a new EventFilter.
+func NewEventFilter(meta ObjectMeta) *EventFilter {
+	return &EventFilter{ObjectMeta: meta}
+}
+
 // FixtureEventFilter returns a Filter fixture for testing.
 func FixtureEventFilter(name string) *EventFilter {
 	return &EventFilter{
@@ -99,7 +118,72 @@ func FixtureDenyEventFilter(name string) *EventFilter {
 	}
 }
 
-// URIPath returns the path component of a Filter URI.
-func (f *EventFilter) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/filters/%s", url.PathEscape(f.Namespace), url.PathEscape(f.Name))
+//
+// Sorting
+//
+type cmpEventFilter func(a, b *EventFilter) bool
+
+// SortEventFiltersByPredicate can be used to sort a given collection using a given
+// predicate.
+func SortEventFiltersByPredicate(ef []*EventFilter, fn cmpEventFilter) sort.Interface {
+	return &eventFilterSorter{eventFilters: ef, byFn: fn}
+}
+
+// SortEventFiltersByName can be used to sort a given collection of event filter by
+// their names.
+func SortEventFiltersByName(ef []*EventFilter, asc bool) sort.Interface {
+	if asc {
+		return SortEventFiltersByPredicate(ef, func(a, b *EventFilter) bool {
+			return a.Name < b.Name
+		})
+	}
+
+	return SortEventFiltersByPredicate(ef, func(a, b *EventFilter) bool {
+		return a.Name > b.Name
+	})
+}
+
+type eventFilterSorter struct {
+	eventFilters []*EventFilter
+	byFn         cmpEventFilter
+}
+
+// Len implements sort.Interface.
+func (s *eventFilterSorter) Len() int {
+	return len(s.eventFilters)
+}
+
+// Swap implements sort.Interface.
+func (s *eventFilterSorter) Swap(i, j int) {
+	s.eventFilters[i], s.eventFilters[j] = s.eventFilters[j], s.eventFilters[i]
+}
+
+// Less implements sort.Interface.
+func (s *eventFilterSorter) Less(i, j int) bool {
+	return s.byFn(s.eventFilters[i], s.eventFilters[j])
+}
+
+// EventFilterFields returns a set of fields that represent that resource
+func EventFilterFields(r Resource) map[string]string {
+	resource := r.(*EventFilter)
+	return map[string]string{
+		"filter.name":           resource.ObjectMeta.Name,
+		"filter.namespace":      resource.ObjectMeta.Namespace,
+		"filter.action":         resource.Action,
+		"filter.runtime_assets": strings.Join(resource.RuntimeAssets, ","),
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (f *EventFilter) SetNamespace(namespace string) {
+	f.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (f *EventFilter) SetObjectMeta(meta ObjectMeta) {
+	f.ObjectMeta = meta
+}
+
+func (f *EventFilter) RBACName() string {
+	return "filters"
 }

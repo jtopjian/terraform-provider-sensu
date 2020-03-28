@@ -2,21 +2,21 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
 
-	"github.com/sensu/sensu-go/types"
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
 
-var namespacesPath = CreateBasePath(coreAPIGroup, coreAPIVersion, "namespaces")
+// NamespacesPath is the api path for namespaces.
+var NamespacesPath = CreateBasePath(coreAPIGroup, coreAPIVersion, "namespaces")
 
 // CreateNamespace creates new namespace on configured Sensu instance
-func (client *RestClient) CreateNamespace(namespace *types.Namespace) error {
+func (client *RestClient) CreateNamespace(namespace *corev2.Namespace) error {
 	bytes, err := json.Marshal(namespace)
 	if err != nil {
 		return err
 	}
 
-	path := namespacesPath()
+	path := NamespacesPath()
 	res, err := client.R().SetBody(bytes).Post(path)
 
 	if err != nil {
@@ -24,27 +24,27 @@ func (client *RestClient) CreateNamespace(namespace *types.Namespace) error {
 	}
 
 	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
+		return UnmarshalError(res)
 	}
 
 	return nil
 }
 
 // UpdateNamespace updates given namespace on a configured Sensu instance
-func (client *RestClient) UpdateNamespace(namespace *types.Namespace) error {
+func (client *RestClient) UpdateNamespace(namespace *corev2.Namespace) error {
 	bytes, err := json.Marshal(namespace)
 	if err != nil {
 		return err
 	}
 
-	path := namespacesPath(namespace.Name)
+	path := NamespacesPath(namespace.Name)
 	res, err := client.R().SetBody(bytes).Put(path)
 	if err != nil {
 		return err
 	}
 
 	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
+		return UnmarshalError(res)
 	}
 
 	return nil
@@ -52,43 +52,14 @@ func (client *RestClient) UpdateNamespace(namespace *types.Namespace) error {
 
 // DeleteNamespace deletes an namespace on configured Sensu instance
 func (client *RestClient) DeleteNamespace(namespace string) error {
-	path := namespacesPath(namespace)
-	res, err := client.R().Delete(path)
-
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
-	}
-
-	return nil
-}
-
-// ListNamespaces fetches all namespaces from configured Sensu instance
-func (client *RestClient) ListNamespaces() ([]types.Namespace, error) {
-	var namespaces []types.Namespace
-
-	path := namespacesPath()
-	res, err := client.R().Get(path)
-	if err != nil {
-		return namespaces, err
-	}
-
-	if res.StatusCode() >= 400 {
-		return namespaces, fmt.Errorf("%v", res.String())
-	}
-
-	err = json.Unmarshal(res.Body(), &namespaces)
-	return namespaces, err
+	return client.Delete(NamespacesPath(namespace))
 }
 
 // FetchNamespace fetches an namespace by name
-func (client *RestClient) FetchNamespace(namespaceName string) (*types.Namespace, error) {
-	var namespace *types.Namespace
+func (client *RestClient) FetchNamespace(namespaceName string) (*corev2.Namespace, error) {
+	var namespace *corev2.Namespace
 
-	path := namespacesPath(namespaceName)
+	path := NamespacesPath(namespaceName)
 	res, err := client.R().Get(path)
 	if err != nil {
 		return namespace, err

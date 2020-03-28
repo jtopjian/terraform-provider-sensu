@@ -5,12 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"path"
 	"sort"
+	"strconv"
+	"strings"
 
 	utilstrings "github.com/sensu/sensu-go/util/strings"
 )
 
 const (
+	// EntitiesResource is the name of this resource type
+	EntitiesResource = "entities"
+
 	// EntityAgentClass is the name of the class given to agent entities.
 	EntityAgentClass = "agent"
 
@@ -27,6 +33,19 @@ const (
 // DefaultRedactFields contains the default fields to redact
 var DefaultRedactFields = []string{"password", "passwd", "pass", "api_key",
 	"api_token", "access_key", "secret_key", "private_key", "secret"}
+
+// StorePrefix returns the path prefix to this resource in the store
+func (e *Entity) StorePrefix() string {
+	return EntitiesResource
+}
+
+// URIPath returns the path component of an entity URI.
+func (e *Entity) URIPath() string {
+	if e.Namespace == "" {
+		return path.Join(URLPrefix, EntitiesResource, url.PathEscape(e.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(e.Namespace), EntitiesResource, url.PathEscape(e.Name))
+}
 
 // Validate returns an error if the entity is invalid.
 func (e *Entity) Validate() error {
@@ -104,7 +123,7 @@ func GetEntitySubscription(entityName string) string {
 func FixtureEntity(name string) *Entity {
 	return &Entity{
 		EntityClass:   "host",
-		Subscriptions: []string{"linux"},
+		Subscriptions: []string{"linux", GetEntitySubscription(name)},
 		ObjectMeta: ObjectMeta{
 			Namespace: "default",
 			Name:      name,
@@ -113,11 +132,6 @@ func FixtureEntity(name string) *Entity {
 			Arch: "amd64",
 		},
 	}
-}
-
-// URIPath returns the path component of a Entity URI.
-func (e *Entity) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/entities/%s", url.PathEscape(e.Namespace), url.PathEscape(e.Name))
 }
 
 //
@@ -168,4 +182,35 @@ func (s *entitySorter) Swap(i, j int) {
 // Less implements sort.Interface.
 func (s *entitySorter) Less(i, j int) bool {
 	return s.byFn(s.entities[i], s.entities[j])
+}
+
+// EntityFields returns a set of fields that represent that resource
+func EntityFields(r Resource) map[string]string {
+	resource := r.(*Entity)
+	return map[string]string{
+		"entity.name":          resource.ObjectMeta.Name,
+		"entity.namespace":     resource.ObjectMeta.Namespace,
+		"entity.deregister":    strconv.FormatBool(resource.Deregister),
+		"entity.entity_class":  resource.EntityClass,
+		"entity.subscriptions": strings.Join(resource.Subscriptions, ","),
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (e *Entity) SetNamespace(namespace string) {
+	e.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (e *Entity) SetObjectMeta(meta ObjectMeta) {
+	e.ObjectMeta = meta
+}
+
+func (e *Entity) RBACName() string {
+	return "entities"
+}
+
+// SetName sets the name of the resource.
+func (e *Entity) SetName(name string) {
+	e.Name = name
 }

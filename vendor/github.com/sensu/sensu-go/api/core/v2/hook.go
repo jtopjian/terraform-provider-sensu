@@ -4,23 +4,31 @@ import (
 	"errors"
 	fmt "fmt"
 	"net/url"
+	"path"
 	"regexp"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
 )
 
-// CheckHookRegexStr used to validate type of check hook
-var CheckHookRegexStr = `([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])`
+const (
+	// HooksResource is the name of this resource type
+	HooksResource = "hooks"
 
-// CheckHookRegex used to validate type of check hook
-var CheckHookRegex = regexp.MustCompile("^" + CheckHookRegexStr + "$")
+	// HookRequestType is the message type string for hook request.
+	HookRequestType = "hook_request"
+)
 
-// Severities used to validate type of check hook
-var Severities = []string{"ok", "warning", "critical", "unknown", "non-zero"}
+var (
+	// CheckHookRegexStr used to validate type of check hook
+	CheckHookRegexStr = `([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])`
 
-// HookRequestType is the message type string for hook request.
-const HookRequestType = "hook_request"
+	// CheckHookRegex used to validate type of check hook
+	CheckHookRegex = regexp.MustCompile("^" + CheckHookRegexStr + "$")
+
+	// Severities used to validate type of check hook
+	Severities = []string{"ok", "warning", "critical", "unknown", "non-zero"}
+)
 
 // Validate returns an error if the hook does not pass validation tests.
 func (h *Hook) Validate() error {
@@ -33,6 +41,19 @@ func (h *Hook) Validate() error {
 	}
 
 	return nil
+}
+
+// StorePrefix returns the path prefix to this resource in the store
+func (c *HookConfig) StorePrefix() string {
+	return HooksResource
+}
+
+// URIPath returns the path component of a hook URI.
+func (c *HookConfig) URIPath() string {
+	if c.Namespace == "" {
+		return path.Join(URLPrefix, HooksResource, url.PathEscape(c.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(c.Namespace), HooksResource, url.PathEscape(c.Name))
 }
 
 // Validate returns an error if the hook does not pass validation tests.
@@ -54,11 +75,6 @@ func (c *HookConfig) Validate() error {
 	}
 
 	return nil
-}
-
-// URIPath returns the path component of a HookConfig URI.
-func (c *HookConfig) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/hooks/%s", url.PathEscape(c.Namespace), url.PathEscape(c.Name))
 }
 
 // Validate returns an error if the check hook does not pass validation tests.
@@ -147,4 +163,36 @@ func FixtureHookList(hookName string) *HookList {
 // URIPath returns the path component of a Hook URI.
 func (h *Hook) URIPath() string {
 	return fmt.Sprintf("/api/core/v2/namespaces/%s/hooks/%s", url.PathEscape(h.Namespace), url.PathEscape(h.Name))
+}
+
+// HookConfigFields returns a set of fields that represent that resource
+func HookConfigFields(r Resource) map[string]string {
+	resource := r.(*HookConfig)
+	return map[string]string{
+		"hook.name":      resource.ObjectMeta.Name,
+		"hook.namespace": resource.ObjectMeta.Namespace,
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (c *HookConfig) SetNamespace(namespace string) {
+	c.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (h *HookConfig) SetObjectMeta(meta ObjectMeta) {
+	h.ObjectMeta = meta
+}
+
+// SetNamespace sets the namespace of the resource.
+func (h *Hook) SetNamespace(namespace string) {
+	h.Namespace = namespace
+}
+
+func (*Hook) RBACName() string {
+	return "hooks"
+}
+
+func (*HookConfig) RBACName() string {
+	return "hooks"
 }

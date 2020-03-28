@@ -1,16 +1,38 @@
 package v2
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
+	"path"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
+
+	stringsutil "github.com/sensu/sensu-go/util/strings"
 )
 
-// NewSilenced creates a new Silenced entry.
-func NewSilenced(meta ObjectMeta) *Silenced {
-	return &Silenced{ObjectMeta: meta}
+const (
+	// SilencedResource is the name of this resource type
+	SilencedResource = "silenced"
+)
+
+// StorePrefix returns the path prefix to this resource in the store
+func (s *Silenced) StorePrefix() string {
+	return SilencedResource
+}
+
+// URIPath returns the path component of a silenced entry URI.
+func (s *Silenced) URIPath() string {
+	if s.Name == "" {
+		s.Name, _ = SilencedName(s.Subscription, s.Check)
+	}
+	if s.Namespace == "" {
+		return path.Join(URLPrefix, SilencedResource, url.PathEscape(s.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(s.Namespace), SilencedResource, url.PathEscape(s.Name))
 }
 
 // Validate returns an error if the CheckName and Subscription fields are not
@@ -42,7 +64,55 @@ func (s *Silenced) StartSilence(currentTime int64) bool {
 	return currentTime > s.Begin
 }
 
-// FixtureSilenced returns a testing fixutre for a Silenced event struct.
+// Prepare prepares a silenced entry for storage
+func (s *Silenced) Prepare(ctx context.Context) {
+	// Populate newSilence.Name with the subscription and checkName. Substitute a
+	// splat if one of the values does not exist. If both values are empty, the
+	// validator will return an error when attempting to update it in the store.
+	s.Name, _ = SilencedName(s.Subscription, s.Check)
+
+	// If begin timestamp was not already provided set it to the current time.
+	if s.Begin == 0 {
+		s.Begin = time.Now().Unix()
+	}
+
+	// Retrieve the subject of the JWT, which represents the logged on user, in
+	// order to set it as the creator of the silenced entry
+	if value := ctx.Value(ClaimsKey); value != nil {
+		claims, ok := value.(*Claims)
+		if ok {
+			s.Creator = claims.Subject
+		}
+	}
+}
+
+// Matches returns true if the given check name and subscription match the silence.
+//
+// The two properties compared, Subscription and Check, are only compared if they are
+// not empty. An empty value for either of those fields is considered a wildcard,
+// ie: s.Check = "foo" && s.Subscription = "" will return true for s.Matches("foo", <anything>).
+func (s *Silenced) Matches(check, subscription string) bool {
+	if s == nil {
+		return false
+	}
+
+	if !stringsutil.InArray(s.Subscription, []string{"*", subscription}) && s.Subscription != "" {
+		return false
+	}
+
+	if !stringsutil.InArray(s.Check, []string{"*", check}) && s.Check != "" {
+		return false
+	}
+
+	return true
+}
+
+// NewSilenced creates a new Silenced entry.
+func NewSilenced(meta ObjectMeta) *Silenced {
+	return &Silenced{ObjectMeta: meta}
+}
+
+// FixtureSilenced returns a testing fixture for a Silenced event struct.
 func FixtureSilenced(name string) *Silenced {
 	var check, subscription string
 
@@ -80,14 +150,6 @@ func SilencedName(subscription, check string) (string, error) {
 	return fmt.Sprintf("%s:%s", subscription, check), nil
 }
 
-// URIPath returns the path component of a Silenced URI.
-func (s *Silenced) URIPath() string {
-	if s.Name == "" {
-		s.Name, _ = SilencedName(s.Subscription, s.Check)
-	}
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/silenced/%s", url.PathEscape(s.Namespace), url.PathEscape(s.Name))
-}
-
 // SortSilencedByPredicate can be used to sort a given collection using a given
 // predicate.
 func SortSilencedByPredicate(es []*Silenced, fn func(a, b *Silenced) bool) sort.Interface {
@@ -123,4 +185,31 @@ func (s *silenceSorter) Swap(i, j int) {
 // Less implements sort.Interface.
 func (s *silenceSorter) Less(i, j int) bool {
 	return s.byFn(s.silences[i], s.silences[j])
+}
+
+// SilencedFields returns a set of fields that represent that resource
+func SilencedFields(r Resource) map[string]string {
+	resource := r.(*Silenced)
+	return map[string]string{
+		"silenced.name":              resource.ObjectMeta.Name,
+		"silenced.namespace":         resource.ObjectMeta.Namespace,
+		"silenced.check":             resource.Check,
+		"silenced.creator":           resource.Creator,
+		"silenced.expire_on_resolve": strconv.FormatBool(resource.ExpireOnResolve),
+		"silenced.subscription":      resource.Subscription,
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (s *Silenced) SetNamespace(namespace string) {
+	s.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (s *Silenced) SetObjectMeta(meta ObjectMeta) {
+	s.ObjectMeta = meta
+}
+
+func (*Silenced) RBACName() string {
+	return "silenced"
 }

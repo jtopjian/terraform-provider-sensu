@@ -1,6 +1,9 @@
 package v2
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/coreos/etcd/etcdserver/etcdserverpb"
 )
 
@@ -8,12 +11,27 @@ import (
 type ClusterHealth struct {
 	// MemberID is the etcd cluster member's ID.
 	MemberID uint64
+
+	// MemberIDHex is the hexadecimal representation of the member's ID.
+	MemberIDHex string
+
 	// Name is the cluster member's name.
 	Name string
-	// Err holds the string representation of any errors encountered while checking the member's health.
+
+	// Err contains any error encountered while checking the member's health.
 	Err string
+
 	// Healthy describes the health of the cluster member.
 	Healthy bool
+}
+
+func (h ClusterHealth) MarshalJSON() ([]byte, error) {
+	if h.MemberIDHex == "" {
+		h.MemberIDHex = fmt.Sprintf("%x", h.MemberID)
+	}
+	type Clone ClusterHealth
+	var clone *Clone = (*Clone)(&h)
+	return json.Marshal(clone)
 }
 
 // HealthResponse contains cluster health and cluster alarms.
@@ -22,12 +40,19 @@ type HealthResponse struct {
 	Alarms []*etcdserverpb.AlarmMember
 	// ClusterHealth is the list of health status for every cluster member.
 	ClusterHealth []*ClusterHealth
+	// Header is the response header for the entire cluster response.
+	Header *etcdserverpb.ResponseHeader
 }
 
 // FixtureHealthResponse returns a HealthResponse fixture for testing.
 func FixtureHealthResponse(healthy bool) *HealthResponse {
 	var err string
-	healthResponse := &HealthResponse{}
+	healthResponse := &HealthResponse{
+		Header: &etcdserverpb.ResponseHeader{
+			ClusterId: uint64(4255616304056076734),
+		},
+	}
+
 	clusterHealth := []*ClusterHealth{}
 	clusterHealth = append(clusterHealth, &ClusterHealth{
 		MemberID: uint64(12345),

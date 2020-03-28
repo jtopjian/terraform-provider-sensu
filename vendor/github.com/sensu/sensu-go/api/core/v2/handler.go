@@ -4,9 +4,15 @@ import (
 	"errors"
 	fmt "fmt"
 	"net/url"
+	"path"
+	"sort"
+	"strings"
 )
 
 const (
+	// HandlersResource is the name of this resource type
+	HandlersResource = "handlers"
+
 	// HandlerPipeType represents handlers that pipes event data // into arbitrary
 	// commands via STDIN
 	HandlerPipeType = "pipe"
@@ -28,9 +34,17 @@ const (
 	HandlerGRPCType = "grpc"
 )
 
-// NewHandler creates a new Handler.
-func NewHandler(meta ObjectMeta) *Handler {
-	return &Handler{ObjectMeta: meta}
+// StorePrefix returns the path prefix to this resource in the store
+func (h *Handler) StorePrefix() string {
+	return HandlersResource
+}
+
+// URIPath returns the path component of a handler URI.
+func (h *Handler) URIPath() string {
+	if h.Namespace == "" {
+		return path.Join(URLPrefix, HandlersResource, url.PathEscape(h.Name))
+	}
+	return path.Join(URLPrefix, "namespaces", url.PathEscape(h.Namespace), HandlersResource, url.PathEscape(h.Name))
 }
 
 // Validate returns an error if the handler does not pass validation tests.
@@ -79,6 +93,54 @@ func (s *HandlerSocket) Validate() error {
 	return nil
 }
 
+// NewHandler creates a new Handler.
+func NewHandler(meta ObjectMeta) *Handler {
+	return &Handler{ObjectMeta: meta}
+}
+
+//
+// Sorting
+
+type cmpHandler func(a, b *Handler) bool
+
+// SortHandlersByPredicate is used to sort a given collection using a given predicate.
+func SortHandlersByPredicate(hs []*Handler, fn cmpHandler) sort.Interface {
+	return &handlerSorter{handlers: hs, byFn: fn}
+}
+
+// SortHandlersByName is used to sort a given collection of handlers by their names.
+func SortHandlersByName(hs []*Handler, asc bool) sort.Interface {
+	if asc {
+		return SortHandlersByPredicate(hs, func(a, b *Handler) bool {
+			return a.Name < b.Name
+		})
+	}
+
+	return SortHandlersByPredicate(hs, func(a, b *Handler) bool {
+		return a.Name > b.Name
+	})
+}
+
+type handlerSorter struct {
+	handlers []*Handler
+	byFn     cmpHandler
+}
+
+// Len implements sort.Interface
+func (s *handlerSorter) Len() int {
+	return len(s.handlers)
+}
+
+// Swap implements sort.Interface
+func (s *handlerSorter) Swap(i, j int) {
+	s.handlers[i], s.handlers[j] = s.handlers[j], s.handlers[i]
+}
+
+// Less implements sort.Interface
+func (s *handlerSorter) Less(i, j int) bool {
+	return s.byFn(s.handlers[i], s.handlers[j])
+}
+
 // FixtureHandler returns a Handler fixture for testing.
 func FixtureHandler(name string) *Handler {
 	return &Handler{
@@ -106,7 +168,29 @@ func FixtureSetHandler(name string, handlers ...string) *Handler {
 	return handler
 }
 
-// URIPath returns the path component of a Handler URI.
-func (h *Handler) URIPath() string {
-	return fmt.Sprintf("/api/core/v2/namespaces/%s/handlers/%s", url.PathEscape(h.Namespace), url.PathEscape(h.Name))
+// HandlerFields returns a set of fields that represent that resource
+func HandlerFields(r Resource) map[string]string {
+	resource := r.(*Handler)
+	return map[string]string{
+		"handler.name":      resource.ObjectMeta.Name,
+		"handler.namespace": resource.ObjectMeta.Namespace,
+		"handler.filters":   strings.Join(resource.Filters, ","),
+		"handler.handlers":  strings.Join(resource.Handlers, ","),
+		"handler.mutator":   resource.Mutator,
+		"handler.type":      resource.Type,
+	}
+}
+
+// SetNamespace sets the namespace of the resource.
+func (h *Handler) SetNamespace(namespace string) {
+	h.Namespace = namespace
+}
+
+// SetObjectMeta sets the meta of the resource.
+func (h *Handler) SetObjectMeta(meta ObjectMeta) {
+	h.ObjectMeta = meta
+}
+
+func (h *Handler) RBACName() string {
+	return "handlers"
 }

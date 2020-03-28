@@ -2,101 +2,71 @@ package client
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 
-	"github.com/sensu/sensu-go/types"
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
 
-var filtersPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "filters")
+// FiltersPath is the api path for filters.
+var FiltersPath = createNSBasePath(coreAPIGroup, coreAPIVersion, "filters")
 
 // CreateFilter creates a new filter on configured Sensu instance
-func (client *RestClient) CreateFilter(filter *types.EventFilter) (err error) {
+func (client *RestClient) CreateFilter(filter *corev2.EventFilter) (err error) {
 	bytes, err := json.Marshal(filter)
 	if err != nil {
 		return err
 	}
 
-	path := filtersPath(client.config.Namespace())
+	path := FiltersPath(client.config.Namespace())
 	res, err := client.R().SetBody(bytes).Post(path)
 	if err != nil {
 		return err
 	}
 
 	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
+		return UnmarshalError(res)
 	}
 
 	return nil
 }
 
 // DeleteFilter deletes a filter from configured Sensu instance
-func (client *RestClient) DeleteFilter(filter *types.EventFilter) error {
-	path := filtersPath(filter.Namespace, filter.Name)
-	res, err := client.R().Delete(path)
-
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode() >= 400 {
-		return fmt.Errorf("%v", res.String())
-	}
-
-	return nil
+func (client *RestClient) DeleteFilter(namespace, name string) error {
+	return client.Delete(FiltersPath(namespace, name))
 }
 
 // FetchFilter fetches a specific check
-func (client *RestClient) FetchFilter(name string) (*types.EventFilter, error) {
-	var filter *types.EventFilter
+func (client *RestClient) FetchFilter(name string) (*corev2.EventFilter, error) {
+	var filter *corev2.EventFilter
 
-	path := filtersPath(client.config.Namespace(), name)
+	path := FiltersPath(client.config.Namespace(), name)
 	res, err := client.R().Get(path)
 	if err != nil {
 		return nil, err
 	}
 
 	if res.StatusCode() >= 400 {
-		return nil, fmt.Errorf("%v", res.String())
+		return nil, UnmarshalError(res)
 	}
 
 	err = json.Unmarshal(res.Body(), &filter)
 	return filter, err
 }
 
-// ListFilters fetches all filters from configured Sensu instance
-func (client *RestClient) ListFilters(namespace string) ([]types.EventFilter, error) {
-	var filters []types.EventFilter
-
-	path := filtersPath(namespace)
-	res, err := client.R().Get(path)
-	if err != nil {
-		return filters, err
-	}
-
-	if res.StatusCode() >= 400 {
-		return filters, UnmarshalError(res)
-	}
-
-	err = json.Unmarshal(res.Body(), &filters)
-	return filters, err
-}
-
 // UpdateFilter updates an existing filter with fields from a new one.
-func (client *RestClient) UpdateFilter(f *types.EventFilter) error {
+func (client *RestClient) UpdateFilter(f *corev2.EventFilter) error {
 	b, err := json.Marshal(f)
 	if err != nil {
 		return err
 	}
 
-	path := filtersPath(f.Namespace, f.Name)
+	path := FiltersPath(f.Namespace, f.Name)
 	resp, err := client.R().SetBody(b).Put(path)
 	if err != nil {
 		return err
 	}
 
 	if resp.StatusCode() >= 400 {
-		err = errors.New(resp.String())
+		return UnmarshalError(resp)
 	}
 
 	return err

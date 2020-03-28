@@ -3,14 +3,15 @@
 
 package v2
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "github.com/gogo/protobuf/gogoproto"
-
-import bytes "bytes"
-
-import io "io"
+import (
+	bytes "bytes"
+	fmt "fmt"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/golang/protobuf/proto"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -21,7 +22,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // TLSOptions holds TLS options that are used across the varying Sensu
 // components
@@ -30,6 +31,7 @@ type TLSOptions struct {
 	KeyFile              string   `protobuf:"bytes,2,opt,name=key_file,json=keyFile,proto3" json:"key_file,omitempty"`
 	TrustedCAFile        string   `protobuf:"bytes,3,opt,name=trusted_ca_file,json=trustedCaFile,proto3" json:"trusted_ca_file,omitempty"`
 	InsecureSkipVerify   bool     `protobuf:"varint,4,opt,name=insecure_skip_verify,json=insecureSkipVerify,proto3" json:"insecure_skip_verify"`
+	ClientAuthType       bool     `protobuf:"varint,5,opt,name=client_auth_type,json=clientAuthType,proto3" json:"client_auth_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -39,7 +41,7 @@ func (m *TLSOptions) Reset()         { *m = TLSOptions{} }
 func (m *TLSOptions) String() string { return proto.CompactTextString(m) }
 func (*TLSOptions) ProtoMessage()    {}
 func (*TLSOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tls_ec2b0b8f14fde930, []int{0}
+	return fileDescriptor_adf82c87377d3c77, []int{0}
 }
 func (m *TLSOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -49,15 +51,15 @@ func (m *TLSOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_TLSOptions.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
 		return b[:n], nil
 	}
 }
-func (dst *TLSOptions) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TLSOptions.Merge(dst, src)
+func (m *TLSOptions) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TLSOptions.Merge(m, src)
 }
 func (m *TLSOptions) XXX_Size() int {
 	return m.Size()
@@ -96,9 +98,43 @@ func (m *TLSOptions) GetInsecureSkipVerify() bool {
 	return false
 }
 
+func (m *TLSOptions) GetClientAuthType() bool {
+	if m != nil {
+		return m.ClientAuthType
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*TLSOptions)(nil), "sensu.core.v2.TLSOptions")
 }
+
+func init() { proto.RegisterFile("tls.proto", fileDescriptor_adf82c87377d3c77) }
+
+var fileDescriptor_adf82c87377d3c77 = []byte{
+	// 307 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x90, 0xbb, 0x4a, 0x03, 0x41,
+	0x18, 0x46, 0x9d, 0x78, 0x4b, 0x06, 0xe2, 0x65, 0xb1, 0x58, 0x15, 0x26, 0xc1, 0x2a, 0xd5, 0x86,
+	0x44, 0x1b, 0x3b, 0x93, 0x80, 0x85, 0x08, 0xc2, 0x26, 0x58, 0xd8, 0x0c, 0xc9, 0xf8, 0x27, 0x19,
+	0x76, 0xdd, 0x19, 0xe6, 0xb2, 0xb0, 0x6f, 0xe2, 0x23, 0xf8, 0x08, 0x3e, 0x82, 0xa5, 0x4f, 0x10,
+	0x74, 0xec, 0xec, 0x05, 0x4b, 0xd9, 0x59, 0xed, 0xec, 0x86, 0x73, 0xce, 0x7c, 0xc5, 0x8f, 0x1b,
+	0x26, 0xd5, 0x91, 0x54, 0xc2, 0x88, 0xa0, 0xa9, 0x21, 0xd3, 0x36, 0x62, 0x42, 0x41, 0x94, 0xf7,
+	0x8f, 0xce, 0x16, 0xdc, 0x2c, 0xed, 0x2c, 0x62, 0xe2, 0xa1, 0xbb, 0x10, 0x0b, 0xd1, 0xf5, 0xd5,
+	0xcc, 0xce, 0x2f, 0xf2, 0x5e, 0xd4, 0x8f, 0x7a, 0x1e, 0x7a, 0xe6, 0x5f, 0xd5, 0xc8, 0xc9, 0x17,
+	0xc2, 0x78, 0x72, 0x3d, 0xbe, 0x91, 0x86, 0x8b, 0x4c, 0x07, 0xc7, 0xb8, 0xc1, 0x40, 0x19, 0x3a,
+	0xe7, 0x29, 0x84, 0xa8, 0x8d, 0x3a, 0x8d, 0xb8, 0x5e, 0x82, 0x4b, 0x9e, 0x42, 0x70, 0x88, 0xeb,
+	0x09, 0x14, 0x95, 0xab, 0x79, 0xb7, 0x9d, 0x40, 0xe1, 0xd5, 0x39, 0xde, 0x35, 0xca, 0x6a, 0x03,
+	0xf7, 0x94, 0x4d, 0xab, 0x62, 0xbd, 0x2c, 0x86, 0xfb, 0x6e, 0xd5, 0x6a, 0x4e, 0x2a, 0x35, 0x1a,
+	0x94, 0x6d, 0xdc, 0xfc, 0x2d, 0x47, 0x53, 0xff, 0xf5, 0x0a, 0x1f, 0xf0, 0x4c, 0x03, 0xb3, 0x0a,
+	0xa8, 0x4e, 0xb8, 0xa4, 0x39, 0x28, 0x3e, 0x2f, 0xc2, 0x8d, 0x36, 0xea, 0xd4, 0x87, 0xe1, 0xe7,
+	0xaa, 0xf5, 0xaf, 0x8f, 0x83, 0x3f, 0x3a, 0x4e, 0xb8, 0xbc, 0xf5, 0x2c, 0xe8, 0xe0, 0x3d, 0x96,
+	0x72, 0xc8, 0x0c, 0x9d, 0x5a, 0xb3, 0xa4, 0xa6, 0x90, 0x10, 0x6e, 0x96, 0x3b, 0xf1, 0x4e, 0xc5,
+	0x07, 0xd6, 0x2c, 0x27, 0x85, 0x84, 0x61, 0xfb, 0xfb, 0x9d, 0xa0, 0x27, 0x47, 0xd0, 0xb3, 0x23,
+	0xe8, 0xc5, 0x11, 0xf4, 0xea, 0x08, 0x7a, 0x73, 0x04, 0x3d, 0x7e, 0x90, 0xb5, 0xbb, 0x5a, 0xde,
+	0x9f, 0x6d, 0xf9, 0x03, 0x9d, 0xfe, 0x04, 0x00, 0x00, 0xff, 0xff, 0x63, 0xa2, 0x6d, 0x33, 0x72,
+	0x01, 0x00, 0x00,
+}
+
 func (this *TLSOptions) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -130,6 +166,9 @@ func (this *TLSOptions) Equal(that interface{}) bool {
 	if this.InsecureSkipVerify != that1.InsecureSkipVerify {
 		return false
 	}
+	if this.ClientAuthType != that1.ClientAuthType {
+		return false
+	}
 	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
@@ -138,7 +177,7 @@ func (this *TLSOptions) Equal(that interface{}) bool {
 func (m *TLSOptions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -146,52 +185,73 @@ func (m *TLSOptions) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *TLSOptions) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TLSOptions) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.CertFile) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintTls(dAtA, i, uint64(len(m.CertFile)))
-		i += copy(dAtA[i:], m.CertFile)
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.KeyFile) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintTls(dAtA, i, uint64(len(m.KeyFile)))
-		i += copy(dAtA[i:], m.KeyFile)
-	}
-	if len(m.TrustedCAFile) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintTls(dAtA, i, uint64(len(m.TrustedCAFile)))
-		i += copy(dAtA[i:], m.TrustedCAFile)
+	if m.ClientAuthType {
+		i--
+		if m.ClientAuthType {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
 	}
 	if m.InsecureSkipVerify {
-		dAtA[i] = 0x20
-		i++
+		i--
 		if m.InsecureSkipVerify {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
-		i++
+		i--
+		dAtA[i] = 0x20
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.TrustedCAFile) > 0 {
+		i -= len(m.TrustedCAFile)
+		copy(dAtA[i:], m.TrustedCAFile)
+		i = encodeVarintTls(dAtA, i, uint64(len(m.TrustedCAFile)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if len(m.KeyFile) > 0 {
+		i -= len(m.KeyFile)
+		copy(dAtA[i:], m.KeyFile)
+		i = encodeVarintTls(dAtA, i, uint64(len(m.KeyFile)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.CertFile) > 0 {
+		i -= len(m.CertFile)
+		copy(dAtA[i:], m.CertFile)
+		i = encodeVarintTls(dAtA, i, uint64(len(m.CertFile)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintTls(dAtA []byte, offset int, v uint64) int {
+	offset -= sovTls(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func NewPopulatedTLSOptions(r randyTls, easy bool) *TLSOptions {
 	this := &TLSOptions{}
@@ -199,8 +259,9 @@ func NewPopulatedTLSOptions(r randyTls, easy bool) *TLSOptions {
 	this.KeyFile = string(randStringTls(r))
 	this.TrustedCAFile = string(randStringTls(r))
 	this.InsecureSkipVerify = bool(bool(r.Intn(2) == 0))
+	this.ClientAuthType = bool(bool(r.Intn(2) == 0))
 	if !easy && r.Intn(10) != 0 {
-		this.XXX_unrecognized = randUnrecognizedTls(r, 5)
+		this.XXX_unrecognized = randUnrecognizedTls(r, 6)
 	}
 	return this
 }
@@ -278,6 +339,9 @@ func encodeVarintPopulateTls(dAtA []byte, v uint64) []byte {
 	return dAtA
 }
 func (m *TLSOptions) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.CertFile)
@@ -295,6 +359,9 @@ func (m *TLSOptions) Size() (n int) {
 	if m.InsecureSkipVerify {
 		n += 2
 	}
+	if m.ClientAuthType {
+		n += 2
+	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
 	}
@@ -302,14 +369,7 @@ func (m *TLSOptions) Size() (n int) {
 }
 
 func sovTls(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozTls(x uint64) (n int) {
 	return sovTls(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -329,7 +389,7 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -357,7 +417,7 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -367,6 +427,9 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTls
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTls
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -386,7 +449,7 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -396,6 +459,9 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTls
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTls
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -415,7 +481,7 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -425,6 +491,9 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTls
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTls
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -444,12 +513,32 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= (int(b) & 0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 			m.InsecureSkipVerify = bool(v != 0)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientAuthType", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTls
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ClientAuthType = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTls(dAtA[iNdEx:])
@@ -457,6 +546,9 @@ func (m *TLSOptions) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTls
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTls
 			}
 			if (iNdEx + skippy) > l {
@@ -526,8 +618,11 @@ func skipTls(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthTls
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthTls
 			}
 			return iNdEx, nil
@@ -558,6 +653,9 @@ func skipTls(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthTls
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -576,26 +674,3 @@ var (
 	ErrInvalidLengthTls = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTls   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() { proto.RegisterFile("tls.proto", fileDescriptor_tls_ec2b0b8f14fde930) }
-
-var fileDescriptor_tls_ec2b0b8f14fde930 = []byte{
-	// 267 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2c, 0xc9, 0x29, 0xd6,
-	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x2d, 0x4e, 0xcd, 0x2b, 0x2e, 0xd5, 0x4b, 0xce, 0x2f,
-	0x4a, 0xd5, 0x2b, 0x33, 0x92, 0xd2, 0x4d, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf,
-	0xd5, 0x4f, 0xcf, 0x4f, 0xcf, 0xd7, 0x07, 0xab, 0x4a, 0x2a, 0x4d, 0x03, 0xf3, 0xc0, 0x1c, 0x30,
-	0x0b, 0xa2, 0x5b, 0xe9, 0x34, 0x23, 0x17, 0x57, 0x88, 0x4f, 0xb0, 0x7f, 0x41, 0x49, 0x66, 0x7e,
-	0x5e, 0xb1, 0x90, 0x34, 0x17, 0x67, 0x72, 0x6a, 0x51, 0x49, 0x7c, 0x5a, 0x66, 0x4e, 0xaa, 0x04,
-	0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x07, 0x48, 0xc0, 0x2d, 0x33, 0x27, 0x55, 0x48, 0x92, 0x8b,
-	0x23, 0x3b, 0xb5, 0x12, 0x22, 0xc7, 0x04, 0x96, 0x63, 0xcf, 0x4e, 0xad, 0x04, 0x4b, 0x59, 0x72,
-	0xf1, 0x97, 0x14, 0x95, 0x16, 0x97, 0xa4, 0xa6, 0xc4, 0x27, 0x27, 0x42, 0x54, 0x30, 0x83, 0x54,
-	0x38, 0x09, 0x3e, 0xba, 0x27, 0xcf, 0x1b, 0x02, 0x91, 0x72, 0x76, 0x04, 0xa9, 0x0d, 0xe2, 0x85,
-	0xaa, 0x74, 0x4e, 0x04, 0x6b, 0xf5, 0xe2, 0x12, 0xc9, 0xcc, 0x2b, 0x4e, 0x4d, 0x2e, 0x2d, 0x4a,
-	0x8d, 0x2f, 0xce, 0xce, 0x2c, 0x88, 0x2f, 0x4b, 0x2d, 0xca, 0x4c, 0xab, 0x94, 0x60, 0x51, 0x60,
-	0xd4, 0xe0, 0x70, 0x92, 0x78, 0x75, 0x4f, 0x1e, 0xab, 0x7c, 0x90, 0x10, 0x4c, 0x34, 0x38, 0x3b,
-	0xb3, 0x20, 0x0c, 0x2c, 0xe6, 0xa4, 0xf0, 0xe3, 0xa1, 0x1c, 0xe3, 0x8a, 0x47, 0x72, 0x8c, 0x3b,
-	0x1e, 0xc9, 0x31, 0x9e, 0x78, 0x24, 0xc7, 0x78, 0xe1, 0x91, 0x1c, 0xe3, 0x83, 0x47, 0x72, 0x8c,
-	0x33, 0x1e, 0xcb, 0x31, 0x44, 0x31, 0x95, 0x19, 0x25, 0xb1, 0x81, 0xbd, 0x6d, 0x0c, 0x08, 0x00,
-	0x00, 0xff, 0xff, 0x72, 0x61, 0xa6, 0x2f, 0x41, 0x01, 0x00, 0x00,
-}
