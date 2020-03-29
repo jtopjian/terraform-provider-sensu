@@ -39,3 +39,11 @@ The following arguments are supported:
 
 * `edition` - *Optional* - The edition of the Sensu service. This can also
   be set with the `SENSU_EDITION` environment variable.
+  
+* `trusted_ca_file` - *Optional* - Specify a file to be used as a trusted CA
+  certificate. This can also be set with the `SENSU_TRUSTED_CA_FILE` environment
+  variable.
+  
+* `insecure_skip_tls_verify` - *Optional* - Skip TLS verification. This is
+  commonly used when communicating with self-signed certificates. This can also
+  be set with thet `SENSU_INSECURE_SKIP_TLS_VERIFY` environment variable.
