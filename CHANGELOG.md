@@ -1,4 +1,11 @@
-## 0.7.0 (Unreleased)
+## 0.8.0 (Unreleased)
+
+## 0.7.0 (March 29, 2020)
+
+IMPROVEMENTS
+
+* Added `trusted_ca_file` to the provider [GH-18](https://github.com/jtopjian/terraform-provider-sensu/pull/18)
+* Added `insecure_skip_tls_verify` to the provider [GH-18](https://github.com/jtopjian/terraform-provider-sensu/pull/18)
 
 ## 0.6.0 (March 26, 2020)
 
