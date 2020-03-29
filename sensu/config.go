@@ -1,10 +1,13 @@
 package sensu
 
 import (
+	"crypto/tls"
 	"fmt"
+	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
 	"github.com/sensu/sensu-go/cli/client"
 	"github.com/sensu/sensu-go/cli/client/config"
 	"github.com/sensu/sensu-go/types"
@@ -43,6 +46,26 @@ type Config struct {
 // LoadAndValidate is a method used to initiate a client.
 func (c *Config) LoadAndValidate() error {
 	c.client = client.New(c)
+
+	// Configure the client for SSL.
+	tlsConfig := tls.Config{}
+
+	if c.TrustedCAFile() != "" {
+		caCertPool, err := corev2.LoadCACerts(c.TrustedCAFile())
+		if err != nil {
+			log.Printf("[DEBUG] Problem loading CA Certs: %s", err)
+		}
+		tlsConfig.RootCAs = caCertPool
+	}
+
+	tlsConfig.InsecureSkipVerify = c.InsecureSkipTLSVerify()
+
+	tlsConfig.BuildNameToCertificate()
+	tlsConfig.CipherSuites = corev2.DefaultCipherSuites
+
+	c.client.SetTLSClientConfig(&tlsConfig)
+
+	// Create an access token.
 	tokens, err := c.client.CreateAccessToken(c.apiUrl, c.username, c.password)
 	if err != nil {
 		return err
@@ -52,6 +75,7 @@ func (c *Config) LoadAndValidate() error {
 		return fmt.Errorf("bad username or password")
 	}
 
+	// Save the access token in the internal Sensu client.
 	err = c.SaveTokens(tokens)
 	if err != nil {
 		return err
