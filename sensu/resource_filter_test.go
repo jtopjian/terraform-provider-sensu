@@ -111,8 +111,10 @@ var testAccResourceFilter_runtimeAssets_1 = fmt.Sprintf(`
 
   resource "sensu_filter" "filter_1" {
     name = "filter_1"
-    type = "pipe"
-    command = "/bin/foo"
+    action = "allow"
+    expressions = [
+      "event.Check.Team == 'ops'",
+    ]
 
     runtime_assets = [
       "${sensu_asset.asset_1.name}"
@@ -125,7 +127,9 @@ var testAccResourceFilter_runtimeAssets_2 = fmt.Sprintf(`
 
   resource "sensu_filter" "filter_1" {
     name = "filter_1"
-    type = "pipe"
-    command = "/bin/foo"
+    action = "allow"
+    expressions = [
+      "event.Check.Team == 'ops'",
+    ]
   }
 `, testAccResourceAsset_basic)
