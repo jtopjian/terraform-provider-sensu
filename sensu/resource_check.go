@@ -402,11 +402,11 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 		check.LowFlapThreshold = uint32(d.Get("low_flap_threshold").(int))
 	}
 
-	if d.HasChange("metric_format") {
+	if d.HasChange("output_metric_format") {
 		check.OutputMetricFormat = d.Get("output_metric_format").(string)
 	}
 
-	if d.HasChange("metric_handlers") {
+	if d.HasChange("output_metric_handlers") {
 		metricHandlers := expandStringList(d.Get("output_metric_handlers").([]interface{}))
 		check.OutputMetricHandlers = metricHandlers
 	}
