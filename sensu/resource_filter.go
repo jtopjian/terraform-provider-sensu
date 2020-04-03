@@ -63,10 +63,10 @@ func resourceFilterCreate(d *schema.ResourceData, meta interface{}) error {
 			Name:      name,
 			Namespace: config.determineNamespace(d),
 		},
-		Action:      d.Get("action").(string),
-		Expressions: expressions,
+		Action:        d.Get("action").(string),
+		Expressions:   expressions,
 		RuntimeAssets: runtimeAssets,
-		When:        &when,
+		When:          &when,
 	}
 
 	log.Printf("[DEBUG] Creating filter %s: %#v", name, filter)
