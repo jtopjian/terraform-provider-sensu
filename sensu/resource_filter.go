@@ -36,6 +36,12 @@ func resourceFilter() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
+			"runtime_assets": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
 			"when": resourceTimeWindowsSchema,
 
 			// Optional
@@ -49,6 +55,7 @@ func resourceFilterCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	expressions := expandStringList(d.Get("expressions").([]interface{}))
+	runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
 	when := expandTimeWindows(d.Get("when").(*schema.Set).List())
 
 	filter := &types.EventFilter{
@@ -58,6 +65,7 @@ func resourceFilterCreate(d *schema.ResourceData, meta interface{}) error {
 		},
 		Action:      d.Get("action").(string),
 		Expressions: expressions,
+		RuntimeAssets: runtimeAssets,
 		When:        &when,
 	}
 
@@ -92,6 +100,7 @@ func resourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("namespace", filter.ObjectMeta.Namespace)
 	d.Set("action", filter.Action)
 	d.Set("expressions", filter.Expressions)
+	d.Set("runtime_assets", filter.RuntimeAssets)
 
 	when := flattenTimeWindows(filter.When)
 	if err := d.Set("when", when); err != nil {
@@ -120,6 +129,11 @@ func resourceFilterUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("expressions") {
 		expressions := expandStringList(d.Get("expressions").([]interface{}))
 		filter.Expressions = expressions
+	}
+
+	if d.HasChange("runtime_assets") {
+		runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
+		filter.RuntimeAssets = runtimeAssets
 	}
 
 	if d.HasChange("when") {

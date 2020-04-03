@@ -30,6 +30,12 @@ func dataSourceFilter() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
+			"runtime_assets": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
 			"when": dataSourceTimeWindowsSchema,
 		},
 	}
@@ -55,6 +61,10 @@ func dataSourceFilterRead(d *schema.ResourceData, meta interface{}) error {
 	when := flattenTimeWindows(filter.When)
 	if err := d.Set("when", when); err != nil {
 		return fmt.Errorf("Unable to set %s.when: %s", name, err)
+	}
+
+	if err := d.Set("runtime_assets", filter.RuntimeAssets); err != nil {
+		return fmt.Errorf("Unable to set %s.runtime_assets: %s", name, err)
 	}
 
 	d.SetId(name)
