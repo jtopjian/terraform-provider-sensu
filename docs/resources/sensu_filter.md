@@ -36,6 +36,8 @@ resource "sensu_filter" "filter_1" {
 
 * `expressions` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
 
+* `runtime_assets` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
+
 * `when` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
 
 ### when
