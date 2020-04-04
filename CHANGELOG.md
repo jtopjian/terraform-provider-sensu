@@ -1,5 +1,9 @@
 ## 0.8.0 (Unreleased)
 
+IMPROVEMENTS
+
+* Added `sensu_filter.runtime_assets` [GH-20](https://github.com/jtopjian/terraform-provider-sensu/pull/20)
+
 BUG FIXES
 
 * Fix typo with `sensu_check.output_metric_format` [GH-19](https://github.com/jtopjian/terraform-provider-sensu/pull/19)
