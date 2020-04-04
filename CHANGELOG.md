@@ -1,5 +1,9 @@
 ## 0.8.0 (Unreleased)
 
+BUG FIXES
+
+* Fix typo with `sensu_check.output_metric_format` [GH-19](https://github.com/jtopjian/terraform-provider-sensu/pull/19)
+
 ## 0.7.0 (March 29, 2020)
 
 IMPROVEMENTS
