@@ -29,7 +29,7 @@ func TestAccDataSourceCheck_headers(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccDataSourceCheck_headers,
+				Config: testAccDataSourceAsset_headers,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"data.sensu_asset.asset_1", "headers.header1", "test1"),
@@ -55,4 +55,4 @@ var testAccDataSourceAsset_headers = fmt.Sprintf(`
   data "sensu_asset" "asset_1" {
     name = "${sensu_asset.asset_1.name}"
   }
-`, testAccResourceAsset_headers)
+`, testAccResourceAsset_headers_1)
