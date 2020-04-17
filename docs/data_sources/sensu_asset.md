@@ -28,3 +28,5 @@ data "sensu_asset" "asset_1" {
 * `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
 
 * `filter` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
+
+* `headers` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).

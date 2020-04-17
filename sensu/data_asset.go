@@ -34,6 +34,11 @@ func dataSourceAsset() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+
+			"headers": &schema.Schema{
+				Type:     schema.TypeMap,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -53,6 +58,7 @@ func dataSourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(asset.Name)
 	d.Set("sha512", asset.Sha512)
 	d.Set("url", asset.URL)
+	d.Set("headers", asset.Headers)
 	d.Set("namespace", asset.ObjectMeta.Namespace)
 
 	if err := d.Set("filters", asset.Filters); err != nil {
