@@ -35,6 +35,8 @@ resource "sensu_asset" "asset_1" {
 
 * `filters` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets).
 
+* `headers` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets).
+
 ## Attribute Reference
 
 The resource has no computed fields.

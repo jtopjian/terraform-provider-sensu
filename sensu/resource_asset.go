@@ -39,6 +39,11 @@ func resourceAsset() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
+			"headers": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+
 			"namespace": resourceNamespaceSchema,
 		},
 	}
@@ -49,6 +54,7 @@ func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	filters := expandStringList(d.Get("filters").([]interface{}))
+	headers := expandHeaders(d.Get("headers").(map[string]interface{}))
 
 	asset := &types.Asset{
 		ObjectMeta: types.ObjectMeta{
@@ -58,6 +64,7 @@ func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 		Sha512:  d.Get("sha512").(string),
 		URL:     d.Get("url").(string),
 		Filters: filters,
+		Headers: headers,
 	}
 
 	log.Printf("[DEBUG] Creating asset %s: %#v", name, asset)
@@ -96,6 +103,7 @@ func resourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("namespace", asset.ObjectMeta.Namespace)
 	d.Set("sha512", asset.Sha512)
 	d.Set("url", asset.URL)
+	d.Set("headers", asset.Headers)
 
 	if err := d.Set("filters", asset.Filters); err != nil {
 		return fmt.Errorf("Error setting %s.filter: %s", name, err)
@@ -130,6 +138,11 @@ func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 		asset.Filters = filters
 	}
 
+	if d.HasChange("headers") {
+		headers := expandHeaders(d.Get("headers").(map[string]interface{}))
+		asset.Headers = headers
+	}
+
 	if err := asset.Validate(); err != nil {
 		return fmt.Errorf("Invalid asset %s: %s", name, err)
 	}
@@ -158,3 +171,13 @@ func resourceAssetDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 */
+
+func expandHeaders(v map[string]interface{}) (headers map[string]string) {
+
+	headers = make(map[string]string)
+	for key, val := range v {
+		headers[key] = val.(string)
+	}
+
+	return
+}
