@@ -3,6 +3,7 @@
 IMPROVEMENTS
 
 * Added `sensu_filter.runtime_assets` [GH-20](https://github.com/jtopjian/terraform-provider-sensu/pull/20)
+* Added `sensu_asset.headers` [GH-21](https://github.com/jtopjian/terraform-provider-sensu/pull/21)
 
 BUG FIXES
 
