@@ -13,7 +13,7 @@ func resourceAsset() *schema.Resource {
 		Create: resourceAssetCreate,
 		Read:   resourceAssetRead,
 		Update: resourceAssetUpdate,
-		Delete: schema.RemoveFromState,
+		Delete: resourceAssetDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -154,7 +154,6 @@ func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 	return resourceAssetRead(d, meta)
 }
 
-/*
 func resourceAssetDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	name := d.Id()
@@ -164,13 +163,12 @@ func resourceAssetDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve asset %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteAsset(asset); err != nil {
+	if err := config.client.Delete(asset.URIPath()); err != nil {
 		return fmt.Errorf("Unable to delete asset %s: %s", name, err)
 	}
 
 	return nil
 }
-*/
 
 func expandHeaders(v map[string]interface{}) (headers map[string]string) {
 
