@@ -5,6 +5,8 @@ IMPROVEMENTS
 * Added `sensu_filter.runtime_assets` [GH-20](https://github.com/jtopjian/terraform-provider-sensu/pull/20)
 * Added `sensu_asset.headers` [GH-21](https://github.com/jtopjian/terraform-provider-sensu/pull/21)
 * Enabled `sensu_asset`s to be truly deleted instead of just deleted in the Terrafom State [GH-22](https://github.com/jtopjian/terraform-provider-sensu/pull/22)
+* Added `sensu_silenced` resource [GH-25](https://github.com/jtopjian/terraform-provider-sensu/pull/25)
+* Added `sensu_silenced` data source [GH-25](https://github.com/jtopjian/terraform-provider-sensu/pull/25)
 
 BUG FIXES
 
