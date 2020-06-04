@@ -63,6 +63,7 @@ func Provider() terraform.ResourceProvider {
 			"sensu_namespace":    dataSourceNamespace(),
 			"sensu_role":         dataSourceRole(),
 			"sensu_role_binding": dataSourceRoleBinding(),
+			"sensu_silenced":     dataSourceSilenced(),
 			"sensu_user":         dataSourceUser(),
 		},
 
@@ -76,6 +77,7 @@ func Provider() terraform.ResourceProvider {
 			"sensu_namespace":    resourceNamespace(),
 			"sensu_role":         resourceRole(),
 			"sensu_role_binding": resourceRoleBinding(),
+			"sensu_silenced":     resourceSilenced(),
 			"sensu_user":         resourceUser(),
 		},
 
