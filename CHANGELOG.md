@@ -9,6 +9,7 @@ IMPROVEMENTS
 BUG FIXES
 
 * Fix typo with `sensu_check.output_metric_format` [GH-19](https://github.com/jtopjian/terraform-provider-sensu/pull/19)
+* Fix empty `when` blocks from being created in `sensu_filter` resource [GH-26](https://github.com/jtopjian/terraform-provider-sensu/pull/26)
 
 ## 0.7.0 (March 29, 2020)
 
