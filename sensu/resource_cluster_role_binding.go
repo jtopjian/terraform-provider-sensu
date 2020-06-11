@@ -59,7 +59,7 @@ func resourceClusterRoleBindingCreate(d *schema.ResourceData, meta interface{}) 
 			Name: name,
 		},
 		RoleRef: v2.RoleRef{
-            Type: "ClusterRole",
+			Type: "ClusterRole",
 			Name: roleName,
 		},
 	}

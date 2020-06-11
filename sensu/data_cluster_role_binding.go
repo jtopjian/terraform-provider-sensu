@@ -49,7 +49,7 @@ func dataSourceClusterRoleBindingRead(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[DEBUG] Retrieved cluster role binding %s: %#v", name, clusterRoleBinding)
 
 	d.Set("cluster_role", clusterRoleBinding.RoleRef.Name)
-    d.Set("binding_type", "cluster_role")
+	d.Set("binding_type", "cluster_role")
 
 	users := []string{}
 	groups := []string{}

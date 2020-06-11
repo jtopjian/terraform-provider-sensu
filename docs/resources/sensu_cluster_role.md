@@ -9,8 +9,10 @@ For full documentation on Sensu Cluster Roles, see [here](https://docs.sensu.io/
 ```hcl
 resource "sensu_cluster_role" "cluster_role_1" {
   name = "my_role"
-  password = "abcd1234"
-  cluster_roles = ["admin"]
+  rule {
+    verbs = ["get", "list"]
+    resource = ["checks"]
+  }
 }
 ```
 

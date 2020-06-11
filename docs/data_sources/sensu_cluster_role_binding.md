@@ -8,7 +8,7 @@ For full documentation on Sensu Cluster Roles bindings, see [here](https://docs.
 
 ```hcl
 data "sensu_cluster_role_binding" "cluster_role_binding_1" {
-  name = "cluster_role_binding_1"
+  name         = "cluster_role_binding_1"
 }
 ```
 

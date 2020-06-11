@@ -34,7 +34,7 @@ func resourceClusterRoleCreate(d *schema.ResourceData, meta interface{}) error {
 
 	cluster_role := &types.ClusterRole{
 		ObjectMeta: types.ObjectMeta{
-			Name:      name,
+			Name: name,
 		},
 		Rules: rules,
 	}

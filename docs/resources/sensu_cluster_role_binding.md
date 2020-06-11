@@ -21,7 +21,7 @@ resource "sensu_cluster_role_binding" "cluster_role_binding_1" {
 
   [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#role-bindings-and-cluster-role-bindings) for more information.
 
-* `role` - *Required* - The name of the role. See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#role-bindings-and-cluster-role-bindings) for more information.
+* `cluster_role` - *Required* - The name of the cluster role. See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#role-bindings-and-cluster-role-bindings) for more information.
 
 * `users` - *Optional* - The users to bind. See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#role-bindings-and-cluster-role-bindings) for more information.
 

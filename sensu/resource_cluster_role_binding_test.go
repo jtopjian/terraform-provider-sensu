@@ -41,9 +41,9 @@ func testAccResourceClusterRoleBinding_basic(username string) string {
 		resource "sensu_cluster_role_binding" "cluster_role_binding_1" {
 			name = "cluster_role_binding_1"
 
-			role = "${sensu_cluster_role.cluster_role_1.name}"
+			cluster_role = "${sensu_cluster_role.cluster_role_1.name}"
 
 			users = ["${sensu_user.user_1.name}"]
 		}
-	`, testAccResourceRole_basic, userResource)
+	`, testAccResourceClusterRole_basic, userResource)
 }
