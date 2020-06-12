@@ -5,9 +5,8 @@
 
 Sensu Go resource provider for Terraform
 
-> This provider is still in early stages and has not seen
-> a lot of production use. Backwards compatibility is not
-> guaranteed at this time.
+> This provider is maintained on a volunteer basis. Please
+> excuse any delay in response.
 
 ## Prerequisites
 
@@ -69,8 +68,9 @@ directory as described in Terraform's [plugin installation instructions][3]
 
 ## Development
 
-This project is using [`govendor`][5] for the time being. In the future,
-it'll probably move to the official Go module support.
+* This provider attempts to adere to the best practices of developing 
+  Terraform providers.
+* This project is using Go modules for dependencies.
 
 ## Documentation
 
