@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -45,7 +44,6 @@ func dataSourceClusterRoleBindingRead(d *schema.ResourceData, meta interface{}) 
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve cluster role binding %s: %s", name, err)
 	}
-
 	log.Printf("[DEBUG] Retrieved cluster role binding %s: %#v", name, clusterRoleBinding)
 
 	d.Set("cluster_role", clusterRoleBinding.RoleRef.Name)
@@ -65,7 +63,6 @@ func dataSourceClusterRoleBindingRead(d *schema.ResourceData, meta interface{}) 
 
 	d.Set("users", users)
 	d.Set("groups", groups)
-
 	d.SetId(name)
 
 	return nil

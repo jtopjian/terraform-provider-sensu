@@ -29,13 +29,10 @@ func dataSourceClusterRoleRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve cluster role %s: %s", name, err)
 	}
-
 	log.Printf("[DEBUG] Retrieved cluster role %s: %#v", name, cluster_role)
 
 	rules := flattenRules(cluster_role.Rules)
-
 	d.Set("rule", rules)
-
 	d.SetId(name)
 
 	return nil

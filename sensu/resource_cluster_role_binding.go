@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-
 	"github.com/sensu/sensu-go/api/core/v2"
 	"github.com/sensu/sensu-go/types"
 )
