@@ -18,19 +18,18 @@ func TestAccDataSourceClusterRoleBinding_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccDataSourceClusterRoleBinding_basic(username),
 				Check: resource.ComposeTestCheckFunc(
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role_binding.cluster_role_binding_1", "name", "cluster_role_binding_1"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role_binding.cluster_role_binding_1", "cluster_role", "cluster_role_1"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role_binding.cluster_role_binding_1", "users.#", "1"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role_binding.cluster_role_binding_1", "users.0", "${sensu_user.user_1.name}"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role_binding.cluster_role_binding_1", "groups.#", "2"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role_binding.cluster_role_binding_1", "groups.1", "group_1"),
-
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role_binding.cluster_role_binding_1", "name", "cluster_role_binding_1"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role_binding.cluster_role_binding_1", "cluster_role", "cluster_role_1"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role_binding.cluster_role_binding_1", "users.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role_binding.cluster_role_binding_1", "groups.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role_binding.cluster_role_binding_1", "groups.0", "group_0"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role_binding.cluster_role_binding_1", "groups.1", "group_1"),
 				),
 			},
 		},

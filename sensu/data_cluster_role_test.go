@@ -15,22 +15,30 @@ func TestAccDataSourceClusterRole_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccDataSourceClusterRole_basic,
 				Check: resource.ComposeTestCheckFunc(
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "name", "cluster_role_1"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.#", "2"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.0.verbs.#", "1"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.0.verbs.0", "*"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.1.verbs.1", "list"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.1.resources.#", "2"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.0.resources.0", "checks"),
-                    resource.TestCheckResourceAttr(
-                        "sensu_cluster_role.cluster_role_1", "rule.1.resources.1", "filters"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "name", "cluster_role_1"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.0.verbs.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.0.resources.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.0.verbs.0", "*"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.0.resources.0", "checks"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.resources.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.0", "get"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.1", "list"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.resources.0", "assets"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.resources.1", "filters"),
 				),
 			},
 		},

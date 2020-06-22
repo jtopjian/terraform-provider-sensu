@@ -2,7 +2,7 @@
 
 Get information about a Sensu Cluser Role.
 
-For full documentation on Sensu Cluster Roles, see [here](https://docs.sensu.io/sensu-go/lates/reference/rbac/#roles-and-cluster-roles).
+For full documentation on Sensu Cluster Roles, see [here](https://docs.sensu.io/sensu-go/latest/reference/rbac/#roles-and-cluster-roles).
 
 ## Basic Example
 

@@ -21,13 +21,21 @@ func TestAccResourceClusterRole_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_cluster_role.cluster_role_1", "rule.0.verbs.#", "1"),
 					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.0.resources.#", "1"),
+					resource.TestCheckResourceAttr(
 						"sensu_cluster_role.cluster_role_1", "rule.0.verbs.0", "*"),
 					resource.TestCheckResourceAttr(
-						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.1", "list"),
+						"sensu_cluster_role.cluster_role_1", "rule.0.resources.0", "checks"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.#", "2"),
 					resource.TestCheckResourceAttr(
 						"sensu_cluster_role.cluster_role_1", "rule.1.resources.#", "2"),
 					resource.TestCheckResourceAttr(
-						"sensu_cluster_role.cluster_role_1", "rule.0.resources.0", "checks"),
+						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.0", "get"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.verbs.1", "list"),
+					resource.TestCheckResourceAttr(
+						"sensu_cluster_role.cluster_role_1", "rule.1.resources.0", "assets"),
 					resource.TestCheckResourceAttr(
 						"sensu_cluster_role.cluster_role_1", "rule.1.resources.1", "filters"),
 				),
