@@ -2,7 +2,7 @@
 
 Get information about a Sensu User.
 
-For full documentation on Sensu Users, see [here](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
+For full documentation on Sensu Users, see [here](https://docs.sensu.io/sensu-go/latest/reference/rbac/#user).
 
 ## Basic Example
 
@@ -18,4 +18,4 @@ data "sensu_user" "user_1" {
 
 ## Attribute Reference
 
-* `groups` - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#user).
+* `groups` - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/reference/rbac/#user).
