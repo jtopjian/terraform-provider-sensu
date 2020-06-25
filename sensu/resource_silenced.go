@@ -79,8 +79,8 @@ func resourceSilencedCreate(d *schema.ResourceData, meta interface{}) error {
 	subscription := d.Get("subscription").(string)
 	name := fmt.Sprintf("%s:%s", subscription, check)
 
-	annotations := expandAnnotations(d.Get("annotations").(map[string]interface{}))
-	labels := expandLabels(d.Get("labels").(map[string]interface{}))
+	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
+	labels := expandStringMap(d.Get("labels").(map[string]interface{}))
 
 	begin, err := beginConvertToTimestamp(d.Get("begin").(string))
 	if err != nil {
@@ -156,11 +156,11 @@ func resourceSilencedUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Retrieved silenced %s: %#v", name, silenced)
 
 	if d.HasChange("annotations") {
-		silenced.ObjectMeta.Annotations = expandAnnotations(d.Get("annotations").(map[string]interface{}))
+		silenced.ObjectMeta.Annotations = expandStringMap(d.Get("annotations").(map[string]interface{}))
 	}
 
 	if d.HasChange("labels") {
-		silenced.ObjectMeta.Labels = expandLabels(d.Get("labels").(map[string]interface{}))
+		silenced.ObjectMeta.Labels = expandStringMap(d.Get("labels").(map[string]interface{}))
 	}
 
 	if d.HasChange("begin") {

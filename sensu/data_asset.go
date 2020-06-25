@@ -19,6 +19,18 @@ func dataSourceAsset() *schema.Resource {
 			"namespace": resourceNamespaceSchema,
 
 			// Computed
+			"build": dataSourceAssetBuildsSchema,
+
+			"labels": &schema.Schema{
+				Type:     schema.TypeMap,
+				Computed: true,
+			},
+
+			"annotations": &schema.Schema{
+				Type:     schema.TypeMap,
+				Computed: true,
+			},
+
 			"sha512": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -60,9 +72,16 @@ func dataSourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("url", asset.URL)
 	d.Set("headers", asset.Headers)
 	d.Set("namespace", asset.ObjectMeta.Namespace)
+	d.Set("annotations", asset.ObjectMeta.Annotations)
+	d.Set("labels", asset.ObjectMeta.Labels)
 
 	if err := d.Set("filters", asset.Filters); err != nil {
 		return fmt.Errorf("Error setting %s.filter: %s", name, err)
+	}
+
+	builds := flattenAssetBuilds(asset.Builds)
+	if err := d.Set("build", builds); err != nil {
+		return fmt.Errorf("Error setting %s.build: %s", name, err)
 	}
 
 	return nil

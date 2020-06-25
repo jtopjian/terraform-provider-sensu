@@ -22,26 +22,50 @@ func resourceAsset() *schema.Resource {
 			// Required
 			"name": resourceNameSchema,
 
-			"sha512": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+			// Optional
+			"build": resourceAssetBuildsSchema,
+
+			"labels": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+
+			"annotations": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
 			},
 
 			"url": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"build"},
+				Deprecated: "This field is for single-build assets, " +
+					"which have been deprecated. Please use multiple-build assets instead.",
 			},
 
-			// Optional
+			"sha512": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"build"},
+				Deprecated: "This field is for single-build assets, " +
+					"which have been deprecated. Please use multiple-build assets instead.",
+			},
+
 			"filters": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:          schema.TypeList,
+				Optional:      true,
+				ConflictsWith: []string{"build"},
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				Deprecated: "This field is for single-build assets, " +
+					"which have been deprecated. Please use multiple-build assets instead.",
 			},
 
 			"headers": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:          schema.TypeMap,
+				Optional:      true,
+				ConflictsWith: []string{"build"},
+				Deprecated: "This field is for single-build assets, " +
+					"which have been deprecated. Please use multiple-build assets instead.",
 			},
 
 			"namespace": resourceNamespaceSchema,
@@ -52,19 +76,27 @@ func resourceAsset() *schema.Resource {
 func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	name := d.Get("name").(string)
-
-	filters := expandStringList(d.Get("filters").([]interface{}))
-	headers := expandHeaders(d.Get("headers").(map[string]interface{}))
+	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
+	labels := expandStringMap(d.Get("labels").(map[string]interface{}))
 
 	asset := &types.Asset{
 		ObjectMeta: types.ObjectMeta{
-			Name:      name,
-			Namespace: config.determineNamespace(d),
+			Name:        name,
+			Namespace:   config.determineNamespace(d),
+			Annotations: annotations,
+			Labels:      labels,
 		},
-		Sha512:  d.Get("sha512").(string),
-		URL:     d.Get("url").(string),
-		Filters: filters,
-		Headers: headers,
+	}
+
+	// First process multi-build assets.
+	builds := expandAssetBuilds(d.Get("build").([]interface{}))
+	if len(builds) > 0 {
+		asset.Builds = builds
+	} else {
+		asset.Filters = expandStringList(d.Get("filters").([]interface{}))
+		asset.Headers = expandStringMap(d.Get("headers").(map[string]interface{}))
+		asset.URL = d.Get("url").(string)
+		asset.Sha512 = d.Get("sha512").(string)
 	}
 
 	log.Printf("[DEBUG] Creating asset %s: %#v", name, asset)
@@ -73,11 +105,7 @@ func resourceAssetCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Invalid asset %s: %s", name, err)
 	}
 
-	// Not possible to delete an asset at this time,
-	// so just update call update which will either create or update.
-	//
-	// https://github.com/sensu/sensu-go/issues/988
-	if err := config.client.UpdateAsset(asset); err != nil {
+	if err := config.client.CreateAsset(asset); err != nil {
 		return fmt.Errorf("Error creating asset %s: %s", name, err)
 	}
 
@@ -104,9 +132,16 @@ func resourceAssetRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("sha512", asset.Sha512)
 	d.Set("url", asset.URL)
 	d.Set("headers", asset.Headers)
+	d.Set("annotations", asset.ObjectMeta.Annotations)
+	d.Set("labels", asset.ObjectMeta.Labels)
 
 	if err := d.Set("filters", asset.Filters); err != nil {
 		return fmt.Errorf("Error setting %s.filter: %s", name, err)
+	}
+
+	builds := flattenAssetBuilds(asset.Builds)
+	if err := d.Set("build", builds); err != nil {
+		return fmt.Errorf("Error setting %s.build: %s", name, err)
 	}
 
 	return nil
@@ -139,7 +174,7 @@ func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("headers") {
-		headers := expandHeaders(d.Get("headers").(map[string]interface{}))
+		headers := expandStringMap(d.Get("headers").(map[string]interface{}))
 		asset.Headers = headers
 	}
 
@@ -168,14 +203,4 @@ func resourceAssetDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
-}
-
-func expandHeaders(v map[string]interface{}) (headers map[string]string) {
-
-	headers = make(map[string]string)
-	for key, val := range v {
-		headers[key] = val.(string)
-	}
-
-	return
 }
