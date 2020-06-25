@@ -13,7 +13,7 @@ func dataSourceAsset() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			// Required
-			"name": dataSourceNameSchema,
+			"name": dataSourceAssetNameSchema,
 
 			// Optional
 			"namespace": resourceNamespaceSchema,

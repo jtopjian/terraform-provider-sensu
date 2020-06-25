@@ -31,6 +31,24 @@ var dataSourceNameSchema = &schema.Schema{
 		"Invalid name"),
 }
 
+var resourceAssetNameSchema = &schema.Schema{
+	Type:     schema.TypeString,
+	Required: true,
+	ForceNew: true,
+	ValidateFunc: validation.StringMatch(
+		regexp.MustCompile(`\A[\w\.\-/]+\z`),
+		"Invalid name"),
+}
+
+var dataSourceAssetNameSchema = &schema.Schema{
+	Type:     schema.TypeString,
+	Required: true,
+	ForceNew: true,
+	ValidateFunc: validation.StringMatch(
+		regexp.MustCompile(`\A[\w\.\-/]+\z`),
+		"Invalid name"),
+}
+
 // Namespace
 var resourceNamespaceSchema = &schema.Schema{
 	Type:     schema.TypeString,

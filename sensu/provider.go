@@ -54,6 +54,7 @@ func Provider() terraform.ResourceProvider {
 
 		DataSourcesMap: map[string]*schema.Resource{
 			"sensu_asset":                dataSourceAsset(),
+			"sensu_bonsai_asset":         dataSourceBonsaiAsset(),
 			"sensu_check":                dataSourceCheck(),
 			"sensu_cluster_role":         dataSourceClusterRole(),
 			"sensu_cluster_role_binding": dataSourceClusterRoleBinding(),

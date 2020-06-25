@@ -20,7 +20,7 @@ func resourceAsset() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			// Required
-			"name": resourceNameSchema,
+			"name": resourceAssetNameSchema,
 
 			// Optional
 			"build": resourceAssetBuildsSchema,
