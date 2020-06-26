@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
@@ -168,6 +169,24 @@ func (c *Config) TrustedCAFile() string {
 // used to satisfy the Sensu client interface.
 func (c *Config) SaveTrustedCAFile(v string) error {
 	c.trustedCAFile = v
+	return nil
+}
+
+// Timeout implements the Timeout method for the config.Config
+// interface.
+//
+// Note: this is not actually implemented in this provider. This is only
+// used to satisfy the Sensu client interface.
+func (c *Config) Timeout() time.Duration {
+	return 0
+}
+
+// SaveTimeout implements the SaveTimeout method for the
+// config.Config interface.
+//
+// Note: this is not actually implemented in this provider. This is only
+// used to satisfy the Sensu client interface.
+func (c *Config) SaveTimeout(val time.Duration) error {
 	return nil
 }
 
