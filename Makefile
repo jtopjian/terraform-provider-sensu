@@ -1,6 +1,6 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 TARGETS=darwin linux windows
-SENSU_VERSION=5.18.1
+SENSU_VERSION=5.21.0
 
 docker:
 	rm -rf /var/lib/sensu
@@ -10,7 +10,7 @@ docker:
 	docker run -v /var/lib/sensu:/var/lib/sensu -d --name sensu-agent sensu/sensu:$(SENSU_VERSION) sensu-agent start --backend-url ws://localhost:8081 --subscriptions webserver,system --cache-dir /var/lib/sensu
 
 testacc:
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m -count 1
 
 build:
 	go install
