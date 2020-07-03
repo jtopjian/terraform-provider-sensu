@@ -1,5 +1,12 @@
 ## 0.9.0 (Unreleased)
 
+IMPROVEMENTS
+
+* Added `sensu_cluster_role` resource [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
+* Added `sensu_cluster_role` data source [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
+* Added `sensu_cluster_role_binding` resource [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
+* Added `sensu_cluster_role_binding` data source [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
+
 ## 0.8.0 (June 4, 2020)
 
 IMPROVEMENTS
@@ -9,11 +16,6 @@ IMPROVEMENTS
 * Enabled `sensu_asset`s to be truly deleted instead of just deleted in the Terrafom State [GH-22](https://github.com/jtopjian/terraform-provider-sensu/pull/22)
 * Added `sensu_silenced` resource [GH-25](https://github.com/jtopjian/terraform-provider-sensu/pull/25)
 * Added `sensu_silenced` data source [GH-25](https://github.com/jtopjian/terraform-provider-sensu/pull/25)
-* Added `sensu_cluster_role` resource [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
-* Added `sensu_cluster_role` data source [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
-* Added `sensu_cluster_role_binding` resource [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
-* Added `sensu_cluster_role_binding` data source [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
-
 
 BUG FIXES
 
