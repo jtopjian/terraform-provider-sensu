@@ -2,7 +2,7 @@
 
 Get information about a Sensu Namespace.
 
-For full documentation on Sensu Namespaces, see [here](https://docs.sensu.io/sensu-go/5.0/reference/rbac/#namespaces)
+For full documentation on Sensu Namespaces, see [here](https://docs.sensu.io/sensu-go/latest/reference/rbac/#namespaces)
 
 ## Basic Example
 

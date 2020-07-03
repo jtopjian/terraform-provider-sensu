@@ -2,7 +2,7 @@
 
 Get information about a Sensu Asset.
 
-For full documentation on Sensu Hooks, see [here](https://docs.sensu.io/sensu-go/5.0/reference/assets).
+For full documentation on Sensu Asset, see [here](https://docs.sensu.io/sensu-go/latest/reference/assets).
 
 ## Basic Example
 
@@ -23,10 +23,33 @@ data "sensu_asset" "asset_1" {
 
 ## Attribute Reference
 
-* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
+* `build` - Defines a build for an asset. Define more than one `build` block for
 
-* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
+* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+  This was for single-build assets which have been deprecated. It is recommended to use the `build` block
+  for multiple-build assets.
 
-* `filter` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
+* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+  This was for single-build assets which have been deprecated. It is recommended to use the `build` block
+  for multiple-build assets.
 
-* `headers` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/5.0/reference/assets/).
+* `filter` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+  This was for single-build assets which have been deprecated. It is recommended to use the `build` block
+  for multiple-build assets.
+
+* `headers` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+  This was for single-build assets which have been deprecated. It is recommended to use the `build` block
+  for multiple-build assets.
+
+### build
+
+The `build` block supports:
+
+* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
+
+* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
+
+* `filters` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
+
+* `headers` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
+

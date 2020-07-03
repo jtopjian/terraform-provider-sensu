@@ -2,7 +2,7 @@
 
 Get information about a Sensu Mutator.
 
-For full documentation on Sensu Mutators, see [here](https://docs.sensu.io/sensu-go/5.0/reference/mutators).
+For full documentation on Sensu Mutators, see [here](https://docs.sensu.io/sensu-go/latest/reference/mutators).
 
 ## Basic Example
 
@@ -22,8 +22,8 @@ data "sensu_mutator" "mutator_1" {
 
 ## Attribute Reference
 
-* `command` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/5.0/reference/mutators/#attributes).
+* `command` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/reference/mutators/#attributes).
 
-* `timeout` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/5.0/reference/mutators/#attributes).
+* `timeout` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/reference/mutators/#attributes).
 
-* `env_vars` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/5.0/reference/mutators/#attributes).
+* `env_vars` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/reference/mutators/#attributes).

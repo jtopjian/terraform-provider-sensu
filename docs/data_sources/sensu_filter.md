@@ -2,7 +2,7 @@
 
 Get information about a Sensu Filter
 
-For full documentation on Sensu Filters, see [here](https://docs.sensu.io/sensu-go/5.0/reference/filters).
+For full documentation on Sensu Filters, see [here](https://docs.sensu.io/sensu-go/latest/reference/filters).
 
 ## Basic Example
 
@@ -22,14 +22,14 @@ data "sensu_filter" "filter_1" {
 
 ## Attribute Reference
 
-* `action` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
+* `action` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
   Valid values are `allow` and `deny`.
 
-* `expressions` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
+* `expressions` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
 
-* `runtime_assets` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
+* `runtime_assets` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
 
-* `when` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/5.0/reference/filters/#filter-attributes).
+* `when` - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
 
 ### when
 

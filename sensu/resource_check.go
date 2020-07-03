@@ -192,8 +192,8 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	//proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
-	annotations := expandAnnotations(d.Get("annotations").(map[string]interface{}))
-	labels := expandLabels(d.Get("labels").(map[string]interface{}))
+	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
+	labels := expandStringMap(d.Get("labels").(map[string]interface{}))
 
 	// Using partial to resume hook configuration if there's a failure.
 	d.Partial(true)
@@ -383,11 +383,11 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("annotations") {
-		check.ObjectMeta.Annotations = expandAnnotations(d.Get("annotations").(map[string]interface{}))
+		check.ObjectMeta.Annotations = expandStringMap(d.Get("annotations").(map[string]interface{}))
 	}
 
 	if d.HasChange("labels") {
-		check.ObjectMeta.Labels = expandLabels(d.Get("labels").(map[string]interface{}))
+		check.ObjectMeta.Labels = expandStringMap(d.Get("labels").(map[string]interface{}))
 	}
 
 	if d.HasChange("high_flap_threshold") {

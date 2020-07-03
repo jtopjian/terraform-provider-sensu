@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
+	"github.com/sensu/sensu-go/api/core/v2"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -47,26 +48,6 @@ var resourceEnvVarsSchema = &schema.Schema{
 var dataSourceEnvVarsSchema = &schema.Schema{
 	Type:     schema.TypeMap,
 	Computed: true,
-}
-
-func expandAnnotations(v map[string]interface{}) (annotations map[string]string) {
-
-	annotations = make(map[string]string)
-	for key, val := range v {
-		annotations[key] = val.(string)
-	}
-
-	return
-}
-
-func expandLabels(v map[string]interface{}) (labels map[string]string) {
-
-	labels = make(map[string]string)
-	for key, val := range v {
-		labels[key] = val.(string)
-	}
-
-	return
 }
 
 func expandEnvVars(v map[string]interface{}) []string {
@@ -380,4 +361,120 @@ func expandStringList(v []interface{}) []string {
 	}
 
 	return vs
+}
+
+// Map to String Map
+func expandStringMap(v map[string]interface{}) map[string]string {
+	m := make(map[string]string)
+	for key, val := range v {
+		m[key] = val.(string)
+	}
+
+	return m
+}
+
+// Assets
+var resourceAssetBuildsSchema = &schema.Schema{
+	Type:          schema.TypeList,
+	Optional:      true,
+	ForceNew:      true,
+	ConflictsWith: []string{"url", "sha512", "filters", "headers"},
+	Elem: &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"sha512": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"url": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"filters": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
+			"headers": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+		},
+	},
+}
+
+var dataSourceAssetBuildsSchema = &schema.Schema{
+	Type:     schema.TypeList,
+	Computed: true,
+	Elem: &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"sha512": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"url": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"filters": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
+			"headers": &schema.Schema{
+				Type:     schema.TypeMap,
+				Computed: true,
+			},
+		},
+	},
+}
+
+func expandAssetBuilds(v []interface{}) []*v2.AssetBuild {
+	var builds []*v2.AssetBuild
+
+	for _, v := range v {
+		build := new(v2.AssetBuild)
+		data := v.(map[string]interface{})
+
+		if raw, ok := data["sha512"]; ok {
+			build.Sha512 = raw.(string)
+		}
+
+		if raw, ok := data["url"]; ok {
+			build.URL = raw.(string)
+		}
+
+		if raw, ok := data["filters"]; ok {
+			build.Filters = expandStringList(raw.([]interface{}))
+		}
+
+		if raw, ok := data["headers"]; ok {
+			build.Headers = expandStringMap(raw.(map[string]interface{}))
+		}
+
+		builds = append(builds, build)
+	}
+
+	return builds
+}
+
+func flattenAssetBuilds(v []*v2.AssetBuild) []map[string]interface{} {
+	var builds []map[string]interface{}
+
+	for _, b := range v {
+		build := make(map[string]interface{})
+		build["sha512"] = b.Sha512
+		build["url"] = b.URL
+		build["filters"] = b.Filters
+		build["headers"] = b.Headers
+
+		builds = append(builds, build)
+	}
+
+	return builds
 }
