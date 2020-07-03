@@ -6,6 +6,7 @@ IMPROVEMENTS
 * Added `sensu_cluster_role` data source [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
 * Added `sensu_cluster_role_binding` resource [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
 * Added `sensu_cluster_role_binding` data source [GH-29](https://github.com/jtopjian/terraform-provider-sensu/pull/29)
+* Added multi-build support for the Asset resource and data source [GH-31](https://github.com/jtopjian/terraform-provider-sensu/pull/31)
 
 ## 0.8.0 (June 4, 2020)
 
