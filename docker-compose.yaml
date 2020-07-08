@@ -1,0 +1,21 @@
+version: '3'
+services:
+  backend1:
+    image: sensu/sensu:5.21.0
+    command: sensu-backend start --log-level debug --debug
+    hostname: backend1
+    restart: always
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+      - "8080:8080"
+      - "8081:8081"
+      - "6060:6060"
+      - "3000:3000"
+  agent1:
+    image: sensu/sensu:5.21.0
+    command: sensu-agent start --backend-url ws://backend1:8081 --log-level warn --keepalive-interval 5 --keepalive-timeout 10
+    hostname: agent1
+    restart: always
+    depends_on:
+      - backend1
