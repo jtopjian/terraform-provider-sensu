@@ -191,6 +191,22 @@ func TestAccResourceCheck_annotations(t *testing.T) {
 	})
 }
 
+func TestAccResourceCheck_proxyRequests(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_proxyRequests,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "proxy_requests.0.entity_attributes.#", "2"),
+				),
+			},
+		},
+	})
+}
+
 const testAccResourceCheck_basic = `
 	resource "sensu_check" "check_1" {
 		name = "check_1"
@@ -428,5 +444,31 @@ const testAccResourceCheck_annotations_3 = `
 			"foo",
 			"bar",
 		]
+	}
+`
+
+const testAccResourceCheck_proxyRequests = `
+	resource "sensu_entity" "entities" {
+		count = 3
+		name = format("entity-%02d", count.index+1)
+		class = "proxy"
+		labels = {
+			"proxy_type" = "website"
+			"url" = format("http://example-%02d.com", count.index+1)
+		}
+	}
+
+	resource "sensu_check" "check_1" {
+		name = "check-http"
+		command = "check-http.rb -u {{ .labels url }}"
+		interval = 60
+		proxy_requests {
+			entity_attributes = [
+				"entity.entity_class == 'proxy'",
+				"entity.labels.proxy_type == 'website'",
+			]
+		}
+		publish = true
+		subscriptions = ["proxy"]
 	}
 `

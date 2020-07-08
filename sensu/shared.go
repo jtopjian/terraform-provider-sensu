@@ -478,3 +478,108 @@ func flattenAssetBuilds(v []*v2.AssetBuild) []map[string]interface{} {
 
 	return builds
 }
+
+// Entities
+func expandEntityDeregistration(v []interface{}) types.Deregistration {
+	var deregistration types.Deregistration
+
+	for _, v := range v {
+		data := v.(map[string]interface{})
+		if raw, ok := data["handler"]; ok {
+			deregistration.Handler = raw.(string)
+		}
+	}
+
+	return deregistration
+}
+
+func flattenEntityDeregistration(v types.Deregistration) []map[string]interface{} {
+	var dereg []map[string]interface{}
+
+	if h := v.Handler; h != "" {
+		handler := make(map[string]interface{})
+		handler["handler"] = h
+		dereg = append(dereg, handler)
+	}
+
+	return dereg
+}
+
+func flattenEntitySystem(v types.System) []map[string]interface{} {
+	var systems []map[string]interface{}
+
+	if h := v.Hostname; h != "" {
+		system := make(map[string]interface{})
+		system["hostname"] = v.Hostname
+		system["os"] = v.OS
+		system["platform"] = v.Platform
+		system["platform_family"] = v.PlatformFamily
+		system["platform_version"] = v.PlatformVersion
+		system["arch"] = v.Arch
+
+		var networks []map[string]interface{}
+		for _, i := range v.Network.Interfaces {
+			network := make(map[string]interface{})
+			network["name"] = i.Name
+			network["mac"] = i.MAC
+			network["addresses"] = i.Addresses
+
+			networks = append(networks, network)
+		}
+
+		system["network_interfaces"] = networks
+		systems = append(systems, system)
+	}
+
+	return systems
+}
+
+// Suppress diffs for REDACTED values.
+func suppressDiffRedacted(k, old, new string, d *schema.ResourceData) bool {
+	if new != "" && old == "REDACTED" {
+		return true
+	}
+
+	return false
+}
+
+// Check Proxy Requests
+func expandCheckProxyRequests(v []interface{}) types.ProxyRequests {
+	var proxyRequests types.ProxyRequests
+
+	for _, v := range v {
+		proxyData := v.(map[string]interface{})
+
+		// entity attributes
+		if raw, ok := proxyData["entity_attributes"]; ok {
+			list := raw.([]interface{})
+			proxyRequests.EntityAttributes = expandStringList(list)
+		}
+
+		// splay
+		if raw, ok := proxyData["splay"]; ok {
+			proxyRequests.Splay = raw.(bool)
+		}
+
+		// splay coverage
+		if raw, ok := proxyData["splay_coverage"]; ok {
+			proxyRequests.SplayCoverage = uint32(raw.(int))
+		}
+	}
+
+	return proxyRequests
+}
+
+func flattenCheckProxyRequests(v *types.ProxyRequests) []map[string]interface{} {
+	var proxyRequests []map[string]interface{}
+	pr := make(map[string]interface{})
+
+	if len(v.EntityAttributes) > 0 {
+		pr["entity_attributes"] = v.EntityAttributes
+		pr["splay"] = v.Splay
+		pr["splay_coverage"] = v.SplayCoverage
+		proxyRequests = append(proxyRequests, pr)
+	}
+
+	return proxyRequests
+}

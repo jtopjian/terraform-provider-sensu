@@ -107,30 +107,28 @@ func resourceCheck() *schema.Resource {
 				Optional: true,
 			},
 
-			/*
-				"proxy_requests": &schema.Schema{
-					Type:     schema.TypeList,
-					Optional: true,
-					MaxItems: 1,
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"entity_attributes": &schema.Schema{
-								Type:     schema.TypeList,
-								Optional: true,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-							},
-							"splay": &schema.Schema{
-								Type:     schema.TypeBool,
-								Optional: true,
-							},
-							"splay_coverage": &schema.Schema{
-								Type:     schema.TypeInt,
-								Optional: true,
-							},
+			"proxy_requests": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"entity_attributes": &schema.Schema{
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"splay": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"splay_coverage": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 					},
 				},
-			*/
+			},
 
 			"publish": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -189,7 +187,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
 
 	// detailed structures
-	//proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
+	proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
 	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
@@ -216,14 +214,14 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 		OutputMetricFormat:   d.Get("output_metric_format").(string),
 		OutputMetricHandlers: outputMetricHandlers,
 		ProxyEntityName:      d.Get("proxy_entity_name").(string),
-		//ProxyRequests:        &proxyRequests,
-		Publish:       d.Get("publish").(bool),
-		RoundRobin:    d.Get("round_robin").(bool),
-		RuntimeAssets: runtimeAssets,
-		Stdin:         d.Get("stdin").(bool),
-		Subdue:        &subdues,
-		Timeout:       uint32(d.Get("timeout").(int)),
-		Ttl:           int64(d.Get("ttl").(int)),
+		ProxyRequests:        &proxyRequests,
+		Publish:              d.Get("publish").(bool),
+		RoundRobin:           d.Get("round_robin").(bool),
+		RuntimeAssets:        runtimeAssets,
+		Stdin:                d.Get("stdin").(bool),
+		Subdue:               &subdues,
+		Timeout:              uint32(d.Get("timeout").(int)),
+		Ttl:                  int64(d.Get("ttl").(int)),
 	}
 
 	log.Printf("[DEBUG] Creating check %s: %#v", name, check)
@@ -336,12 +334,10 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to set %s.output_metric_handlers: %s", name, err)
 	}
 
-	/*
-		proxyRequests := flattenCheckProxyRequests(check.ProxyRequests)
-		if err := d.Set("proxy_requests", proxyRequests); err != nil {
-			return fmt.Errorf("Unable to set %s.proxy_requests: %s", name, err)
-		}
-	*/
+	proxyRequests := flattenCheckProxyRequests(check.ProxyRequests)
+	if err := d.Set("proxy_requests", proxyRequests); err != nil {
+		return fmt.Errorf("Unable to set %s.proxy_requests: %s", name, err)
+	}
 
 	if err := d.Set("runtime_assets", check.RuntimeAssets); err != nil {
 		return fmt.Errorf("Unable to set %s.runtime_assets: %s", name, err)
@@ -415,12 +411,10 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 		check.ProxyEntityName = d.Get("proxy_entity_name").(string)
 	}
 
-	/*
-		if d.HasChange("proxy_requests") {
-			proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
-			check.ProxyRequests = &proxyRequests
-		}
-	*/
+	if d.HasChange("proxy_requests") {
+		proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
+		check.ProxyRequests = &proxyRequests
+	}
 
 	if d.HasChange("publish") {
 		check.Publish = d.Get("publish").(bool)
@@ -548,45 +542,3 @@ func flattenCheckHooks(v []types.HookList) []map[string]interface{} {
 
 	return hookLists
 }
-
-/*
-func expandCheckProxyRequests(v []interface{}) types.ProxyRequests {
-	var proxyRequests types.ProxyRequests
-
-	for _, v := range v {
-		proxyData := v.(map[string]interface{})
-
-		// entity attributes
-		if raw, ok := proxyData["entity_attributes"]; ok {
-			list := raw.([]interface{})
-			proxyRequests.EntityAttributes = expandStringList(list)
-		}
-
-		// splay
-		if raw, ok := proxyData["splay"]; ok {
-			proxyRequests.Splay = raw.(bool)
-		}
-
-		// splay coverage
-		if raw, ok := proxyData["splay_coverage"]; ok {
-			proxyRequests.SplayCoverage = uint32(raw.(int))
-		}
-	}
-
-	return proxyRequests
-}
-
-func flattenCheckProxyRequests(v *types.ProxyRequests) []map[string]interface{} {
-	var proxyRequests []map[string]interface{}
-	pr := make(map[string]interface{})
-
-	if len(v.EntityAttributes) > 0 {
-		pr["entity_attributes"] = v.EntityAttributes
-		pr["splay"] = v.Splay
-		pr["splay_coverage"] = v.SplayCoverage
-		proxyRequests = append(proxyRequests, pr)
-	}
-
-	return proxyRequests
-}
-*/

@@ -74,6 +74,7 @@ func Provider() terraform.ResourceProvider {
 			"sensu_check":                resourceCheck(),
 			"sensu_cluster_role":         resourceClusterRole(),
 			"sensu_cluster_role_binding": resourceClusterRoleBinding(),
+			"sensu_entity":               resourceEntity(),
 			"sensu_filter":               resourceFilter(),
 			"sensu_handler":              resourceHandler(),
 			"sensu_hook":                 resourceHook(),

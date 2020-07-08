@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sensu/sensu-go/types"
 )
 
 func dataSourceEntity() *schema.Resource {
@@ -46,11 +45,6 @@ func dataSourceEntity() *schema.Resource {
 				},
 			},
 
-			"keepalive_timeout": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-
 			"last_seen": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -66,6 +60,11 @@ func dataSourceEntity() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
+			"user": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 
 			"system": &schema.Schema{
@@ -163,45 +162,4 @@ func dataSourceEntityRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
-}
-
-func flattenEntityDeregistration(v types.Deregistration) []map[string]interface{} {
-	var dereg []map[string]interface{}
-
-	if h := v.Handler; h != "" {
-		handler := make(map[string]interface{})
-		handler["handler"] = h
-		dereg = append(dereg, handler)
-	}
-
-	return dereg
-}
-
-func flattenEntitySystem(v types.System) []map[string]interface{} {
-	var systems []map[string]interface{}
-
-	if h := v.Hostname; h != "" {
-		system := make(map[string]interface{})
-		system["hostname"] = v.Hostname
-		system["os"] = v.OS
-		system["platform"] = v.Platform
-		system["platform_family"] = v.PlatformFamily
-		system["platform_version"] = v.PlatformVersion
-		system["arch"] = v.Arch
-
-		var networks []map[string]interface{}
-		for _, i := range v.Network.Interfaces {
-			network := make(map[string]interface{})
-			network["name"] = i.Name
-			network["mac"] = i.MAC
-			network["addresses"] = i.Addresses
-
-			networks = append(networks, network)
-		}
-
-		system["network_interfaces"] = networks
-		systems = append(systems, system)
-	}
-
-	return systems
 }
