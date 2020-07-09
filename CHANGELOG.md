@@ -1,5 +1,15 @@
 ## 0.10.0 (Unreleased)
 
+IMPROVEMENTS
+
+* Added `sensu_entity` resource [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
+* Added `proxy_requests` to the `sensu_check` resource [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
+
+BUG FIXES
+
+* Removed `keepalive_timeout` from the `sensu_entity` data source [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
+
+
 ## 0.9.0 (July 3, 2020)
 
 IMPROVEMENTS
