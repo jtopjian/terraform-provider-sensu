@@ -22,7 +22,12 @@ data "sensu_check" "check_1" {
 
 ## Attribute Reference
 
+* `annotations` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+
 * `command` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+
+* `check_hook` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+  Also see the `check_hook` section below for details on this block.
 
 * `cron` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
@@ -32,9 +37,13 @@ data "sensu_check" "check_1" {
 
 * `interval` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
+* `label` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+
 * `low_flap_threshold` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
-* `proxy_entity_id` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `proxy_entity_name` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+
+* `proxy_requests` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
 * `publish` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
@@ -53,9 +62,26 @@ data "sensu_check" "check_1" {
 
 * `ttl` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
-* `annotations` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+### check_hook
 
-* `label` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+The `check_hook` block supports:
+
+* `hook` - *Required* - The name of the `sensu_hook` to run.
+
+* `trigger` - *Required* - Known as `type` in the Sensu documention, but, IMO,
+  `trigger` makes more sense. Determines when the trigger will run. Valid values
+  are: `1`-`255`, `ok`, `warning`, `critical`, `unknown`, and `non-zero`.
+
+### proxy_requests
+
+The `proxy_requests` block supports:
+
+* `entity_attributes` - Attributes to match entities.
+
+* `splay` - Enable splaying of coverage for checks.
+
+* `splay_coverage` - The percentage of the check interval for Sensu to execute
+  checks for entities matching the entity attributes.
 
 ### subdue
 
