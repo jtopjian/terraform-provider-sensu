@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/sensu/sensu-go/cli/client/config"
+	"github.com/sensu/sensu-go/version"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,7 +40,7 @@ func New(config config.Config) *RestClient {
 	client := &RestClient{resty: restyInst, config: config}
 
 	// set http client timeout
-	restyInst.SetTimeout(15 * time.Second)
+	restyInst.SetTimeout(config.Timeout())
 
 	// Standardize redirect policy
 	restyInst.SetRedirectPolicy(resty.FlexibleRedirectPolicy(10))
@@ -47,6 +48,9 @@ func New(config config.Config) *RestClient {
 	// JSON
 	restyInst.SetHeader("Accept", "application/json")
 	restyInst.SetHeader("Content-Type", "application/json")
+
+	// Set the User-Agent header
+	restyInst.SetHeader("User-Agent", "sensuctl/"+version.Semver())
 
 	// Check that Access-Token has not expired
 	restyInst.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
@@ -105,6 +109,11 @@ func New(config config.Config) *RestClient {
 	})
 
 	restyInst.SetLogger(logger)
+
+	// Disable warning log entries from resty when an HTTP address is used to
+	// configure sensuctl. We should remove that line whenever we decide to make
+	// sensuctl log level configurable.
+	restyInst.SetDisableWarn(true)
 
 	return client
 }

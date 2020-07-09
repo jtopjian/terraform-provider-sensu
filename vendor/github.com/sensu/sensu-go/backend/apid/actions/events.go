@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/sensu/sensu-go/backend/authentication/jwt"
 	"github.com/sensu/sensu-go/backend/messaging"
 	"github.com/sensu/sensu-go/backend/store"
 
@@ -127,9 +128,21 @@ func (a EventController) CreateOrReplace(ctx context.Context, event *corev2.Even
 		event.ID = id[:]
 	}
 
+	if claims := jwt.GetClaimsFromContext(ctx); claims != nil {
+		event.CreatedBy = claims.StandardClaims.Subject
+		event.Check.CreatedBy = claims.StandardClaims.Subject
+		event.Entity.CreatedBy = claims.StandardClaims.Subject
+	}
+
 	// Publish to event pipeline
 	if err := a.bus.Publish(messaging.TopicEventRaw, event); err != nil {
 		return NewError(InternalErr, err)
+	}
+
+	if event.HasCheck() && event.Check.Name == "keepalive" {
+		if err := a.bus.Publish(messaging.TopicKeepalive, event); err != nil {
+			return NewError(InternalErr, err)
+		}
 	}
 
 	return nil

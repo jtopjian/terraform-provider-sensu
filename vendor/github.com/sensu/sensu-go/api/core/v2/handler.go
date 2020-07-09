@@ -32,6 +32,14 @@ const (
 
 	// HandlerGRPCType is a special kind of handler that represents an extension
 	HandlerGRPCType = "grpc"
+
+	// KeepaliveHandlerName is the name of the handler that is executed when
+	// a keepalive timeout occurs.
+	KeepaliveHandlerName = "keepalive"
+
+	// RegistrationHandlerName is the name of the handler that is executed when
+	// a registration event is passed to pipelined.
+	RegistrationHandlerName = "registration"
 )
 
 // StorePrefix returns the path prefix to this resource in the store
@@ -70,7 +78,12 @@ func (h *Handler) validateType() error {
 	}
 
 	switch h.Type {
-	case "pipe", "set", "grpc":
+	case "pipe":
+		if strings.TrimSpace(h.Command) == "" {
+			return errors.New("missing command")
+		}
+		return nil
+	case "set", "grpc":
 		return nil
 	case "tcp", "udp":
 		return h.Socket.Validate()

@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"net/url"
 	"path"
-	"sort"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	cron "github.com/robfig/cron/v3"
-	utilstrings "github.com/sensu/sensu-go/util/strings"
+	utilstrings "github.com/sensu/sensu-go/api/core/v2/internal/stringutil"
 )
 
 const (
@@ -38,6 +37,14 @@ const (
 	// InfluxDBOutputMetricFormat is the accepted string to represent the output metric format of
 	// InfluxDB Line
 	InfluxDBOutputMetricFormat = "influxdb_line"
+
+	// KeepaliveCheckName is the name of the check that is created when a
+	// keepalive timeout occurs.
+	KeepaliveCheckName = "keepalive"
+
+	// RegistrationCheckName is the name of the check that is created when an
+	// entity sends a keepalive and the entity does not yet exist in the store.
+	RegistrationCheckName = "registration"
 )
 
 // OutputMetricFormats represents all the accepted output_metric_format's a check can have
@@ -172,6 +179,12 @@ func (c *Check) Validate() error {
 		}
 	}
 
+	for _, subscription := range c.Subscriptions {
+		if subscription == "" {
+			return fmt.Errorf("subscriptions cannot be empty strings")
+		}
+	}
+
 	// The entity can be empty but can't contain invalid characters (only
 	// alphanumeric string)
 	if c.ProxyEntityName != "" {
@@ -236,7 +249,6 @@ func (c *Check) MergeWith(prevCheck *Check) {
 	}
 
 	history = append(history, histEntry)
-	sort.Sort(ByExecuted(history))
 	if len(history) > 21 {
 		history = history[1:]
 	}
@@ -246,6 +258,13 @@ func (c *Check) MergeWith(prevCheck *Check) {
 	c.Occurrences = prevCheck.Occurrences
 	c.OccurrencesWatermark = prevCheck.OccurrencesWatermark
 	updateCheckState(c)
+
+	// This has to be done after the call to updateCheckState, as that function is what
+	// sets the value for c.State that is used below, but the order can't be switched
+	// around as updateCheckState relies on the latest item (specifically, its status)
+	// being present in c.History.
+	// NB! This has been disabled for 5.x releases.
+	// c.History[len(c.History)-1].Flapping = c.State == EventFlappingState
 }
 
 // ValidateOutputMetricFormat returns an error if the string is not a valid metric
@@ -257,6 +276,15 @@ func ValidateOutputMetricFormat(format string) error {
 	return errors.New("output metric format is not valid")
 }
 
+// previousOccurrence returns the most recent CheckHistory item, excluding the current result.
+func (c *Check) previousOccurrence() *CheckHistory {
+	if len(c.History) < 2 {
+		return nil
+	}
+	return &c.History[len(c.History)-2]
+}
+
+// DEPRECATED, DO NOT USE! Events should be ordered FIFO.
 // ByExecuted implements the sort.Interface for []CheckHistory based on the
 // Executed field.
 //
