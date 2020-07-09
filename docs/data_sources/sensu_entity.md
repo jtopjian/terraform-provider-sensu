@@ -1,8 +1,8 @@
 # sensu_entity
 
-Get information about a Sensu Handler.
+Get information about a Sensu Entity.
 
-For full documentation on Sensu Handlers, see [here](https://docs.sensu.io/sensu-go/latest/reference/entities).
+For full documentation on Sensu Entities, see [here](https://docs.sensu.io/sensu-go/latest/reference/entities).
 
 ## Basic Example
 
@@ -22,17 +22,23 @@ data "sensu_entity" "entity_1" {
 
 ## Attribute Reference
 
+* `annotations` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
+
 * `class` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
+
+* `deregister` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
 
 * `deregistration` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
 
-* `keepalive_timeout` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
+* `labels` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
 
 * `last_seen` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
 
 * `subscriptions` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
 
 * `system` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
+
+* `user` - See the [Sensu entity reference](https://docs.sensu.io/sensu-go/latest/reference/entities/#entity-attributes).
 
 ### deregistration
 

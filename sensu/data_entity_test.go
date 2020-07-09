@@ -1,13 +1,5 @@
 package sensu
 
-/*
-	Disabling test temporarily.
-
-	It works, but I need to figure out how to successfully
-	run it in Travis.
-*/
-
-/*
 import (
 	"fmt"
 	"testing"
@@ -21,19 +13,20 @@ func TestAccDataSourceEntity_basic(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccDataSourceEntity_basicPipe,
+				Config: testAccDataSourceEntity_basic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"data.sensu_entity.entity_1", "name", "sensu"),
+						"data.sensu_entity.entity_1", "name", "entity_1"),
 				),
 			},
 		},
 	})
 }
-*/
 
-const testAccDataSourceEntity_basicPipe = `
+var testAccDataSourceEntity_basic = fmt.Sprintf(`
+	%s
+
 	data "sensu_entity" "entity_1" {
-		name = "sensu"
+		name = "${sensu_entity.entity_1.name}"
 	}
-`
+`, testAccResourceEntity_basic)
