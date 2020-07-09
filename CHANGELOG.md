@@ -4,6 +4,7 @@ IMPROVEMENTS
 
 * Added `sensu_entity` resource [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
 * Added `proxy_requests` to the `sensu_check` resource [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
+* Added `proxy_requests` to the `sensu_check` data source [GH-33](https://github.com/jtopjian/terraform-provider-sensu/pull/33)
 
 BUG FIXES
 
