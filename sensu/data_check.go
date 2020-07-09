@@ -94,30 +94,28 @@ func dataSourceCheck() *schema.Resource {
 				Computed: true,
 			},
 
-			/*
-				"proxy_requests": &schema.Schema{
-					Type:     schema.TypeList,
-					Optional: true,
-					MaxItems: 1,
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"entity_attributes": &schema.Schema{
-								Type:     schema.TypeList,
-								Optional: true,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-							},
-							"splay": &schema.Schema{
-								Type:     schema.TypeBool,
-								Optional: true,
-							},
-							"splay_coverage": &schema.Schema{
-								Type:     schema.TypeInt,
-								Optional: true,
-							},
+			"proxy_requests": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"entity_attributes": &schema.Schema{
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"splay": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"splay_coverage": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 					},
 				},
-			*/
+			},
 
 			"publish": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -212,12 +210,10 @@ func dataSourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to set %s.output_metric_handlers: %s", name, err)
 	}
 
-	/*
-		proxyRequests := flattenCheckProxyRequests(check.ProxyRequests)
-		if err := d.Set("proxy_requests", proxyRequests); err != nil {
-			return fmt.Errorf("Unable to set %s.proxy_requests: %s", name, err)
-		}
-	*/
+	proxyRequests := flattenCheckProxyRequests(check.ProxyRequests)
+	if err := d.Set("proxy_requests", proxyRequests); err != nil {
+		return fmt.Errorf("Unable to set %s.proxy_requests: %s", name, err)
+	}
 
 	if err := d.Set("runtime_assets", check.RuntimeAssets); err != nil {
 		return fmt.Errorf("Unable to set %s.proxy_requests: %s", name, err)

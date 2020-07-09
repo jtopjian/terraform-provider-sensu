@@ -81,6 +81,24 @@ func TestAccDataSourceCheck_labels(t *testing.T) {
 	})
 }
 
+func TestAccDataSourceCheck_proxyRequests(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccDataSourceCheck_proxyRequests,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"data.sensu_check.check_1", "proxy_requests.0.entity_attributes.#", "2"),
+					resource.TestCheckResourceAttr(
+						"data.sensu_check.check_1", "proxy_requests.0.entity_attributes.0", "entity.entity_class == 'proxy'"),
+				),
+			},
+		},
+	})
+}
+
 var testAccDataSourceCheck_basic = fmt.Sprintf(`
   %s
 
@@ -112,3 +130,11 @@ var testAccDataSourceCheck_labels = fmt.Sprintf(`
     name = "${sensu_check.check_1.name}"
   }
 `, testAccResourceCheck_labels_1)
+
+var testAccDataSourceCheck_proxyRequests = fmt.Sprintf(`
+	%s
+
+	data "sensu_check" "check_1" {
+		name = "${sensu_check.check_1.name}"
+	}
+`, testAccResourceCheck_proxyRequests)

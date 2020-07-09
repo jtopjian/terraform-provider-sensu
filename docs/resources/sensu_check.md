@@ -23,13 +23,11 @@ resource "sensu_check" "check_1" {
 
 * `name` - *Required* - The name of the Sensu check.
 
-* `namespace` - *Optional* - The namespace to manage resources in. This can
-  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
-  this defaults to `default`.
-
 * `command` - *Required* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
 * `subscriptions` - *Required* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+
+* `annotations` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
 
 * `check_hook` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
   Also see the `check_hook` section below for details on this block.
@@ -42,9 +40,17 @@ resource "sensu_check" "check_1" {
 
 * `high_flap_threshold` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
+* `label` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+
 * `low_flap_threshold` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
+* `namespace` - *Optional* - The namespace to manage resources in. This can
+  also be set with the `SENSU_NAMESPACE` environment variable. If not set,
+  this defaults to `default`.
+
 * `proxy_entity_name` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+
+* `proxy_requests` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
 * `publish` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
@@ -61,10 +67,6 @@ resource "sensu_check" "check_1" {
 
 * `ttl` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
-* `annotations` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
-
-* `label` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
-
 ### check_hook
 
 The `check_hook` block supports:
@@ -74,6 +76,17 @@ The `check_hook` block supports:
 * `trigger` - *Required* - Known as `type` in the Sensu documention, but, IMO,
   `trigger` makes more sense. Determines when the trigger will run. Valid values
   are: `1`-`255`, `ok`, `warning`, `critical`, `unknown`, and `non-zero`.
+
+### proxy_requests
+
+The `proxy_requests` block supports:
+
+* `entity_attributes` - Attributes to match entities.
+
+* `splay` - Enable splaying of coverage for checks.
+
+* `splay_coverage` - The percentage of the check interval for Sensu to execute
+  checks for entities matching the entity attributes.
 
 ### subdue
 
