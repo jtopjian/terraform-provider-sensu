@@ -6,6 +6,7 @@ import (
 	"unsafe"
 
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
+	"github.com/sensu/sensu-go/backend/store/provider"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -52,6 +53,19 @@ func (e *EventStoreProxy) UpdateEvent(ctx context.Context, event *types.Event) (
 	return e.do().UpdateEvent(ctx, event)
 }
 
+func (e *EventStoreProxy) GetProviderInfo() *provider.Info {
+	p, ok := e.do().(provider.InfoGetter)
+	if ok {
+		return p.GetProviderInfo()
+	}
+	return &provider.Info{
+		TypeMeta: corev2.TypeMeta{
+			Type:       "etcd",
+			APIVersion: "core/v2",
+		},
+	}
+}
+
 type closer interface {
 	Close() error
 }
@@ -64,4 +78,12 @@ func (e *EventStoreProxy) UpdateEventStore(to EventStore) {
 		defer s.Close()
 	}
 	e.gcGuard = to
+}
+
+func (e *EventStoreProxy) Close() error {
+	s := e.do()
+	if c, ok := s.(closer); ok {
+		return c.Close()
+	}
+	return nil
 }

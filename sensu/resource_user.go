@@ -6,7 +6,9 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
+	"github.com/sensu/sensu-go/backend/authentication/bcrypt"
 	"github.com/sensu/sensu-go/cli/client"
 	"github.com/sensu/sensu-go/types"
 )
@@ -177,8 +179,16 @@ func updateUser(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("password") {
-		password := d.Get("password").(string)
-		if err := config.client.UpdatePassword(name, password); err != nil {
+		o, n := d.GetChange("password")
+		oldPassword := o.(string)
+		newPassword := n.(string)
+
+		hash, err := bcrypt.HashPassword(newPassword)
+		if err != nil {
+			return fmt.Errorf("Error hashing new password for user %s: %s", name, err)
+		}
+
+		if err := config.client.UpdatePassword(name, hash, oldPassword); err != nil {
 			return fmt.Errorf("Unable to update password for user %s: %s", name, err)
 		}
 	}

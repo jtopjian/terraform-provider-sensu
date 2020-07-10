@@ -2,7 +2,14 @@ package version
 
 import (
 	"fmt"
+	"runtime"
 	"runtime/debug"
+)
+
+const (
+	CommunityEditionSuffix  = "ce"
+	EnterpriseEditionSuffix = "ee"
+	InvalidEditionSuffix    = "invalid"
 )
 
 // These values are baked into the sensu-agent and sensu-backend binaries
@@ -18,6 +25,14 @@ var (
 	// BuildSHA stores the git sha of the build
 	// (e.g. 8673bed0a9705083987b9ecbbc1cc0758df13dd2)
 	BuildSHA string
+
+	// Edition stores the edition of the build
+	// (e.g. community or enterprise)
+	Edition string = "community"
+
+	// GoVersion stores the version of Go used to build the binary
+	// (e.g. go1.14.2)
+	GoVersion string = runtime.Version()
 )
 
 // Semver returns full semantic versioning compatible identifier.
@@ -37,20 +52,45 @@ func Semver() string {
 	return version
 }
 
-// Println prints all available details about the current version in a
-// human-readable format, with an optional component name as the prefix
-func Println(component string) {
+func SemverWithEditionSuffix() string {
+	var editionSuffix string
+	switch Edition {
+	case "community":
+		editionSuffix = CommunityEditionSuffix
+	case "enterprise":
+		editionSuffix = EnterpriseEditionSuffix
+	default:
+		editionSuffix = InvalidEditionSuffix
+	}
+	return fmt.Sprintf("%s+%s", Semver(), editionSuffix)
+}
+
+func EditionOutput() string {
+	if Edition == "community" || Edition == "enterprise" {
+		return fmt.Sprintf("%s edition", Edition)
+	}
+	return "built with an invalid \"edition\" ldflag"
+}
+
+func FormattedOutput(component string) string {
 	var output string
 	if component != "" {
 		output += fmt.Sprintf("%s ", component)
 	}
-	output += fmt.Sprintf("version %s", Semver())
+	output += fmt.Sprintf("version %s", SemverWithEditionSuffix())
+	output += fmt.Sprintf(", %s", EditionOutput())
 	if BuildSHA != "" {
 		output += fmt.Sprintf(", build %s", BuildSHA)
 	}
 	if BuildDate != "" {
 		output += fmt.Sprintf(", built %s", BuildDate)
 	}
+	output += fmt.Sprintf(", built with %s", GoVersion)
+	return output
+}
 
-	fmt.Println(output)
+// Println prints all available details about the current version in a
+// human-readable format, with an optional component name as the prefix
+func Println(component string) {
+	fmt.Println(FormattedOutput(component))
 }

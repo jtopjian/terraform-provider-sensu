@@ -1,13 +1,13 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 TARGETS=darwin linux windows
-SENSU_VERSION=5.18.1
+SENSU_VERSION=5.21.0
 
 docker:
 	docker-compose down || true
 	docker-compose up -d
 
 testacc:
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m -count 1
 
 build:
 	go install
