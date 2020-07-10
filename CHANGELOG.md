@@ -5,6 +5,7 @@ IMPROVEMENTS
 * Added `sensu_entity` resource [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
 * Added `proxy_requests` to the `sensu_check` resource [GH-32](https://github.com/jtopjian/terraform-provider-sensu/pull/32)
 * Added `proxy_requests` to the `sensu_check` data source [GH-33](https://github.com/jtopjian/terraform-provider-sensu/pull/33)
+* Added `sensu_bonsai_asset` data source [GH-30](https://github.com/jtopjian/terraform-provider-sensu/pull/30)
 
 BUG FIXES
 
