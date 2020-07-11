@@ -166,8 +166,6 @@ func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 		asset.URL = d.Get("url").(string)
 	}
 
-	// Filters can't really be updated right now...
-	// This is buggy.
 	if d.HasChange("filter") {
 		filters := expandStringList(d.Get("filter").([]interface{}))
 		asset.Filters = filters
@@ -176,6 +174,11 @@ func resourceAssetUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("headers") {
 		headers := expandStringMap(d.Get("headers").(map[string]interface{}))
 		asset.Headers = headers
+	}
+
+	if d.HasChange("build") {
+		builds := expandAssetBuilds(d.Get("build").([]interface{}))
+		asset.Builds = builds
 	}
 
 	if err := asset.Validate(); err != nil {
