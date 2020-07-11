@@ -83,4 +83,4 @@ var testAccDataSourceAsset_multipleBuild = fmt.Sprintf(`
   data "sensu_asset" "asset_1" {
     name = "${sensu_asset.asset_1.name}"
   }
-`, testAccResourceAsset_createMultipleBuild)
+`, testAccResourceAsset_createMultipleBuild_1)
