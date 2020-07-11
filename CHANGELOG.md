@@ -1,5 +1,11 @@
 ## 0.11.0 (Unreleased)
 
+## 0.10.1 (July 11, 2020)
+
+BUG FIXES
+
+* Fixed missing update logic preventing asset builds from being updated [GH-35](https://github.com/jtopjian/terraform-provider-sensu/pull/35)
+
 ## 0.10.0 (July 10, 2020)
 
 IMPROVEMENTS
