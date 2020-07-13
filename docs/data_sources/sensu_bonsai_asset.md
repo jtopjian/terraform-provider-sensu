@@ -12,6 +12,29 @@ data "sensu_bonsai_asset" "bonsai_asset_1" {
 }
 ```
 
+## Create Asset from Bonsai
+
+```hcl
+data "sensu_bonsai_asset" "bonsai_asset_1" {
+  name = "sensu-plugins/sensu-plugins-cpu-checks"
+  version = "4.1.0"
+}
+
+resource "sensu_asset" "asset_1" {
+  name = data.sensu_bonsai_asset.bonsai_asset_1.annotations["io.sensu.bonsai.name"]
+
+  dynamic "build" {
+    for_each = data.sensu_bonsai_asset.bonsai_asset_1.build
+    content {
+      sha512 = build.value["sha512"]
+      url = build.value["url"]
+      filters = build.value["filters"]
+      headers = build.value["headers"]
+    }
+  }
+}
+```
+
 ## Argument Reference
 
 * `name` - *Required* - The name of the Sensu Bonsai asset.
