@@ -47,9 +47,11 @@ resource "sensu_asset" "asset_1" {
 
 * `annotations` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
 
-* `builds` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `builds` - Deprecated. Use `build`.
 
-### Builds
+* `build` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+
+### Build
 
 The `build` block contains the following, for each asset build:
 
