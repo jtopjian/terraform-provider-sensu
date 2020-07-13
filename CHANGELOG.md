@@ -1,6 +1,12 @@
 ## 0.11.0 (Unreleased)
 
-## 0.10.2 (July 12, 2020)
+## 0.10.3 (July 13, 2020)
+
+BUG FIXES
+
+* Fixed nil pointer bug in `sensu_check.proxy_requests` [GH-37](https://github.com/jtopjian/terraform-provider-sensu/pull/37)
+
+## 0.10.2 (July 13, 2020)
 
 BUG FIXES
 
