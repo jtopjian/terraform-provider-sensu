@@ -590,13 +590,15 @@ func expandCheckProxyRequests(v []interface{}) types.ProxyRequests {
 
 func flattenCheckProxyRequests(v *types.ProxyRequests) []map[string]interface{} {
 	var proxyRequests []map[string]interface{}
-	pr := make(map[string]interface{})
 
-	if len(v.EntityAttributes) > 0 {
-		pr["entity_attributes"] = v.EntityAttributes
-		pr["splay"] = v.Splay
-		pr["splay_coverage"] = v.SplayCoverage
-		proxyRequests = append(proxyRequests, pr)
+	if v != nil {
+		if len(v.EntityAttributes) > 0 {
+			pr := make(map[string]interface{})
+			pr["entity_attributes"] = v.EntityAttributes
+			pr["splay"] = v.Splay
+			pr["splay_coverage"] = v.SplayCoverage
+			proxyRequests = append(proxyRequests, pr)
+		}
 	}
 
 	return proxyRequests
