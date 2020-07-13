@@ -39,9 +39,12 @@ func dataSourceBonsaiAsset() *schema.Resource {
 				Computed: true,
 			},
 
+			"build": dataSourceAssetBuildsSchema,
+
 			"builds": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:       schema.TypeList,
+				Computed:   true,
+				Deprecated: "Use build instead",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"sha512": &schema.Schema{
@@ -148,11 +151,13 @@ func dataSourceBonsaiAssetRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	log.Printf("[DEBUG] FOO3: %#v", builds)
-
 	d.SetId(fullName)
-	if err := d.Set("builds", builds); err != nil {
-		log.Printf("[DEBUG] FOO4: %s", err)
+	if d.Set("builds", builds); err != nil {
+		return fmt.Errorf("Error setting bonsai asset builds %s: %s", name, err)
+	}
+
+	if d.Set("build", builds); err != nil {
+		return fmt.Errorf("Error setting bonsai asset build %s: %s", name, err)
 	}
 
 	resourceMeta := resources[0].Value.GetObjectMeta()
