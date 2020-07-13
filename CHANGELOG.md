@@ -1,5 +1,12 @@
 ## 0.11.0 (Unreleased)
 
+## 0.10.2 (July 12, 2020)
+
+BUG FIXES
+
+* Added `sensu_bonsai_asset.build` and deprecated `sensu_bonsai_asset.builds` for naming consistency [GH-36](https://github.com/jtopjian/terraform-provider-sensu/pull/36)
+
+
 ## 0.10.1 (July 11, 2020)
 
 BUG FIXES
