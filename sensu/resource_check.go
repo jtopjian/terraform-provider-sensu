@@ -187,7 +187,6 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
 
 	// detailed structures
-	proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
 	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
@@ -214,7 +213,6 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 		OutputMetricFormat:   d.Get("output_metric_format").(string),
 		OutputMetricHandlers: outputMetricHandlers,
 		ProxyEntityName:      d.Get("proxy_entity_name").(string),
-		ProxyRequests:        &proxyRequests,
 		Publish:              d.Get("publish").(bool),
 		RoundRobin:           d.Get("round_robin").(bool),
 		RuntimeAssets:        runtimeAssets,
@@ -222,6 +220,12 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 		Subdue:               &subdues,
 		Timeout:              uint32(d.Get("timeout").(int)),
 		Ttl:                  int64(d.Get("ttl").(int)),
+	}
+
+	proxyRequests := d.Get("proxy_requests").([]interface{})
+	if len(proxyRequests) > 0 {
+		v := expandCheckProxyRequests(proxyRequests)
+		check.ProxyRequests = &v
 	}
 
 	log.Printf("[DEBUG] Creating check %s: %#v", name, check)
@@ -250,7 +254,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("output_metric_format")
 	d.SetPartial("output_metric_handlers")
 	d.SetPartial("proxy_entity_name")
-	//d.SetPartial("proxy_requests")
+	d.SetPartial("proxy_requests")
 	d.SetPartial("publish")
 	d.SetPartial("round_robin")
 	d.SetPartial("runtime_assets")
@@ -412,8 +416,13 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("proxy_requests") {
-		proxyRequests := expandCheckProxyRequests(d.Get("proxy_requests").([]interface{}))
-		check.ProxyRequests = &proxyRequests
+		proxyRequests := d.Get("proxy_requests").([]interface{})
+		if len(proxyRequests) > 0 {
+			v := expandCheckProxyRequests(proxyRequests)
+			check.ProxyRequests = &v
+		} else {
+			check.ProxyRequests = nil
+		}
 	}
 
 	if d.HasChange("publish") {

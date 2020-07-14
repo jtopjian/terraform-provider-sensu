@@ -137,4 +137,4 @@ var testAccDataSourceCheck_proxyRequests = fmt.Sprintf(`
 	data "sensu_check" "check_1" {
 		name = "${sensu_check.check_1.name}"
 	}
-`, testAccResourceCheck_proxyRequests)
+`, testAccResourceCheck_proxyRequests_1)
