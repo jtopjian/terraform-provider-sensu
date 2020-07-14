@@ -1,5 +1,11 @@
 ## 0.11.0 (Unreleased)
 
+## 0.10.4 (July 14, 2020)
+
+BUG FIXES
+
+* Don't create an empty `sensu_check.proxy_requests` when one isn't specified in Terraform [GH-38](https://github.com/jtopjian/terraform-provider-sensu/pull/38)
+
 ## 0.10.3 (July 13, 2020)
 
 BUG FIXES
