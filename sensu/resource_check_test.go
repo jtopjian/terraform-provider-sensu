@@ -56,26 +56,6 @@ func TestAccResourceCheck_basic(t *testing.T) {
 	})
 }
 
-/*
-func TestAccResourceCheck_proxyRequests(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccResourceCheck_proxyRequests,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "proxy_requests.0.entity_attributes.0", "entity.Class == \"proxy\""),
-					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "proxy_requests.0.splay", "true"),
-				),
-			},
-		},
-	})
-}
-*/
-
 func TestAccResourceCheck_subdue(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -197,10 +177,17 @@ func TestAccResourceCheck_proxyRequests(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccResourceCheck_proxyRequests,
+				Config: testAccResourceCheck_proxyRequests_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sensu_check.check_1", "proxy_requests.0.entity_attributes.#", "2"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_proxyRequests_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "proxy_requests.#", "0"),
 				),
 			},
 		},
@@ -243,28 +230,6 @@ const testAccResourceCheck_update_2 = `
 		]
 	}
 `
-
-/*
-const testAccResourceCheck_proxyRequests = `
-	resource "sensu_check" "check_1" {
-		name = "check_1"
-		command = "/bin/foo"
-		interval = 60000
-		subscriptions = [
-			"foo",
-			"bar",
-		]
-
-		proxy_requests {
-			entity_attributes = [
-				"entity.Class == \"proxy\"",
-			]
-			splay = true
-			splay_coverage = 90
-		}
-	}
-`
-*/
 
 const testAccResourceCheck_subdue_1 = `
 	resource "sensu_check" "check_1" {
@@ -447,7 +412,7 @@ const testAccResourceCheck_annotations_3 = `
 	}
 `
 
-const testAccResourceCheck_proxyRequests = `
+const testAccResourceCheck_proxyRequests_1 = `
 	resource "sensu_entity" "entities" {
 		count = 3
 		name = format("entity-%02d", count.index+1)
@@ -468,6 +433,26 @@ const testAccResourceCheck_proxyRequests = `
 				"entity.labels.proxy_type == 'website'",
 			]
 		}
+		publish = true
+		subscriptions = ["proxy"]
+	}
+`
+
+const testAccResourceCheck_proxyRequests_2 = `
+	resource "sensu_entity" "entities" {
+		count = 3
+		name = format("entity-%02d", count.index+1)
+		class = "proxy"
+		labels = {
+			"proxy_type" = "website"
+			"url" = format("http://example-%02d.com", count.index+1)
+		}
+	}
+
+	resource "sensu_check" "check_1" {
+		name = "check-http"
+		command = "check-http.rb -u {{ .labels url }}"
+		interval = 60
 		publish = true
 		subscriptions = ["proxy"]
 	}
