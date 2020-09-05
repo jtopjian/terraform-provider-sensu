@@ -68,7 +68,7 @@ directory as described in Terraform's [plugin installation instructions][3]
 
 ## Development
 
-* This provider attempts to adere to the best practices of developing 
+* This provider attempts to adere to the best practices of developing
   Terraform providers.
 * This project is using Go modules for dependencies.
 
