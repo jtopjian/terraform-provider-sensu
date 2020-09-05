@@ -1,5 +1,9 @@
 ## 0.11.0 (Unreleased)
 
+## 0.10.5 (September 5, 2020)
+
+No changes. This release was only created to be published to the Terraform Registry.
+
 ## 0.10.4 (July 14, 2020)
 
 BUG FIXES
