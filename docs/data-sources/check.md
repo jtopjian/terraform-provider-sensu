@@ -31,6 +31,8 @@ data "sensu_check" "check_1" {
 
 * `cron` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
+* `env_vars` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+
 * `high_flap_threshold` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
 * `handlers` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).

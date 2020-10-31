@@ -194,6 +194,54 @@ func TestAccResourceCheck_proxyRequests(t *testing.T) {
 	})
 }
 
+func TestAccResourceCheck_envVars(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_envvars_1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "env_vars.foo", "bar"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_envvars_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "env_vars.foo", "bar"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "env_vars.bar", "baz"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_envvars_3,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "env_vars.foo", "barr"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "env_vars.bar", "baz"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_envvars_4,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "env_vars.foo", "barr"),
+					resource.TestCheckNoResourceAttr("sensu_check.check_1", "env_vars.bar"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_envvars_5,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("sensu_check.check_1", "env_vars"),
+				),
+			},
+		},
+	})
+}
+
 const testAccResourceCheck_basic = `
 	resource "sensu_check" "check_1" {
 		name = "check_1"
@@ -455,5 +503,84 @@ const testAccResourceCheck_proxyRequests_2 = `
 		interval = 60
 		publish = true
 		subscriptions = ["proxy"]
+	}
+`
+
+const testAccResourceCheck_envvars_1 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		env_vars = {
+			"foo" = "bar",
+		}
+	}
+`
+
+const testAccResourceCheck_envvars_2 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		env_vars = {
+			"foo" = "bar",
+			"bar" = "baz",
+		}
+	}
+`
+
+const testAccResourceCheck_envvars_3 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		env_vars = {
+			"foo" = "barr",
+			"bar" = "baz",
+		}
+	}
+`
+
+const testAccResourceCheck_envvars_4 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		env_vars = {
+			"foo" = "barr",
+		}
+	}
+`
+
+const testAccResourceCheck_envvars_5 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
 	}
 `

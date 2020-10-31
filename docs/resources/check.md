@@ -34,6 +34,8 @@ resource "sensu_check" "check_1" {
 
 * `cron` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
+* `env_vars` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+
 * `handlers` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
 
 * `interval` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
