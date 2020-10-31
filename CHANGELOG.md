@@ -1,5 +1,11 @@
 ## 0.11.0 (Unreleased)
 
+## 0.10.6 (October 31, 2020)
+
+BUG FIXES
+
+* `sensu_check.env_vars` can now be updated [GH-42](https://github.com/jtopjian/terraform-provider-sensu/pull/42)
+
 ## 0.10.5 (September 5, 2020)
 
 No changes. This release was only created to be published to the Terraform Registry.
