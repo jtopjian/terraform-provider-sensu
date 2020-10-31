@@ -377,6 +377,11 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 		check.Cron = d.Get("cron").(string)
 	}
 
+	if d.HasChange("env_vars") {
+		envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
+		check.EnvVars = envVars
+	}
+
 	if d.HasChange("handlers") {
 		handlers := expandStringList(d.Get("handlers").([]interface{}))
 		check.Handlers = handlers
