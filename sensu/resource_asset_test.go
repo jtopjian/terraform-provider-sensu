@@ -98,7 +98,7 @@ func TestAccResourceAsset_createMultipleBuild(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sensu_asset.asset_1", "build.0.filters.0", "entity.system.os == 'linux'"),
 					resource.TestCheckResourceAttr(
-						"sensu_asset.asset_1", "build.0.url", "https://example.com/asset_0.2.0.tar.gz"),
+						"sensu_asset.asset_1", "build.0.url", "https://example.com/asset_0.2.0_rhel.tar.gz"),
 				),
 			},
 		},
@@ -200,6 +200,9 @@ const testAccResourceAsset_createMultipleBuild_1 = `
 				"entity.system.platform_family == 'rhel'",
 				"parseInt(entity.system.platform_version.split('.')[0]) == 6",
 			]
+                	headers = {
+                        	"Authorization" = "Bearer changeme"
+                	}
 		}
 
 		build {
@@ -210,6 +213,9 @@ const testAccResourceAsset_createMultipleBuild_1 = `
 				"entity.system.arch == 'amd64'",
 				"entity.system.platform_family == 'debian'",
 			]
+                	headers = {
+                        	"Authorization" = "Bearer changeme"
+                	}
 		}
 	}
 `
@@ -228,7 +234,7 @@ const testAccResourceAsset_createMultipleBuild_2 = `
 		}
 
 		build {
-			url = "https://example.com/asset_0.2.0.tar.gz"
+			url = "https://example.com/asset_0.2.0_rhel.tar.gz"
 			sha512 = "cbee19124b7007342ce37ff9dfd4a1dde03beb1e87e61ca2aef606a7ad3c9bd0bba4e53873c07afa5ac46b0861967a9224511b4504dadb1a5e8fb687e9495304"
 			filters = [
 				"entity.system.os == 'linux'",
@@ -239,13 +245,17 @@ const testAccResourceAsset_createMultipleBuild_2 = `
 		}
 
 		build {
-			url = "https://assets.bonsai.sensu.io/5123017d3dadf2067fa90fc28275b92e9b586885/sensu-ruby-runtime_0.0.20_ruby-2.4.4_debian_linux_amd64.tar.gz"
+			url = "https://example.com/asset_0.2.0_debian.tar.gz"
 			sha512 = "a28952fd93fc63db1f8988c7bc40b0ad815eb9f35ef7317d6caf5d77ecfbfd824a9db54184400aa0c81c29b34cb48c7e8c6e3f17891aaf84cafa3c134266a61a"
 			filters = [
 				"entity.system.os == 'linux'",
 				"entity.system.arch == 'amd64'",
 				"entity.system.platform_family == 'debian'",
 			]
+		}
+
+		headers = {
+			"Authorization" = "Bearer changeme"
 		}
 	}
 `

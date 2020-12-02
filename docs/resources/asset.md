@@ -46,14 +46,14 @@ resource "sensu_asset" "asset_1" {
   also be set with the `SENSU_NAMESPACE` environment variable. If not set,
   this defaults to `default`.
 
-* `build` - *Optional* - Defines a build for an asset. Define more than one `build` block for
+* `build` - *Required, if `url`, `sha512` and `filters` are not provided* - Defines a build for an asset. Define more than one `build` block for
   multiple-build assets
 
-* `sha512` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
+* `sha512` - *Required, unless `builds` are provided* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
   This was for single-build assets which have been deprecated. It is recommended to use the `build` block
   for multiple-build assets.
 
-* `url` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
+* `url` - *Required, unless `builds` are provided* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
   This was for single-build assets which have been deprecated. It is recommended to use the `build` block
   for multiple-build assets.
 
@@ -62,8 +62,6 @@ resource "sensu_asset" "asset_1" {
   for multiple-build assets.
 
 * `headers` - *Optional* - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets).
-  This was for single-build assets which have been deprecated. It is recommended to use the `build` block
-  for multiple-build assets.
 
 ### build
 

@@ -396,7 +396,7 @@ var resourceAssetBuildsSchema = &schema.Schema{
 	Type:          schema.TypeList,
 	Optional:      true,
 	ForceNew:      true,
-	ConflictsWith: []string{"url", "sha512", "filters", "headers"},
+	ConflictsWith: []string{"url", "sha512", "filters"},
 	Elem: &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"sha512": &schema.Schema{
