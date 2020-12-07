@@ -61,11 +61,8 @@ func resourceAsset() *schema.Resource {
 			},
 
 			"headers": &schema.Schema{
-				Type:          schema.TypeMap,
-				Optional:      true,
-				ConflictsWith: []string{"build"},
-				Deprecated: "This field is for single-build assets, " +
-					"which have been deprecated. Please use multiple-build assets instead.",
+				Type:     schema.TypeMap,
+				Optional: true,
 			},
 
 			"namespace": resourceNamespaceSchema,
