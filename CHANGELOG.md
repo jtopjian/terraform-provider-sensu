@@ -1,5 +1,9 @@
 ## 0.11.0 (Unreleased)
 
+IMPROVEMENTS
+
+* Headers can be defined at top level or in each build of `sensu_asset` [GH-44](https://github.com/jtopjian/terraform-provider-sensu/pull/44)
+
 ## 0.10.6 (October 31, 2020)
 
 BUG FIXES
