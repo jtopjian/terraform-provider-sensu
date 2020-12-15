@@ -1,8 +1,5 @@
 # terraform-provider-sensu
 
-[![Build Status](https://travis-ci.org/jtopjian/terraform-provider-sensu.svg?branch=master)](https://travis-ci.org/jtopjian/terraform-provider-sensu)
-
-
 Sensu Go resource provider for Terraform
 
 > This provider is maintained on a volunteer basis. Please
