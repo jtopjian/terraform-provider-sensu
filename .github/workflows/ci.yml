@@ -1,0 +1,40 @@
+on: [push, pull_request]
+name: Acceptance Testing
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - "1.15"
+        sensu-version:
+          - "5.21.0"
+
+    env:
+      TF_ACC: "1"
+      GO111MODULE: "on"
+      TF_LOG: "DEBUG"
+      SENSU_API_URL: "http://127.0.0.1:8080"
+      SENSU_USERNAME: "admin"
+      SENSU_PASSWORD: "P@ssw0rd!"
+      SENSU_ENVIRONMENT: "default"
+      SENSU_ORGANIZATION: "default"
+      SENSU_VERSION: "5.21.0"
+
+    steps:
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Setup Sensu from ${{ matrix.sensu-version }}
+        run: |
+          docker pull sensu/sensu:${{ matrix.sensu-version }}
+          docker run -v /var/lib/sensu:/var/lib/sensu -d --name sensu-backend -p 2380:2380 -p 3000:3000 -p 8080:8080 -p 8081:8081 sensu/sensu:${{ matrix.sensu-version }} sensu-backend start
+          docker run -v /var/lib/sensu:/var/lib/sensu -d --name sensu-agent sensu/sensu:${{ matrix.sensu-version }} sensu-agent start --backend-url ws://localhost:8081 --subscriptions webserver,system --cache-dir /var/lib/sensu
+
+      - uses: actions/checkout@v2
+      - run: make fmtcheck
+      - run: make vet
+      - run: make testacc
