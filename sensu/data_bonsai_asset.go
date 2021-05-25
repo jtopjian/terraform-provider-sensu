@@ -11,6 +11,7 @@ import (
 	"github.com/sensu/sensu-go/api/core/v2"
 	"github.com/sensu/sensu-go/bonsai"
 	"github.com/sensu/sensu-go/cli/resource"
+	"github.com/sensu/sensu-go/types/compat"
 )
 
 func dataSourceBonsaiAsset() *schema.Resource {
@@ -160,7 +161,7 @@ func dataSourceBonsaiAssetRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error setting bonsai asset build %s: %s", name, err)
 	}
 
-	resourceMeta := resources[0].Value.GetObjectMeta()
+	resourceMeta := compat.GetObjectMeta(resources[0].Value)
 	d.Set("labels", resourceMeta.Labels)
 	d.Set("annotations", resourceMeta.Annotations)
 

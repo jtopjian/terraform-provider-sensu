@@ -15,17 +15,27 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("SENSU_API_URL", ""),
 			},
 
+			"api_key": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				DefaultFunc:   schema.EnvDefaultFunc("SENSU_API_KEY", ""),
+				ConflictsWith: []string{"username", "password"},
+			},
+
 			"username": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SENSU_USERNAME", ""),
+				Type:          schema.TypeString,
+				Optional:      true,
+				DefaultFunc:   schema.EnvDefaultFunc("SENSU_USERNAME", ""),
+				ConflictsWith: []string{"api_key"},
 			},
 
 			"password": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("SENSU_PASSWORD", ""),
+				Type:          schema.TypeString,
+				Optional:      true,
+				Sensitive:     true,
+				DefaultFunc:   schema.EnvDefaultFunc("SENSU_PASSWORD", ""),
+				ConflictsWith: []string{"api_key"},
 			},
 
 			"namespace": &schema.Schema{
@@ -94,6 +104,7 @@ func Provider() terraform.ResourceProvider {
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		apiUrl:                d.Get("api_url").(string),
+		apiKey:                d.Get("api_key").(string),
 		username:              d.Get("username").(string),
 		password:              d.Get("password").(string),
 		edition:               d.Get("edition").(string),
