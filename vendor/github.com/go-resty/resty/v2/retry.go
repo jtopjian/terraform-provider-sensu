@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 Jeevanandam M (jeeva@myjeeva.com), All rights reserved.
+// Copyright (c) 2015-2020 Jeevanandam M (jeeva@myjeeva.com), All rights reserved.
 // resty source code and usage is governed by a MIT style
 // license that can be found in the LICENSE file.
 
@@ -89,7 +89,7 @@ func Backoff(operation func() (*Response, error), options ...Option) error {
 		err  error
 	)
 
-	for attempt := 0; attempt < opts.maxRetries; attempt++ {
+	for attempt := 0; attempt <= opts.maxRetries; attempt++ {
 		resp, err = operation()
 		ctx := context.Background()
 		if resp != nil && resp.Request.ctx != nil {
@@ -99,10 +99,11 @@ func Backoff(operation func() (*Response, error), options ...Option) error {
 			return err
 		}
 
-		needsRetry := err != nil // retry on operation errors by default
+		err1 := unwrapNoRetryErr(err)           // raw error, it used for return users callback.
+		needsRetry := err != nil && err == err1 // retry on a few operation errors by default
 
 		for _, condition := range opts.retryConditions {
-			needsRetry = condition(resp, err)
+			needsRetry = condition(resp, err1)
 			if needsRetry {
 				break
 			}
@@ -166,11 +167,8 @@ defaultCase:
 	capLevel := float64(max)
 
 	temp := math.Min(capLevel, base*math.Exp2(float64(attempt)))
-	ri := int(temp / 2)
-	if ri <= 0 {
-		ri = maxInt // max int for arch 386
-	}
-	result := time.Duration(math.Abs(float64(ri + rand.Intn(ri))))
+	ri := int64(temp / 2)
+	result := time.Duration(math.Abs(float64(ri + rand.Int63n(ri))))
 
 	if result < min {
 		result = min

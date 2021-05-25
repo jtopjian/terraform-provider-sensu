@@ -38,6 +38,10 @@ const (
 	// InfluxDB Line
 	InfluxDBOutputMetricFormat = "influxdb_line"
 
+	// PrometheusOutputMetricFormat is the accepted string to represent the output metric format of
+	// Prometheus Exposition Text Format
+	PrometheusOutputMetricFormat = "prometheus_text"
+
 	// KeepaliveCheckName is the name of the check that is created when a
 	// keepalive timeout occurs.
 	KeepaliveCheckName = "keepalive"
@@ -45,10 +49,21 @@ const (
 	// RegistrationCheckName is the name of the check that is created when an
 	// entity sends a keepalive and the entity does not yet exist in the store.
 	RegistrationCheckName = "registration"
+
+	// MemoryScheduler indicates that a check is scheduled in-memory.
+	MemoryScheduler = "memory"
+
+	// EtcdScheduler indicates that a check is scheduled with etcd leases and
+	// watchers.
+	EtcdScheduler = "etcd"
+
+	// PostgresScheduler indicates that a check is scheduled with postgresql,
+	// using transactions and asynchronous notification (NOTIFY).
+	PostgresScheduler = "postgres"
 )
 
 // OutputMetricFormats represents all the accepted output_metric_format's a check can have
-var OutputMetricFormats = []string{NagiosOutputMetricFormat, GraphiteOutputMetricFormat, OpenTSDBOutputMetricFormat, InfluxDBOutputMetricFormat}
+var OutputMetricFormats = []string{NagiosOutputMetricFormat, GraphiteOutputMetricFormat, OpenTSDBOutputMetricFormat, InfluxDBOutputMetricFormat, PrometheusOutputMetricFormat}
 
 // FixtureCheck returns a fixture for a Check object.
 func FixtureCheck(id string) *Check {
@@ -67,6 +82,7 @@ func FixtureCheck(id string) *Check {
 	c.Executed = t + 1
 	c.Duration = 1.0
 	c.History = history
+	c.State = EventPassingState
 
 	return c
 }
@@ -104,9 +120,11 @@ func NewCheck(c *CheckConfig) *Check {
 		RoundRobin:           c.RoundRobin,
 		OutputMetricFormat:   c.OutputMetricFormat,
 		OutputMetricHandlers: c.OutputMetricHandlers,
+		OutputMetricTags:     c.OutputMetricTags,
 		EnvVars:              c.EnvVars,
 		DiscardOutput:        c.DiscardOutput,
 		MaxOutputSize:        c.MaxOutputSize,
+		Scheduler:            c.Scheduler,
 	}
 	if check.Labels == nil {
 		check.Labels = make(map[string]string)

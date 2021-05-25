@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"runtime"
 	"runtime/debug"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -33,23 +35,33 @@ var (
 	// GoVersion stores the version of Go used to build the binary
 	// (e.g. go1.14.2)
 	GoVersion string = runtime.Version()
+
+	promBuildInfo = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "sensu_go_build_info",
+			Help: "Sensu Go build information",
+		},
+		[]string{"version", "buildsha", "goversion"},
+	).WithLabelValues(Version, BuildSHA, GoVersion)
 )
+
+func init() {
+	prometheus.MustRegister(promBuildInfo)
+	promBuildInfo.Set(1)
+
+	// If we don't have a version because it has been manually built from source,
+	// use Go build info to display the main module version
+	if Version == "" {
+		if buildInfo, ok := debug.ReadBuildInfo(); ok {
+			Version = buildInfo.Main.Version
+		}
+	}
+}
 
 // Semver returns full semantic versioning compatible identifier.
 // Format: VERSION-PRERELEASE+METADATA
 func Semver() string {
-	version := Version
-
-	// If we don't have a version because it has been manually built from source,
-	// use Go build info to display the main module version
-	if version == "" {
-		buildInfo, ok := debug.ReadBuildInfo()
-		if ok {
-			version = buildInfo.Main.Version
-		}
-	}
-
-	return version
+	return Version
 }
 
 func SemverWithEditionSuffix() string {

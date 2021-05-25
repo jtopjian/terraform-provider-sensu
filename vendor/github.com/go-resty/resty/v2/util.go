@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 Jeevanandam M (jeeva@myjeeva.com), All rights reserved.
+// Copyright (c) 2015-2020 Jeevanandam M (jeeva@myjeeva.com), All rights reserved.
 // resty source code and usage is governed by a MIT style
 // license that can be found in the LICENSE file.
 
@@ -285,11 +285,11 @@ func releaseBuffer(buf *bytes.Buffer) {
 
 func closeq(v interface{}) {
 	if c, ok := v.(io.Closer); ok {
-		sliently(c.Close())
+		silently(c.Close())
 	}
 }
 
-func sliently(_ ...interface{}) {}
+func silently(_ ...interface{}) {}
 
 func composeHeaders(c *Client, r *Request, hdrs http.Header) string {
 	str := make([]string, 0, len(hdrs))
@@ -297,11 +297,13 @@ func composeHeaders(c *Client, r *Request, hdrs http.Header) string {
 		var v string
 		if k == "Cookie" {
 			cv := strings.TrimSpace(strings.Join(hdrs[k], ", "))
-			for _, c := range c.GetClient().Jar.Cookies(r.RawRequest.URL) {
-				if cv != "" {
-					cv = cv + "; " + c.String()
-				} else {
-					cv = c.String()
+			if c.GetClient().Jar != nil {
+				for _, c := range c.GetClient().Jar.Cookies(r.RawRequest.URL) {
+					if cv != "" {
+						cv = cv + "; " + c.String()
+					} else {
+						cv = c.String()
+					}
 				}
 			}
 			v = strings.TrimSpace(fmt.Sprintf("%25s: %s", k, cv))
@@ -330,4 +332,26 @@ func copyHeaders(hdrs http.Header) http.Header {
 		nh[k] = v
 	}
 	return nh
+}
+
+type noRetryErr struct {
+	err error
+}
+
+func (e *noRetryErr) Error() string {
+	return e.err.Error()
+}
+
+func wrapNoRetryErr(err error) error {
+	if err != nil {
+		err = &noRetryErr{err: err}
+	}
+	return err
+}
+
+func unwrapNoRetryErr(err error) error {
+	if e, ok := err.(*noRetryErr); ok {
+		err = e.err
+	}
+	return err
 }

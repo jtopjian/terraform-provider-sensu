@@ -2,11 +2,43 @@ package messaging
 
 import (
 	"errors"
+	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
+
+const (
+	WizardBusMessagesPublished      = "sensu_go_bus_messages_published"
+	WizardBusMessagePublishDuration = "sensu_go_bus_message_duration"
+	WizardBusTopicLabelName         = "topic"
+)
+
+var (
+	messagePublishedCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: WizardBusMessagesPublished,
+			Help: "The total number of messages published to wizard bus",
+		},
+		[]string{WizardBusTopicLabelName},
+	)
+
+	messagePublishedDurations = prometheus.NewSummaryVec(
+		prometheus.SummaryOpts{
+			Name:       WizardBusMessagePublishDuration,
+			Help:       "message publish latency distributions",
+			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		},
+		[]string{WizardBusTopicLabelName},
+	)
+)
+
+func init() {
+	_ = prometheus.Register(messagePublishedCounter)
+	_ = prometheus.Register(messagePublishedDurations)
+}
 
 // WizardBus is a message bus.
 //
@@ -17,10 +49,9 @@ import (
 // message types over a single topic, however, as we do not want to introduce
 // a dependency on reflection to determine the type of the received interface{}.
 type WizardBus struct {
-	running  atomic.Value
-	topicsMu sync.RWMutex
-	topics   map[string]*wizardTopic
-	errchan  chan error
+	running atomic.Value
+	topics  sync.Map
+	errchan chan error
 }
 
 // WizardBusConfig configures a WizardBus
@@ -33,7 +64,6 @@ type WizardOption func(*WizardBus) error
 func NewWizardBus(cfg WizardBusConfig, opts ...WizardOption) (*WizardBus, error) {
 	bus := &WizardBus{
 		errchan: make(chan error, 1),
-		topics:  make(map[string]*wizardTopic),
 	}
 	for _, opt := range opts {
 		if err := opt(bus); err != nil {
@@ -55,11 +85,10 @@ func (b *WizardBus) Start() error {
 func (b *WizardBus) Stop() error {
 	b.running.Store(false)
 	close(b.errchan)
-	b.topicsMu.Lock()
-	for _, wTopic := range b.topics {
-		wTopic.Close()
-	}
-	b.topicsMu.Unlock()
+	b.topics.Range(func(_, value interface{}) bool {
+		value.(*wizardTopic).Close()
+		return true
+	})
 	return nil
 }
 
@@ -107,31 +136,44 @@ func (b *WizardBus) Subscribe(topic string, consumer string, sub Subscriber) (Su
 		return Subscription{}, errors.New("bus no longer running")
 	}
 
-	b.topicsMu.Lock()
-	defer b.topicsMu.Unlock()
-
-	t, ok := b.topics[topic]
-	if !ok || t.IsClosed() {
+	var t *wizardTopic
+	value, ok := b.topics.Load(topic)
+	if !ok || value.(*wizardTopic).IsClosed() {
 		t = b.createTopic(topic)
-		b.topics[topic] = t
+		b.topics.Store(topic, t)
+	} else {
+		t = value.(*wizardTopic)
 	}
 
 	subscription, err := t.Subscribe(consumer, sub)
 	return subscription, err
 }
 
+func findGenericTopic(topic string) string {
+	index := strings.IndexRune(topic, ':')
+	if index <= 0 {
+		return topic
+	}
+	return topic[:index]
+}
+
 // Publish publishes a message to a topic. If the topic does not
 // exist, this is a noop.
 func (b *WizardBus) Publish(topic string, msg interface{}) error {
+	genericTopic := findGenericTopic(topic)
+	then := time.Now()
+	defer func() {
+		duration := time.Since(then)
+		messagePublishedDurations.WithLabelValues(genericTopic).Observe(float64(duration) / float64(time.Millisecond))
+	}()
 	if !b.running.Load().(bool) {
 		return errors.New("bus no longer running")
 	}
 
-	b.topicsMu.RLock()
-	wTopic, ok := b.topics[topic]
-	b.topicsMu.RUnlock()
-
+	value, ok := b.topics.Load(topic)
 	if ok {
+		wTopic := value.(*wizardTopic)
+		defer messagePublishedCounter.WithLabelValues(genericTopic).Inc()
 		wTopic.Send(msg)
 	}
 

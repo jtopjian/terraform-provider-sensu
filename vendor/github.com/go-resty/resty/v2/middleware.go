@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 Jeevanandam M (jeeva@myjeeva.com), All rights reserved.
+// Copyright (c) 2015-2020 Jeevanandam M (jeeva@myjeeva.com), All rights reserved.
 // resty source code and usage is governed by a MIT style
 // license that can be found in the LICENSE file.
 
@@ -162,6 +162,8 @@ func createHTTPRequest(c *Client, r *Request) (err error) {
 	if r.bodyBuf == nil {
 		if reader, ok := r.Body.(io.Reader); ok {
 			r.RawRequest, err = http.NewRequest(r.Method, r.URL, reader)
+		} else if c.setContentLength || r.setContentLength {
+			r.RawRequest, err = http.NewRequest(r.Method, r.URL, http.NoBody)
 		} else {
 			r.RawRequest, err = http.NewRequest(r.Method, r.URL, nil)
 		}
@@ -195,40 +197,27 @@ func createHTTPRequest(c *Client, r *Request) (err error) {
 		r.RawRequest.URL.Host = r.URL
 	}
 
+	// Enable trace
+	if c.trace || r.trace {
+		r.clientTrace = &clientTrace{}
+		r.ctx = r.clientTrace.createContext(r.Context())
+	}
+
 	// Use context if it was specified
 	if r.ctx != nil {
 		r.RawRequest = r.RawRequest.WithContext(r.ctx)
 	}
 
-	// Enable trace
-	if c.trace || r.trace {
-		r.clientTrace = &clientTrace{}
-		r.RawRequest = r.RawRequest.WithContext(r.clientTrace.createContext())
+	bodyCopy, err := getBodyCopy(r)
+	if err != nil {
+		return err
 	}
 
 	// assign get body func for the underlying raw request instance
 	r.RawRequest.GetBody = func() (io.ReadCloser, error) {
-		// If r.bodyBuf present, return the copy
-		if r.bodyBuf != nil {
-			return ioutil.NopCloser(bytes.NewReader(r.bodyBuf.Bytes())), nil
+		if bodyCopy != nil {
+			return ioutil.NopCloser(bytes.NewReader(bodyCopy.Bytes())), nil
 		}
-
-		// Maybe body is `io.Reader`.
-		// Note: Resty user have to watchout for large body size of `io.Reader`
-		if r.RawRequest.Body != nil {
-			b, err := ioutil.ReadAll(r.RawRequest.Body)
-			if err != nil {
-				return nil, err
-			}
-
-			// Restore the Body
-			closeq(r.RawRequest.Body)
-			r.RawRequest.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-
-			// Return the Body bytes
-			return ioutil.NopCloser(bytes.NewBuffer(b)), nil
-		}
-
 		return nil, nil
 	}
 
@@ -252,11 +241,21 @@ func addCredentials(c *Client, r *Request) error {
 		}
 	}
 
-	// Token Auth
+	// Set the Authorization Header Scheme
+	var authScheme string
+	if !IsStringEmpty(r.AuthScheme) {
+		authScheme = r.AuthScheme
+	} else if !IsStringEmpty(c.AuthScheme) {
+		authScheme = c.AuthScheme
+	} else {
+		authScheme = "Bearer"
+	}
+
+	// Build the Token Auth header
 	if !IsStringEmpty(r.Token) { // takes precedence
-		r.RawRequest.Header.Set(hdrAuthorizationKey, "Bearer "+r.Token)
+		r.RawRequest.Header.Set(c.HeaderAuthorizationKey, authScheme+" "+r.Token)
 	} else if !IsStringEmpty(c.Token) {
-		r.RawRequest.Header.Set(hdrAuthorizationKey, "Bearer "+c.Token)
+		r.RawRequest.Header.Set(c.HeaderAuthorizationKey, authScheme+" "+c.Token)
 	}
 
 	return nil
@@ -265,7 +264,7 @@ func addCredentials(c *Client, r *Request) error {
 func requestLogger(c *Client, r *Request) error {
 	if c.Debug {
 		rr := r.RawRequest
-		rl := &RequestLog{Header: copyHeaders(rr.Header), Body: r.fmtBodyString()}
+		rl := &RequestLog{Header: copyHeaders(rr.Header), Body: r.fmtBodyString(c.debugBodySizeLimit)}
 		if c.requestLog != nil {
 			if err := c.requestLog(rl); err != nil {
 				return err
@@ -304,18 +303,19 @@ func responseLogger(c *Client, res *Response) error {
 		debugLog := res.Request.values[debugRequestLogKey].(string)
 		debugLog += "~~~ RESPONSE ~~~\n" +
 			fmt.Sprintf("STATUS       : %s\n", res.Status()) +
+			fmt.Sprintf("PROTO        : %s\n", res.RawResponse.Proto) +
 			fmt.Sprintf("RECEIVED AT  : %v\n", res.ReceivedAt().Format(time.RFC3339Nano)) +
 			fmt.Sprintf("TIME DURATION: %v\n", res.Time()) +
 			"HEADERS      :\n" +
 			composeHeaders(c, res.Request, rl.Header) + "\n"
 		if res.Request.isSaveResponse {
-			debugLog += fmt.Sprintf("BODY         :\n***** RESPONSE WRITTEN INTO FILE *****\n")
+			debugLog += "BODY         :\n***** RESPONSE WRITTEN INTO FILE *****\n"
 		} else {
 			debugLog += fmt.Sprintf("BODY         :\n%v\n", rl.Body)
 		}
 		debugLog += "==============================================================================\n"
 
-		c.log.Debugf(debugLog)
+		c.log.Debugf("%s", debugLog)
 	}
 
 	return nil
@@ -326,10 +326,11 @@ func parseResponseBody(c *Client, res *Response) (err error) {
 		return
 	}
 	// Handles only JSON or XML content type
-	ct := firstNonEmpty(res.Header().Get(hdrContentTypeKey), res.Request.fallbackContentType)
+	ct := firstNonEmpty(res.Request.forceContentType, res.Header().Get(hdrContentTypeKey), res.Request.fallbackContentType)
 	if IsJSONType(ct) || IsXMLType(ct) {
 		// HTTP status code > 199 and < 300, considered as Result
 		if res.IsSuccess() {
+			res.Request.Error = nil
 			if res.Request.Result != nil {
 				err = Unmarshalc(c, ct, res.body, res.Request.Result)
 				return
@@ -443,7 +444,7 @@ func handleRequestBody(c *Client, r *Request) (err error) {
 	r.bodyBuf = nil
 
 	if reader, ok := r.Body.(io.Reader); ok {
-		if c.setContentLength || r.setContentLength { // keep backward compability
+		if c.setContentLength || r.setContentLength { // keep backward compatibility
 			r.bodyBuf = acquireBuffer()
 			_, err = r.bodyBuf.ReadFrom(reader)
 			r.Body = nil
@@ -458,8 +459,14 @@ func handleRequestBody(c *Client, r *Request) (err error) {
 	} else if IsJSONType(contentType) &&
 		(kind == reflect.Struct || kind == reflect.Map || kind == reflect.Slice) {
 		bodyBytes, err = jsonMarshal(c, r, r.Body)
+		if err != nil {
+			return
+		}
 	} else if IsXMLType(contentType) && (kind == reflect.Struct) {
 		bodyBytes, err = xml.Marshal(r.Body)
+		if err != nil {
+			return
+		}
 	}
 
 	if bodyBytes == nil && r.bodyBuf == nil {
@@ -511,4 +518,28 @@ func saveResponseIntoFile(c *Client, res *Response) error {
 	}
 
 	return nil
+}
+
+func getBodyCopy(r *Request) (*bytes.Buffer, error) {
+	// If r.bodyBuf present, return the copy
+	if r.bodyBuf != nil {
+		return bytes.NewBuffer(r.bodyBuf.Bytes()), nil
+	}
+
+	// Maybe body is `io.Reader`.
+	// Note: Resty user have to watchout for large body size of `io.Reader`
+	if r.RawRequest.Body != nil {
+		b, err := ioutil.ReadAll(r.RawRequest.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		// Restore the Body
+		closeq(r.RawRequest.Body)
+		r.RawRequest.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+
+		// Return the Body bytes
+		return bytes.NewBuffer(b), nil
+	}
+	return nil, nil
 }
