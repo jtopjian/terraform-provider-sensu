@@ -16,26 +16,23 @@ func Provider() terraform.ResourceProvider {
 			},
 
 			"api_key": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				Sensitive:     true,
-				DefaultFunc:   schema.EnvDefaultFunc("SENSU_API_KEY", ""),
-				ConflictsWith: []string{"username", "password"},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				DefaultFunc: schema.EnvDefaultFunc("SENSU_API_KEY", ""),
 			},
 
 			"username": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				DefaultFunc:   schema.EnvDefaultFunc("SENSU_USERNAME", ""),
-				ConflictsWith: []string{"api_key"},
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SENSU_USERNAME", ""),
 			},
 
 			"password": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				Sensitive:     true,
-				DefaultFunc:   schema.EnvDefaultFunc("SENSU_PASSWORD", ""),
-				ConflictsWith: []string{"api_key"},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				DefaultFunc: schema.EnvDefaultFunc("SENSU_PASSWORD", ""),
 			},
 
 			"namespace": &schema.Schema{
