@@ -69,7 +69,20 @@ func (c *Config) LoadAndValidate() error {
 
 	c.client.SetTLSClientConfig(&tlsConfig)
 
+	if c.username == "" && c.password == "" && c.apiKey == "" {
+		return fmt.Errorf("Must provide a username/password or an API key")
+	}
+
 	if c.apiKey == "" {
+
+		if c.username == "" {
+			return fmt.Errorf("Must provide a username")
+		}
+
+		if c.password == "" {
+			return fmt.Errorf("Must provide a password")
+		}
+
 		// Create an access token.
 		tokens, err := c.client.CreateAccessToken(c.apiUrl, c.username, c.password)
 		if err != nil {
