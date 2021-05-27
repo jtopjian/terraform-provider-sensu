@@ -34,11 +34,6 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("SENSU_NAMESPACE", ""),
 			},
 
-			"edition": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SENSU_EDITION", ""),
-			},
 			"trusted_ca_file": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -96,7 +91,6 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 		apiUrl:                d.Get("api_url").(string),
 		username:              d.Get("username").(string),
 		password:              d.Get("password").(string),
-		edition:               d.Get("edition").(string),
 		namespace:             d.Get("namespace").(string),
 		trustedCAFile:         d.Get("trusted_ca_file").(string),
 		insecureSkipTLSVerify: d.Get("insecure_skip_tls_verify").(bool),
