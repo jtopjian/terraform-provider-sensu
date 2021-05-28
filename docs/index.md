@@ -36,9 +36,6 @@ The following arguments are supported:
 * `namespace` - *Optional* - The namespace to manage resources in. This can
   also be set with the `SENSU_NAMESPACE` environment variable. If not set,
   this defaults to `default`.
-
-* `edition` - *Optional* - The edition of the Sensu service. This can also
-  be set with the `SENSU_EDITION` environment variable.
   
 * `trusted_ca_file` - *Optional* - Specify a file to be used as a trusted CA
   certificate. This can also be set with the `SENSU_TRUSTED_CA_FILE` environment

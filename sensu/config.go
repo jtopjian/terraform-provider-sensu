@@ -25,9 +25,6 @@ type Config struct {
 	// password is the password.
 	password string
 
-	// edition is the sensu edition.
-	edition string
-
 	// namespace is the sensu namespace.
 	namespace string
 
