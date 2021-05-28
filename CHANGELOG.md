@@ -7,7 +7,7 @@ NOTES
 IMPROVEMENTS
 
 * Headers can be defined at top level or in each build of `sensu_asset` [GH-44](https://github.com/jtopjian/terraform-provider-sensu/pull/44)
-* Removed `edition`.
+* Removed `edition` [GH-47](https://github.com/jtopjian/terraform-provider-sensu/pull/47)
 
 ## 0.10.6 (October 31, 2020)
 
