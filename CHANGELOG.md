@@ -1,8 +1,13 @@
 ## 0.11.0 (Unreleased)
 
+NOTES
+
+* The `edition` argument was removed. You will want to make sure you remove this from all of your configurations, if it ever existed.
+
 IMPROVEMENTS
 
 * Headers can be defined at top level or in each build of `sensu_asset` [GH-44](https://github.com/jtopjian/terraform-provider-sensu/pull/44)
+* Removed `edition`.
 
 ## 0.10.6 (October 31, 2020)
 
