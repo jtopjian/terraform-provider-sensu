@@ -11,6 +11,16 @@ Use Terraform to manage Sensu resources.
 
 To configure this provider, do the following:
 
+With api key:
+```hcl
+provider "sensu" {
+  api_url   = "http://127.0.0.1:8080"
+  api_key   = "admin"
+  namespace = "default"
+}
+```
+
+With username/password:
 ```hcl
 provider "sensu" {
   api_url   = "http://127.0.0.1:8080"
@@ -27,10 +37,13 @@ The following arguments are supported:
 * `api_url` - *Required* - The URL to the Sensu service. This can also be set
   with the `SENSU_API_URL` environment variable.
 
-* `username` - *Required* - The username to connect to the Sensu service as.
+* `api_key` - *Optional* - The API KEY to authenticate to the Sensu service. This can also be set
+  with the `SENSU_API_KEY` environment variable.
+
+* `username` - *Optional* - The username to connect to the Sensu service as.
   This can also be set with the `SENSU_USERNAME` environment variable.
 
-* `password` - *Required* - The password to authenticate to the Sensu service
+* `password` - *Optional* - The password to authenticate to the Sensu service
   with. This can also be set with the `SENSU_PASSWORD` environment variable.
 
 * `namespace` - *Optional* - The namespace to manage resources in. This can

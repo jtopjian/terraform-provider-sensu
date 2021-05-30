@@ -7,6 +7,14 @@ import (
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
 
+const (
+	// EntityNotFound is used to indicate that an entity was not found between
+	// agentd and the agent
+	// TODO(palourde): figure out a better way to express that than relying on a
+	// special entity name
+	EntityNotFound = "not found"
+)
+
 // interface assertions guarantee that EntityConfig and EntityState are valid
 // Resources.
 var (
@@ -25,6 +33,12 @@ type (
 // V2EntityToV3 converts a corev2.Entity to an EntityConfig and EntityState.
 // The resulting values will contain pointers to e's memory.
 func V2EntityToV3(e *corev2.Entity) (*EntityConfig, *EntityState) {
+	if e.ObjectMeta.Labels == nil {
+		e.ObjectMeta.Labels = make(map[string]string)
+	}
+	if e.ObjectMeta.Annotations == nil {
+		e.ObjectMeta.Annotations = make(map[string]string)
+	}
 	cfg := EntityConfig{
 		Metadata:          &e.ObjectMeta,
 		EntityClass:       e.EntityClass,
@@ -36,7 +50,12 @@ func V2EntityToV3(e *corev2.Entity) (*EntityConfig, *EntityState) {
 		Redact:            e.Redact,
 	}
 	state := EntityState{
-		Metadata:          &e.ObjectMeta,
+		Metadata: &corev2.ObjectMeta{
+			Name:        e.ObjectMeta.Name,
+			Namespace:   e.ObjectMeta.Namespace,
+			Labels:      e.ObjectMeta.Labels,
+			Annotations: e.ObjectMeta.Annotations,
+		},
 		System:            e.System,
 		LastSeen:          e.LastSeen,
 		SensuAgentVersion: e.SensuAgentVersion,
@@ -46,9 +65,8 @@ func V2EntityToV3(e *corev2.Entity) (*EntityConfig, *EntityState) {
 
 // V3EntityToV2 converts an EntityConfig and an EntityState to a corev2.Entity.
 // Errors are returned if cfg and state's Metadata are nil or not equal in terms
-// of their namespace and name. Labels and annotations will be merged, with the
-// labels of cfg taking precedence. The resulting object will contain pointers
-// to cfg's and state's memory.
+// of their namespace and name. The resulting object will contain pointers to
+// cfg's and state's memory, and its metadata is carried over from the config.
 func V3EntityToV2(cfg *EntityConfig, state *EntityState) (*corev2.Entity, error) {
 	if cfg.Metadata == nil {
 		return nil, errors.New("nil EntityConfig metadata")
@@ -68,18 +86,14 @@ func V3EntityToV2(cfg *EntityConfig, state *EntityState) (*corev2.Entity, error)
 		Labels:      make(map[string]string),
 		Annotations: make(map[string]string),
 	}
-	for k, v := range state.Metadata.Labels {
-		meta.Labels[k] = v
-	}
-	for k, v := range state.Metadata.Annotations {
-		meta.Annotations[k] = v
-	}
 	for k, v := range cfg.Metadata.Labels {
 		meta.Labels[k] = v
 	}
 	for k, v := range cfg.Metadata.Annotations {
 		meta.Annotations[k] = v
 	}
+	meta.CreatedBy = cfg.Metadata.CreatedBy
+
 	entity := &corev2.Entity{
 		ObjectMeta:        meta,
 		EntityClass:       cfg.EntityClass,
@@ -103,6 +117,7 @@ func FixtureEntityConfig(name string) *EntityConfig {
 			Name:        name,
 			Labels:      make(map[string]string),
 			Annotations: make(map[string]string),
+			CreatedBy:   "user123",
 		},
 		EntityClass:   corev2.EntityAgentClass,
 		User:          "agent1",

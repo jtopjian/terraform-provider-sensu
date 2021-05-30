@@ -19,6 +19,9 @@ type Config struct {
 	// apiUrl is the URL to the Sensu API service.
 	apiUrl string
 
+	// apiKey is the authentication to the Sensu API service.
+	apiKey string
+
 	// username is the username.
 	username string
 
@@ -63,20 +66,35 @@ func (c *Config) LoadAndValidate() error {
 
 	c.client.SetTLSClientConfig(&tlsConfig)
 
-	// Create an access token.
-	tokens, err := c.client.CreateAccessToken(c.apiUrl, c.username, c.password)
-	if err != nil {
-		return err
+	if c.username == "" && c.password == "" && c.apiKey == "" {
+		return fmt.Errorf("Must provide a username/password or an API key")
 	}
 
-	if tokens == nil {
-		return fmt.Errorf("bad username or password")
-	}
+	if c.apiKey == "" {
 
-	// Save the access token in the internal Sensu client.
-	err = c.SaveTokens(tokens)
-	if err != nil {
-		return err
+		if c.username == "" {
+			return fmt.Errorf("Must provide a username")
+		}
+
+		if c.password == "" {
+			return fmt.Errorf("Must provide a password")
+		}
+
+		// Create an access token.
+		tokens, err := c.client.CreateAccessToken(c.apiUrl, c.username, c.password)
+		if err != nil {
+			return err
+		}
+
+		if tokens == nil {
+			return fmt.Errorf("bad username or password")
+		}
+
+		// Save the access token in the internal Sensu client.
+		err = c.SaveTokens(tokens)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -93,6 +111,11 @@ func (c *Config) APIUrl() string {
 func (c *Config) SaveAPIUrl(url string) error {
 	c.apiUrl = url
 	return nil
+}
+
+// APIKey implements APIKey method for the config.Config interface.
+func (c *Config) APIKey() string {
+	return c.apiKey
 }
 
 // Namespace implements the Namespace method for the config.Config interface.

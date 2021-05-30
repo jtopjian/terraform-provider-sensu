@@ -1,18 +1,20 @@
 package resource
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
 	"github.com/sensu/sensu-go/types"
+	"github.com/sensu/sensu-go/types/compat"
 )
 
 // Parse is a rather heroic function that will parse any number of valid
@@ -27,14 +29,15 @@ import (
 // 4. Unmarshal the JSON one resource at a time.
 func Parse(in io.Reader) ([]*types.Wrapper, error) {
 	var resources []*types.Wrapper
-	b, err := ioutil.ReadAll(in)
+
+	resourceStrs, err := splitResources(in)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing resources: %s", err)
 	}
-	// Support concatenated yaml documents separated by '---'
-	array := bytes.Split(b, []byte("\n---\n"))
+
 	count := 0
-	for _, b := range array {
+	for _, resourceStr := range resourceStrs {
+		b := []byte(resourceStr)
 		var jsonBytes []byte
 		if jsonRe.Match(b) {
 			// We are dealing with JSON data
@@ -65,20 +68,6 @@ func Parse(in io.Reader) ([]*types.Wrapper, error) {
 				continue
 			}
 
-			// Mark the resource as managed by sensuctl in the outer labels
-			if len(w.ObjectMeta.Labels) == 0 {
-				w.ObjectMeta.Labels = map[string]string{}
-			}
-			w.ObjectMeta.Labels[corev2.ManagedByLabel] = "sensuctl"
-
-			// Mark the resource as managed by sensuctl in the inner labels
-			innerMeta := w.Value.GetObjectMeta()
-			if len(innerMeta.Labels) == 0 {
-				innerMeta.Labels = map[string]string{}
-			}
-			innerMeta.Labels[corev2.ManagedByLabel] = "sensuctl"
-			w.Value.SetObjectMeta(innerMeta)
-
 			resources = append(resources, &w)
 			count++
 		}
@@ -88,6 +77,33 @@ func Parse(in io.Reader) ([]*types.Wrapper, error) {
 	filterCheckSubdue(resources)
 
 	return resources, err
+}
+
+// splitResources scans the content of the reader and splits the resources.
+// The resources should be separated by a line containing only "---".
+// An error will be returned if the data from the reader cannot be read.
+func splitResources(in io.Reader) ([]string, error) {
+	var resources []string
+	inScanner := bufio.NewScanner(in)
+	currentResource := ""
+	for inScanner.Scan() {
+		line := inScanner.Text()
+		if strings.HasPrefix(line, "---") {
+			if currentResource != "" {
+				resources = append(resources, currentResource)
+			}
+			currentResource = ""
+		} else {
+			currentResource += line + "\n"
+		}
+	}
+	if err := inScanner.Err(); err != nil {
+		return nil, err
+	}
+	if len(currentResource) > 0 {
+		resources = append(resources, currentResource)
+	}
+	return resources, nil
 }
 
 // filterCheckSubdue nils out any check subdue fields that are supplied.
@@ -120,13 +136,13 @@ func Validate(resources []*types.Wrapper, namespace string) error {
 			)
 			continue
 		}
-		if resource.GetObjectMeta().Namespace == "" {
-			resource.SetNamespace(namespace)
+		if compat.GetObjectMeta(resource).Namespace == "" {
+			compat.SetNamespace(resource, namespace)
 			// We just set the namespace within the underlying wrapped value. We also
 			// need to set it to the outer ObjectMeta for consistency, but only if the
 			// resource has a namespace; some resources are cluster-wide and should
 			// not be namespaced
-			if ns := resource.GetObjectMeta().Namespace; ns != "" {
+			if ns := compat.GetObjectMeta(resource).Namespace; ns != "" {
 				r.ObjectMeta.Namespace = ns
 			}
 		}
