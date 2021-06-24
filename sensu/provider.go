@@ -77,6 +77,7 @@ func Provider() terraform.ResourceProvider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"sensu_asset":                resourceAsset(),
+			"sensu_apikey":               resourceAPIKey(),
 			"sensu_check":                resourceCheck(),
 			"sensu_cluster_role":         resourceClusterRole(),
 			"sensu_cluster_role_binding": resourceClusterRoleBinding(),
