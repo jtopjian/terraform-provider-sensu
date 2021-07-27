@@ -4,6 +4,8 @@ package command
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"syscall"
@@ -21,12 +23,35 @@ func Command(ctx context.Context, command string) *exec.Cmd {
 	return cmd
 }
 
-// SetProcessGroup sets the process group of the command process
-func SetProcessGroup(cmd *exec.Cmd) {
-	cmd.SysProcAttr.CreationFlags = syscall.CREATE_NEW_PROCESS_GROUP
-}
-
 // KillProcess kills the command process and any child processes
 func KillProcess(cmd *exec.Cmd) error {
-	return cmd.Process.Kill()
+	process := cmd.Process
+	if process == nil {
+		return nil
+	}
+
+	err := Command(context.Background(), fmt.Sprintf("taskkill /T /F /PID %d", process.Pid)).Run()
+	if err == nil {
+		return nil
+	}
+
+	err = forceKill(process)
+	if err == nil {
+		return nil
+	}
+	err = process.Signal(os.Kill)
+
+	return fmt.Errorf("could not kill process")
+}
+
+func forceKill(process *os.Process) error {
+	handle, err := syscall.OpenProcess(syscall.PROCESS_TERMINATE, true, uint32(process.Pid))
+	if err != nil {
+		return err
+	}
+
+	err = syscall.TerminateProcess(handle, 0)
+	_ = syscall.CloseHandle(handle)
+
+	return err
 }

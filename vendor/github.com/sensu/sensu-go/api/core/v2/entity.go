@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -10,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/sensu/sensu-go/api/core/v2/internal/stringutil"
 )
 
@@ -25,6 +25,9 @@ const (
 
 	// EntityBackendClass is the name of the class given to backend entities.
 	EntityBackendClass = "backend"
+
+	// EntityServiceClass is the name of the class given to BSM service entities.
+	EntityServiceClass = "service"
 
 	// Redacted is filled in for fields that contain sensitive information
 	Redacted = "REDACTED"
@@ -110,7 +113,7 @@ func (e *Entity) MarshalJSON() ([]byte, error) {
 	type Clone Entity
 	clone := (*Clone)(e)
 
-	return json.Marshal(clone)
+	return jsoniter.Marshal(clone)
 }
 
 // GetEntitySubscription returns the entity subscription, using the format

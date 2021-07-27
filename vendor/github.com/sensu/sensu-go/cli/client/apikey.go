@@ -1,9 +1,9 @@
 package client
 
 import (
-    "strings"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
@@ -89,6 +89,7 @@ func (client *RestClient) FetchAPIKey(name string) (*corev2.APIKey, error) {
 	return &result, json.Unmarshal(resp.Body(), &result)
 }
 
+// UpdateAPIKey update an api-key from configured Sensu instance
 func (client *RestClient) UpdateAPIKey(name, username string) error {
 	apikey := &corev2.APIKey{
 		ObjectMeta: corev2.ObjectMeta{
