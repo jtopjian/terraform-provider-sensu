@@ -1,5 +1,9 @@
 ## 0.12.0 (Unreleased)
 
+IMPROVEMENTS
+
+* Added `sensu_apikey` [GH-48](https://github.com/jtopjian/terraform-provider-sensu/pull/48)
+
 ## 0.11.0 (May 30, 2021)
 
 NOTES
