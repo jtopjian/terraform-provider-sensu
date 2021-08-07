@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/coreos/etcd/clientv3"
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
 	corev3 "github.com/sensu/sensu-go/api/core/v3"
 	"github.com/sensu/sensu-go/backend/store/patch"
 	"github.com/sensu/sensu-go/types"
+	"go.etcd.io/etcd/client/v3"
 )
 
 // ErrAlreadyExists is returned when an object already exists
@@ -224,7 +224,7 @@ type Store interface {
 
 	// NewInitializer returns the Initializer interfaces, which provides the
 	// required mechanism to verify if a store is initialized
-	NewInitializer() (Initializer, error)
+	NewInitializer(context.Context) (Initializer, error)
 }
 
 // AssetStore provides methods for managing checks assets
@@ -610,7 +610,7 @@ type UserStore interface {
 	AuthenticateUser(ctx context.Context, username, password string) (*types.User, error)
 
 	// CreateUsern creates a new user with the given user struct.
-	CreateUser(user *types.User) error
+	CreateUser(ctx context.Context, user *types.User) error
 
 	// GetUser returns a user using the given username.
 	GetUser(ctx context.Context, username string) (*types.User, error)
@@ -630,17 +630,17 @@ type UserStore interface {
 // Initializer provides methods to verify if a store is initialized
 type Initializer interface {
 	// Close closes the session to the store and unlock any mutex
-	Close() error
+	Close(context.Context) error
 
 	// FlagAsInitialized marks the store as initialized
-	FlagAsInitialized() error
+	FlagAsInitialized(context.Context) error
 
 	// IsInitialized returns a boolean error that indicates if the store has been
 	// initialized or not
-	IsInitialized() (bool, error)
+	IsInitialized(context.Context) (bool, error)
 
 	// Lock locks a mutex to avoid competing writes
-	Lock() error
+	Lock(context.Context) error
 }
 
 // ErrNoExtension is returned when a named extension does not exist.

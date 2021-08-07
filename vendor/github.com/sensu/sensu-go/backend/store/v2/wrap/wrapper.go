@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"reflect"
 
+	//nolint:staticcheck // SA1004 Replacing this will take some planning.
 	"github.com/golang/protobuf/proto"
+
 	"github.com/golang/snappy"
 	corev2 "github.com/sensu/sensu-go/api/core/v2"
 	corev3 "github.com/sensu/sensu-go/api/core/v3"
@@ -259,6 +261,11 @@ func (w *Wrapper) UnwrapInto(p interface{}) error {
 
 // List is a slice of wrappers.
 type List []*Wrapper
+
+// Len tells the length of the wrap list.
+func (l List) Len() int {
+	return len(l)
+}
 
 // Unwrap unwraps each item in the list and returns a slice of resources of the
 // same size.
