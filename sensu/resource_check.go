@@ -479,8 +479,8 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	// Update hooks
 	if d.HasChange("check_hook") {
 		old, new := d.GetChange("check_hook")
-		oldHookLists := expandCheckHooks(old.([]interface{}))
-		newHookLists := expandCheckHooks(new.([]interface{}))
+		oldHookLists := expandCheckHooks(old.(*schema.Set).List())
+		newHookLists := expandCheckHooks(new.(*schema.Set).List())
 
 		// remove all old hooks
 		for _, v := range oldHookLists {
