@@ -93,12 +93,25 @@ func TestAccResourceCheck_hook(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccResourceCheck_hook,
+				Config: testAccResourceCheck_hook_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sensu_hook.hook_1", "name", "hook_1"),
 					resource.TestCheckResourceAttr(
 						"sensu_check.check_1", "check_hook.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_hook.hook_2", "name", "hook_2"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_hook_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_hook.hook_1", "name", "hook_1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "check_hook.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_hook.hook_2", "name", "hook_2_modified"),
 				),
 			},
 		},
@@ -339,7 +352,7 @@ const testAccResourceCheck_subdue_2 = `
 	}
 `
 
-const testAccResourceCheck_hook = `
+const testAccResourceCheck_hook_1 = `
 	resource "sensu_hook" "hook_1" {
 		name = "hook_1"
 		command = "/bin/foo"
@@ -347,6 +360,35 @@ const testAccResourceCheck_hook = `
 
 	resource "sensu_hook" "hook_2" {
 		name = "hook_2"
+		command = "/bin/bar"
+	}
+
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foobar"
+		interval = 6000
+		subscriptions = ["foo", "bar"]
+
+		check_hook {
+			hook = "${sensu_hook.hook_1.name}"
+			trigger = "non-zero"
+		}
+
+		check_hook {
+			hook = "${sensu_hook.hook_2.name}"
+			trigger = "non-zero"
+		}
+	}
+`
+
+const testAccResourceCheck_hook_2 = `
+	resource "sensu_hook" "hook_1" {
+		name = "hook_1"
+		command = "/bin/foo"
+	}
+
+	resource "sensu_hook" "hook_2" {
+		name = "hook_2_modified"
 		command = "/bin/bar"
 	}
 
