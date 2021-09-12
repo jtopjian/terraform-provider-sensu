@@ -1,5 +1,11 @@
 ## 0.13.0 (Unreleased)
 
+## 0.12.1 (September 12, 2021)
+
+BUG FIXES
+
+* Fixed crash when updating hooks in `sensu_check` [GH-52](https://github.com/jtopjian/terraform-provider-sensu/pull/52)
+
 ## 0.12.0 (August 6th, 2021)
 
 IMPROVEMENTS
