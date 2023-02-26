@@ -1,0 +1,27 @@
+package v2
+
+// {{ .Comment }}
+
+import (
+	"testing"
+
+	"github.com/sensu/sensu-api-tools"
+)
+
+{{ range $index, $typename := .TypeNames }}
+func TestResolve{{ $typename }}(t *testing.T) {
+	var value interface{} = new({{ $typename }})
+	if _, ok := value.(Resource); ok {
+        if actual, err := apitools.Resolve("core/v2", "{{ $typename }}"); err != nil {
+			t.Fatal(err)
+        } else if _, ok := actual.(*{{ $typename }}); !ok {
+            t.Fatal("expected to resolve to type ")
+        }
+		return
+	}
+    _, err := apitools.Resolve("core/v2", "{{ $typename }}")
+    if err == nil {
+        t.Fatalf("expected non-nil error")
+    }
+}
+{{ end }}
