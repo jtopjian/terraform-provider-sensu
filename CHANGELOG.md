@@ -1,5 +1,12 @@
 ## 0.13.0 (Unreleased)
 
+## 0.12.2 (February 26, 2023)
+
+OTHER
+
+* Updating dependencies [GH-54](https://github.com/jtopjian/terraform-provider-sensu/pull/54)
+* Updating dependencies [GH-55](https://github.com/jtopjian/terraform-provider-sensu/pull/55)
+
 ## 0.12.1 (September 12, 2021)
 
 BUG FIXES
