@@ -8,7 +8,7 @@ import (
 	goversion "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/sensu/sensu-go/api/core/v2"
+	"github.com/sensu/core/v2"
 	"github.com/sensu/sensu-go/bonsai"
 	"github.com/sensu/sensu-go/cli/resource"
 	"github.com/sensu/sensu-go/types/compat"
