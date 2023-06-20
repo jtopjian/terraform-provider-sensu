@@ -21,6 +21,8 @@ func TestAccDataSourceMutator_basic(t *testing.T) {
 						"data.sensu_mutator.mutator_1", "command", "/bin/foo"),
 					resource.TestCheckResourceAttr(
 						"data.sensu_mutator.mutator_1", "env_vars.FOO", "bar"),
+					resource.TestCheckResourceAttr(
+						"data.sensu_mutator.mutator_1", "secrets.BAR", "foo"),
 				),
 			},
 		},

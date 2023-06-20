@@ -37,6 +37,8 @@ func resourceMutator() *schema.Resource {
 			},
 
 			"namespace": resourceNamespaceSchema,
+
+			"secrets": resourceSecretValuesSchema,
 		},
 	}
 }
@@ -47,6 +49,7 @@ func resourceMutatorCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
+	secrets := expandSecretValues(d.Get("secrets").(map[string]string))
 
 	mutator := &types.Mutator{
 		ObjectMeta: types.ObjectMeta{
@@ -56,6 +59,7 @@ func resourceMutatorCreate(d *schema.ResourceData, meta interface{}) error {
 		Command: d.Get("command").(string),
 		EnvVars: envVars,
 		Timeout: uint32(d.Get("timeout").(int)),
+		Secrets: secrets,
 	}
 
 	log.Printf("[DEBUG] Creating mutator %s: %#v", name, mutator)
@@ -95,6 +99,11 @@ func resourceMutatorRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to set %s.env_vars: %s", name, err)
 	}
 
+	secretValues := flattenSecretValues(mutator.Secrets)
+	if err := d.Set("secrets", secretValues); err != nil {
+		return fmt.Errorf("Unable to set %s.secrets: %s", name, err)
+	}
+
 	return nil
 }
 
@@ -119,6 +128,11 @@ func resourceMutatorUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("timeout") {
 		mutator.Timeout = uint32(d.Get("timeout").(int))
+	}
+
+	if d.HasChange("secrets") {
+		secretValues := expandSecretValues(d.Get("secrets").(map[string]string))
+		mutator.Secrets = secretValues
 	}
 
 	if err := mutator.Validate(); err != nil {

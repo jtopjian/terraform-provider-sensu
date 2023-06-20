@@ -164,6 +164,8 @@ func resourceCheck() *schema.Resource {
 			},
 
 			"namespace": resourceNamespaceSchema,
+
+			"secrets": resourceSecretValuesSchema,
 		},
 	}
 }
@@ -191,6 +193,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
 	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
 	labels := expandStringMap(d.Get("labels").(map[string]interface{}))
+	secrets := expandSecretValues(d.Get("secrets").(map[string]string))
 
 	// Using partial to resume hook configuration if there's a failure.
 	d.Partial(true)
@@ -220,6 +223,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 		Subdue:               &subdues,
 		Timeout:              uint32(d.Get("timeout").(int)),
 		Ttl:                  int64(d.Get("ttl").(int)),
+		Secrets:              secrets,
 	}
 
 	proxyRequests := d.Get("proxy_requests").([]interface{})
@@ -261,6 +265,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("stdin")
 	d.SetPartial("timeout")
 	d.SetPartial("ttl")
+	d.SetPartial("secrets")
 
 	config.SaveNamespace(config.determineNamespace(d))
 
@@ -354,6 +359,11 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	subdues := flattenTimeWindows(check.Subdue)
 	if err := d.Set("subdue", subdues); err != nil {
 		return fmt.Errorf("Unable to set %s.subdue: %s", name, err)
+	}
+
+	secretValues := flattenSecretValues(check.Secrets)
+	if err := d.Set("secrets", secretValues); err != nil {
+		return fmt.Errorf("Unable to set %s.secrets: %s", name, err)
 	}
 
 	return nil
@@ -463,6 +473,11 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("ttl") {
 		check.Ttl = int64(d.Get("ttl").(int))
+	}
+
+	if d.HasChange("secrets") {
+		secretValues := expandSecretValues(d.Get("secrets").(map[string]string))
+		check.Secrets = secretValues
 	}
 
 	log.Printf("[DEBUG] Updating check %s: %#v", name, check)

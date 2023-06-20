@@ -88,6 +88,8 @@ func resourceHandler() *schema.Resource {
 			},
 
 			"namespace": resourceNamespaceSchema,
+
+			"secrets": resourceSecretValuesSchema,
 		},
 	}
 }
@@ -106,6 +108,7 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	// detailed structures
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
+	secrets := expandSecretValues(d.Get("secrets").(map[string]string))
 
 	handler := &types.Handler{
 		ObjectMeta: types.ObjectMeta{
@@ -120,6 +123,7 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 		Mutator:       d.Get("mutator").(string),
 		Timeout:       uint32(d.Get("timeout").(int)),
 		Type:          d.Get("type").(string),
+		Secrets:       secrets,
 	}
 
 	if v, ok := d.GetOk("socket"); ok {
@@ -171,6 +175,11 @@ func resourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	envVars := flattenEnvVars(handler.EnvVars)
 	if err := d.Set("env_vars", envVars); err != nil {
 		return fmt.Errorf("Unable to set %s.env_vars: %s", name, err)
+	}
+
+	secretValues := flattenSecretValues(handler.Secrets)
+	if err := d.Set("secrets", secretValues); err != nil {
+		return fmt.Errorf("Unable to set %s.secrets: %s", name, err)
 	}
 
 	return nil
@@ -225,6 +234,11 @@ func resourceHandlerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("type") {
 		handler.Type = d.Get("type").(string)
+	}
+
+	if d.HasChange("secrets") {
+		secretValues := expandSecretValues(d.Get("secrets").(map[string]string))
+		handler.Secrets = secretValues
 	}
 
 	if err := handler.Validate(); err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/sensu/core/v2"
+	v2 "github.com/sensu/core/v2"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -602,4 +602,40 @@ func flattenCheckProxyRequests(v *types.ProxyRequests) []map[string]interface{} 
 	}
 
 	return proxyRequests
+}
+
+// Secret Values
+var resourceSecretValuesSchema = &schema.Schema{
+	Type:     schema.TypeMap,
+	Optional: true,
+	Elem:     &schema.Schema{Type: schema.TypeString},
+}
+
+var dataSecretValuesSchema = &schema.Schema{
+	Type:     schema.TypeMap,
+	Optional: true,
+	Elem:     &schema.Schema{Type: schema.TypeString},
+}
+
+func expandSecretValues(v map[string]string) []*v2.Secret {
+	var secretValues []*v2.Secret
+
+	for key, val := range v {
+		secretValue := new(v2.Secret)
+		secretValue.Name = key
+		secretValue.Secret = val
+		secretValues = append(secretValues, secretValue)
+	}
+
+	return secretValues
+}
+
+func flattenSecretValues(v []*v2.Secret) map[string]string {
+	secretValues := make(map[string]string)
+
+	for _, v := range v {
+		secretValues[v.Name] = v.Secret
+	}
+
+	return secretValues
 }
