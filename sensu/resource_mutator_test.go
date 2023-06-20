@@ -72,7 +72,7 @@ func TestAccResourceMutator_secrets(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sensu_mutator.mutator_1", "secrets.foo", "barr"),
-					resource.TestCheckNoResourceAttr("sensu_check.mutator_1", "secrets.bar"),
+					resource.TestCheckNoResourceAttr("sensu_mutator.mutator_1", "secrets.bar"),
 				),
 			},
 			resource.TestStep{

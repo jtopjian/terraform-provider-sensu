@@ -156,7 +156,7 @@ func TestAccResourceHandler_secrets(t *testing.T) {
 			resource.TestStep{
 				Config: testAccResourceHandler_secrets_5,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckNoResourceAttr("sensu_check.check_1", "secrets"),
+					resource.TestCheckNoResourceAttr("sensu_handler.handler_1", "secrets"),
 				),
 			},
 		},
