@@ -617,13 +617,14 @@ var dataSecretValuesSchema = &schema.Schema{
 	Elem:     &schema.Schema{Type: schema.TypeString},
 }
 
-func expandSecretValues(v map[string]string) []*v2.Secret {
+func expandSecretValues(v map[string]interface{}) []*v2.Secret {
 	var secretValues []*v2.Secret
 
 	for key, val := range v {
+		raw := val.(string)
 		secretValue := new(v2.Secret)
 		secretValue.Name = key
-		secretValue.Secret = val
+		secretValue.Secret = raw
 		secretValues = append(secretValues, secretValue)
 	}
 

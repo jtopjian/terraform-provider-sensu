@@ -108,7 +108,7 @@ func resourceHandlerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	// detailed structures
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
-	secrets := expandSecretValues(d.Get("secrets").(map[string]string))
+	secrets := expandSecretValues(d.Get("secrets").(map[string]interface{}))
 
 	handler := &types.Handler{
 		ObjectMeta: types.ObjectMeta{
@@ -237,7 +237,7 @@ func resourceHandlerUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("secrets") {
-		secretValues := expandSecretValues(d.Get("secrets").(map[string]string))
+		secretValues := expandSecretValues(d.Get("secrets").(map[string]interface{}))
 		handler.Secrets = secretValues
 	}
 

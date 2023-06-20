@@ -193,7 +193,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
 	annotations := expandStringMap(d.Get("annotations").(map[string]interface{}))
 	labels := expandStringMap(d.Get("labels").(map[string]interface{}))
-	secrets := expandSecretValues(d.Get("secrets").(map[string]string))
+	secrets := expandSecretValues(d.Get("secrets").(map[string]interface{}))
 
 	// Using partial to resume hook configuration if there's a failure.
 	d.Partial(true)
@@ -476,7 +476,7 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("secrets") {
-		secretValues := expandSecretValues(d.Get("secrets").(map[string]string))
+		secretValues := expandSecretValues(d.Get("secrets").(map[string]interface{}))
 		check.Secrets = secretValues
 	}
 

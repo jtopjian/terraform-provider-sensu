@@ -49,7 +49,7 @@ func resourceMutatorCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
-	secrets := expandSecretValues(d.Get("secrets").(map[string]string))
+	secrets := expandSecretValues(d.Get("secrets").(map[string]interface{}))
 
 	mutator := &types.Mutator{
 		ObjectMeta: types.ObjectMeta{
@@ -131,7 +131,7 @@ func resourceMutatorUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("secrets") {
-		secretValues := expandSecretValues(d.Get("secrets").(map[string]string))
+		secretValues := expandSecretValues(d.Get("secrets").(map[string]interface{}))
 		mutator.Secrets = secretValues
 	}
 
