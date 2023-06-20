@@ -28,8 +28,6 @@ resource "sensu_mutator" "mutator_1" {
 
 * `env_vars` - *Optional* - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-transform/mutators/#mutator-specification).
 
-* `secrets` - *Optional* - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-transform/mutators/#mutator-specification).
-
 ## Attribute Reference
 
 The resource has no computed fields.

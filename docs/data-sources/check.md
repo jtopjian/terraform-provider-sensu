@@ -53,8 +53,6 @@ data "sensu_check" "check_1" {
 
 * `runtime_assets` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `secrets` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
-
 * `stdin` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
 * `subdue` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).

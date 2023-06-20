@@ -2,7 +2,7 @@
 
 Manages a Sensu Filter.
 
-For full documentation on Sensu Filters, see [here](https://docs.sensu.io/sensu-go/latest/reference/filters).
+For full documentation on Sensu Filters, see [here](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/).
 
 ## Basic Example
 
@@ -31,14 +31,14 @@ resource "sensu_filter" "filter_1" {
   also be set with the `SENSU_NAMESPACE` environment variable. If not set,
   this defaults to `default`.
 
-* `action` - *Required* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
+* `action` - *Required* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#event-filter-specification).
   Valid values are `allow` and `deny`.
 
-* `expressions` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
+* `expressions` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#event-filter-specification).
 
-* `runtime_assets` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
+* `runtime_assets` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#event-filter-specification).
 
-* `when` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/reference/filters/#filter-attributes).
+* `when` - *Optional* - See the [Sensu filter reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-filter/filters/#event-filter-specification).
 
 ### when
 

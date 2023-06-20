@@ -36,8 +36,6 @@ resource "sensu_handler" "handler_1" {
 
 * `mutator` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `secrets` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
-
 * `socket` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
 * `timeout` - *Optional* - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).

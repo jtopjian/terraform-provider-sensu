@@ -2,7 +2,7 @@
 
 Get information about a Sensu Role.
 
-For full documentation on Sensu Roles, see [here](https://docs.sensu.io/sensu-go/latest/reference/rbac/#role).
+For full documentation on Sensu Roles, see [here](https://docs.sensu.io/sensu-go/latest/operations/control-access/rbac/#roles).
 
 ## Basic Example
 
@@ -22,14 +22,14 @@ data "sensu_role" "role_1" {
 
 ## Attribute Reference
 
-* `rule` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/reference/rbac/#role).
+* `rule` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/operations/control-access/rbac/#role-and-cluster-role-specification).
 
 ### rule
 
 The `rule` block supports:
 
-* `verbs` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/reference/rbac/#rule).
+* `verbs` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/operations/control-access/rbac/#rules-attributes).
 
-* `resources` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/reference/rbac/#rule).
+* `resources` - *Required* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/operations/control-access/rbac/#rules-attributes).
 
-* `resource_names` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/reference/rbac/#rule).
+* `resource_names` - *Optional* - See the [Sensu rbac reference](https://docs.sensu.io/sensu-go/latest/operations/control-access/rbac/#rules-attributes).
