@@ -29,18 +29,18 @@ func TestAccResourceRole_basic(t *testing.T) {
 }
 
 const testAccResourceRole_basic = `
-  resource "sensu_role" "role_1" {
-    name = "role_1"
+	resource "sensu_role" "role_1" {
+		name = "role_1"
 
-    rule {
-      verbs = ["*"]
-      resources = ["checks"]
-    }
+		rule {
+			verbs = ["*"]
+			resources = ["checks"]
+		}
 
-    rule {
-      verbs = ["get", "list"]
-      resources = ["assets"]
-    }
+		rule {
+			verbs = ["get", "list"]
+			resources = ["assets"]
+		}
 
-  }
+	}
 `

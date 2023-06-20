@@ -46,9 +46,9 @@ func TestAccDataSourceClusterRole_basic(t *testing.T) {
 }
 
 var testAccDataSourceClusterRole_basic = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_cluster_role" "cluster_role_1" {
-    name = "${sensu_cluster_role.cluster_role_1.name}"
-  }
+	data "sensu_cluster_role" "cluster_role_1" {
+		name = "${sensu_cluster_role.cluster_role_1.name}"
+	}
 `, testAccResourceClusterRole_basic)

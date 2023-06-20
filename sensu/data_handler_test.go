@@ -80,33 +80,33 @@ func TestAccDataSourceHandler_runtimeAssets(t *testing.T) {
 }
 
 var testAccDataSourceHandler_basicPipe = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_handler" "handler_1" {
-    name = "${sensu_handler.handler_1.name}"
-  }
+	data "sensu_handler" "handler_1" {
+		name = "${sensu_handler.handler_1.name}"
+	}
 `, testAccResourceHandler_basicPipe)
 
 var testAccDataSourceHandler_basicTCP = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_handler" "handler_1" {
-    name = "${sensu_handler.handler_1.name}"
-  }
+	data "sensu_handler" "handler_1" {
+		name = "${sensu_handler.handler_1.name}"
+	}
 `, testAccResourceHandler_basicTCP)
 
 var testAccDataSourceHandler_basicSet = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_handler" "handler_1" {
-    name = "${sensu_handler.handler_1.name}"
-  }
+	data "sensu_handler" "handler_1" {
+		name = "${sensu_handler.handler_1.name}"
+	}
 `, testAccResourceHandler_basicSet)
 
 var testAccDataSourceHandler_runtimeAssets = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_handler" "handler_1" {
-    name = "${sensu_handler.handler_1.name}"
-  }
+	data "sensu_handler" "handler_1" {
+		name = "${sensu_handler.handler_1.name}"
+	}
 `, testAccResourceHandler_runtimeAssets_1)

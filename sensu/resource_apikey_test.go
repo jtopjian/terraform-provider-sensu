@@ -36,7 +36,7 @@ func testAccResourceAPIKey_basic(username string) string {
 		}
 
 		resource "sensu_apikey" "apikey_1" {
-    	username = sensu_user.user_1.name
-  	}
+			username = sensu_user.user_1.name
+		}
 	`, username)
 }

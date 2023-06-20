@@ -106,76 +106,76 @@ func TestAccResourceAsset_createMultipleBuild(t *testing.T) {
 }
 
 const testAccResourceAsset_basic = `
-  resource "sensu_asset" "asset_1" {
-    name = "asset_1"
-    sha512 = "4f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
-    url = "http://example.com/asset/example.tar.gz"
+	resource "sensu_asset" "asset_1" {
+		name = "asset_1"
+		sha512 = "4f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
+		url = "http://example.com/asset/example.tar.gz"
 
-    filters = [
-      "System.OS=='linux'",
-      "System.Arch=='amd64'",
-    ]
-  }
+		filters = [
+			"System.OS=='linux'",
+			"System.Arch=='amd64'",
+		]
+	}
 `
 
 const testAccResourceAsset_update = `
-  resource "sensu_asset" "asset_1" {
-    name = "asset_1"
-    sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
-    url = "http://example.com/asset/example2.tar.gz"
+	resource "sensu_asset" "asset_1" {
+		name = "asset_1"
+		sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
+		url = "http://example.com/asset/example2.tar.gz"
 
-    filters = [
-      "System.OS=='linux'",
-      "System.Arch=='amd64'",
-    ]
-  }
+		filters = [
+			"System.OS=='linux'",
+			"System.Arch=='amd64'",
+		]
+	}
 `
 
 const testAccResourceAsset_headers_1 = `
-  resource "sensu_asset" "asset_1" {
-    name = "asset_1"
-    sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
-    url = "http://example.com/asset/example2.tar.gz"
+	resource "sensu_asset" "asset_1" {
+		name = "asset_1"
+		sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
+		url = "http://example.com/asset/example2.tar.gz"
 
-    filters = [
-      "System.OS=='linux'",
-      "System.Arch=='amd64'",
-    ]
-    headers = {
-        header1 = "test1"
-        header2 = "test2"
-    }
-  }
+		filters = [
+			"System.OS=='linux'",
+			"System.Arch=='amd64'",
+		]
+		headers = {
+				header1 = "test1"
+				header2 = "test2"
+		}
+	}
 `
 
 const testAccResourceAsset_headers_2 = `
-  resource "sensu_asset" "asset_1" {
-    name = "asset_1"
-    sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
-    url = "http://example.com/asset/example2.tar.gz"
+	resource "sensu_asset" "asset_1" {
+		name = "asset_1"
+		sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
+		url = "http://example.com/asset/example2.tar.gz"
 
-    filters = [
-      "System.OS=='linux'",
-      "System.Arch=='amd64'",
-    ]
-    headers = {
-        header1 = "test1"
-        header2 = "test3"
-    }
-  }
+		filters = [
+			"System.OS=='linux'",
+			"System.Arch=='amd64'",
+		]
+		headers = {
+				header1 = "test1"
+				header2 = "test3"
+		}
+	}
 `
 
 const testAccResourceAsset_headers_3 = `
-  resource "sensu_asset" "asset_1" {
-    name = "asset_1"
-    sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
-    url = "http://example.com/asset/example2.tar.gz"
+	resource "sensu_asset" "asset_1" {
+		name = "asset_1"
+		sha512 = "5f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b"
+		url = "http://example.com/asset/example2.tar.gz"
 
-    filters = [
-      "System.OS=='linux'",
-      "System.Arch=='amd64'",
-    ]
-  }
+		filters = [
+			"System.OS=='linux'",
+			"System.Arch=='amd64'",
+		]
+	}
 `
 
 const testAccResourceAsset_createMultipleBuild_1 = `
@@ -200,9 +200,9 @@ const testAccResourceAsset_createMultipleBuild_1 = `
 				"entity.system.platform_family == 'rhel'",
 				"parseInt(entity.system.platform_version.split('.')[0]) == 6",
 			]
-                	headers = {
-                        	"Authorization" = "Bearer changeme"
-                	}
+									headers = {
+													"Authorization" = "Bearer changeme"
+									}
 		}
 
 		build {
@@ -213,9 +213,9 @@ const testAccResourceAsset_createMultipleBuild_1 = `
 				"entity.system.arch == 'amd64'",
 				"entity.system.platform_family == 'debian'",
 			]
-                	headers = {
-                        	"Authorization" = "Bearer changeme"
-                	}
+									headers = {
+													"Authorization" = "Bearer changeme"
+									}
 		}
 	}
 `

@@ -50,31 +50,31 @@ func TestAccResourceNamespace_check(t *testing.T) {
 }
 
 const testAccResourceNamespace_basic = `
-  resource "sensu_namespace" "namespace_1" {
-    name = "namespace_1"
-  }
+	resource "sensu_namespace" "namespace_1" {
+		name = "namespace_1"
+	}
 `
 
 const testAccResourceNamespace_update = `
-  resource "sensu_namespace" "namespace_1" {
-    name = "namespace_1b"
-  }
+	resource "sensu_namespace" "namespace_1" {
+		name = "namespace_1b"
+	}
 `
 
 const testAccResourceNamespace_check = `
-  resource "sensu_namespace" "namespace_1" {
-    name = "namespace_1"
-  }
+	resource "sensu_namespace" "namespace_1" {
+		name = "namespace_1"
+	}
 
-  resource "sensu_check" "check_1" {
-    name = "check_1"
-    namespace = "${sensu_namespace.namespace_1.name}"
-    command = "/bin/foo"
-    interval = 60000
-    subscriptions = [
-      "foo",
-      "bar",
-      "baz",
-    ]
-  }
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		namespace = "${sensu_namespace.namespace_1.name}"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+	}
 `

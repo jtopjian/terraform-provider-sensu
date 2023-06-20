@@ -27,7 +27,7 @@ func TestAccDataSourceUser_basic(t *testing.T) {
 }
 
 const testAccDataSourceUser_basic = `
-  data "sensu_user" "user_1" {
-    name = "admin"
-  }
+	data "sensu_user" "user_1" {
+		name = "admin"
+	}
 `
