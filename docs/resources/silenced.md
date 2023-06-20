@@ -2,7 +2,7 @@
 
 Get information about a Sensu Silencing.
 
-For full documentation on Sensu Silencing, see [here](https://docs.sensu.io/sensu-go/latest/reference/silencing).
+For full documentation on Sensu Silencing, see [here](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/).
 
 ## Basic Example
 
@@ -28,15 +28,15 @@ resource "sensu_silenced" "silence_1" {
   in human readable time (Format: Jan 02 2006 3:04PM MST)". If not set,
   this defaults to `now`.
 
-* `expire` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
+* `expire` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification). 
 
-* `expire_on_resolve` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes).
+* `expire_on_resolve` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification).
 
-* `reason` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
+* `reason` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification). 
 
-* `labels` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#metadata-attributes). 
+* `labels` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
 
-* `annotations` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#metadata-attributes).
+* `annotations` - *Optional* - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes).
 
 ## Attribute Reference
 

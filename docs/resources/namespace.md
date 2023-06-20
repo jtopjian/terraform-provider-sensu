@@ -2,7 +2,7 @@
 
 Manage a Sensu Namespace.
 
-For full documentation on Sensu Namespaces, see [here](https://docs.sensu.io/sensu-go/latest/reference/rbac/#namespaces)
+For full documentation on Sensu Namespaces, see [here](https://docs.sensu.io/sensu-go/latest/operations/control-access/namespaces/)
 
 ## Basic Example
 

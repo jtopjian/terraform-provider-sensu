@@ -2,7 +2,7 @@
 
 Manages a Sensu API Key.
 
-For full documentation on Sensu API Key, see [here](https://docs.sensu.io/sensu-go/latest/reference/apikeys).
+For full documentation on Sensu API Key, see [here](https://docs.sensu.io/sensu-go/latest/operations/control-access/apikeys/).
 
 ## Basic Example
 

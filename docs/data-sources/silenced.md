@@ -2,7 +2,7 @@
 
 Get information about a Sensu Silencing.
 
-For full documentation on Sensu Silencing, see [here](https://docs.sensu.io/sensu-go/latest/reference/silencing).
+For full documentation on Sensu Silencing, see [here](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/).
 
 ## Basic Example
 
@@ -25,9 +25,9 @@ data "sensu_silenced" "silence_1" {
 
 ## Attribute Reference
 
-* `begin` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes).
-* `expire` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
-* `expire_on_resolve` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
-* `reason` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
-* `labels` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#metadata-attributes). 
-* `annotations` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#metadata-attributes).
+* `begin` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification).
+* `expire` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification). 
+* `expire_on_resolve` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification). 
+* `reason` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/silencing/#silencing-specification). 
+* `labels` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes). 
+* `annotations` - See the [Sensu silence reference](https://docs.sensu.io/sensu-go/latest/reference/silencing/#spec-attributes).

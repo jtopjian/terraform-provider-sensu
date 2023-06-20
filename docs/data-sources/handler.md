@@ -2,7 +2,7 @@
 
 Get information about a Sensu Handler.
 
-For full documentation on Sensu Handlers, see [here](https://docs.sensu.io/sensu-go/latest/reference/handlers).
+For full documentation on Sensu Handlers, see [here](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/).
 
 ## Basic Example
 
@@ -22,23 +22,23 @@ data "sensu_handler" "handler_1" {
 
 ## Attribute Reference
 
-* `type` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `type` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `command` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `command` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `env_vars` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `env_vars` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `filters` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `filters` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `handlers` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `handlers` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `runtime_assets` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `runtime_assets` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `mutator` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `mutator` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `socket` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `socket` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
-* `timeout` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/reference/handlers/#handler-attributes).
+* `timeout` - See the [Sensu handler reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-process/handlers/#handler-specification).
 
 ### socket
 

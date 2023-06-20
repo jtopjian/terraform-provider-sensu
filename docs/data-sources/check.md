@@ -2,7 +2,7 @@
 
 Get information about a Sensu Check.
 
-For full documentation on Sensu Check's, see [here](https://docs.sensu.io/sensu-go/latest/reference/checks).
+For full documentation on Sensu Check's, see [here](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/).
 
 ## Basic Example
 
@@ -22,47 +22,47 @@ data "sensu_check" "check_1" {
 
 ## Attribute Reference
 
-* `annotations` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+* `annotations` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `command` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `command` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `check_hook` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `check_hook` - *Optional* - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
   Also see the `check_hook` section below for details on this block.
 
-* `cron` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `cron` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `env_vars` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `env_vars` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `high_flap_threshold` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `high_flap_threshold` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `handlers` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `handlers` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `interval` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `interval` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `label` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#metadata-attributes).
+* `label` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `low_flap_threshold` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `low_flap_threshold` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `proxy_entity_name` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `proxy_entity_name` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `proxy_requests` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `proxy_requests` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `publish` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `publish` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `round_robin` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `round_robin` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `runtime_assets` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `runtime_assets` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `stdin` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `stdin` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `subdue` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `subdue` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
   Also see the `subdue` section below for details on this block.
 
-* `subscriptions` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `subscriptions` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `timeout` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `timeout` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
-* `ttl` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/reference/checks/#check-attributes).
+* `ttl` - See the [Sensu check reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/checks/#check-specification).
 
 ### check_hook
 

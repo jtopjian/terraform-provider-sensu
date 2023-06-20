@@ -2,7 +2,7 @@
 
 Get information about a Sensu Hook.
 
-For full documentation on Sensu Hooks, see [here](https://docs.sensu.io/sensu-go/latest/reference/hooks).
+For full documentation on Sensu Hooks, see [here](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/).
 
 ## Basic Example
 
@@ -22,8 +22,8 @@ data "sensu_hook" "hook_1" {
 
 ## Attribute Reference
 
-* `command` - See the [Sensu hook reference](https://docs.sensu.io/sensu-go/latest/reference/hooks/#hook-attributes).
+* `command` - See the [Sensu hook reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/#hook-specification).
 
-* `timeout` - See the [Sensu hook reference](https://docs.sensu.io/sensu-go/latest/reference/hooks/#hook-attributes).
+* `timeout` - See the [Sensu hook reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/#hook-specification).
 
-* `stdin` - See the [Sensu hook reference](https://docs.sensu.io/sensu-go/latest/reference/hooks/#hook-attributes).
+* `stdin` - See the [Sensu hook reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-schedule/hooks/#hook-specification).

@@ -2,7 +2,7 @@
 
 Get information about a Sensu Asset hosted at Bonsai.
 
-For full documentation on Sensu Assets, see [here](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+For full documentation on Sensu Assets, see [here](https://docs.sensu.io/sensu-go/latest/plugins/assets/).
 
 ## Basic Example
 
@@ -43,22 +43,22 @@ resource "sensu_asset" "asset_1" {
 
 ## Attribute Reference
 
-* `labels` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/)
+* `labels` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification)
 
-* `annotations` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `annotations` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification).
 
 * `builds` - Deprecated. Use `build`.
 
-* `build` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `build` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification).
 
 ### Build
 
 The `build` block contains the following, for each asset build:
 
-* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `sha512` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification).
 
-* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `url` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification).
 
-* `filters` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `filters` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification).
 
-* `headers` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/reference/assets/).
+* `headers` - See the [Sensu asset reference](https://docs.sensu.io/sensu-go/latest/plugins/assets/#asset-specification).
