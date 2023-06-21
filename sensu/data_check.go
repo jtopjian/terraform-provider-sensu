@@ -155,6 +155,8 @@ func dataSourceCheck() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+
+			"secrets": dataSecretValuesSchema,
 		},
 	}
 }
@@ -222,6 +224,11 @@ func dataSourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	subdues := flattenTimeWindows(check.Subdue)
 	if err := d.Set("subdue", subdues); err != nil {
 		return fmt.Errorf("Unable to set %s.subdue: %s", name, err)
+	}
+
+	secretValues := flattenSecretValues(check.Secrets)
+	if err := d.Set("secrets", secretValues); err != nil {
+		return fmt.Errorf("Unable to set %s.secrets: %s", name, err)
 	}
 
 	return nil

@@ -38,16 +38,16 @@ func TestAccResourceSilenced_basic(t *testing.T) {
 }
 
 const testAccResourceSilenced_basic = `
-  resource "sensu_silenced" "silenced_1" {
-    check = "check_1"
-    subscription = "subscription_1"
-  }
+	resource "sensu_silenced" "silenced_1" {
+		check = "check_1"
+		subscription = "subscription_1"
+	}
 `
 
 const testAccResourceSilenced_update = `
-  resource "sensu_silenced" "silenced_1" {
-    check = "check_1"
-    subscription = "subscription_1"
-    begin = "Jan 02 2020 3:04PM MST"
-  }
+	resource "sensu_silenced" "silenced_1" {
+		check = "check_1"
+		subscription = "subscription_1"
+		begin = "Jan 02 2020 3:04PM MST"
+	}
 `

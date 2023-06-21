@@ -30,9 +30,9 @@ func TestAccDataSourceRole_basic(t *testing.T) {
 }
 
 var testAccDataSourceRole_basic = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_role" "role_1" {
-    name = "${sensu_role.role_1.name}"
-  }
+	data "sensu_role" "role_1" {
+		name = "${sensu_role.role_1.name}"
+	}
 `, testAccResourceRole_basic)

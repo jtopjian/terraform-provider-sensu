@@ -115,6 +115,54 @@ func TestAccResourceHandler_runtimeAssets(t *testing.T) {
 	})
 }
 
+func TestAccResourceHandler_secrets(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceHandler_secrets_1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "secrets.foo", "bar"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceHandler_secrets_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "secrets.foo", "bar"),
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "secrets.bar", "baz"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceHandler_secrets_3,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "secrets.foo", "barr"),
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "secrets.bar", "baz"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceHandler_secrets_4,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_handler.handler_1", "secrets.foo", "barr"),
+					resource.TestCheckNoResourceAttr("sensu_handler.handler_1", "secrets.bar"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceHandler_secrets_5,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("sensu_handler.handler_1", "secrets"),
+				),
+			},
+		},
+	})
+}
+
 const testAccResourceHandler_basicPipe = `
   resource "sensu_handler" "handler_1" {
     name = "handler_1"
@@ -205,3 +253,57 @@ var testAccResourceHandler_runtimeAssets_2 = fmt.Sprintf(`
     command = "/bin/foo"
   }
 `, testAccResourceAsset_basic)
+
+const testAccResourceHandler_secrets_1 = `
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+		secrets = {
+			"foo" = "bar",
+		}
+	}
+`
+
+const testAccResourceHandler_secrets_2 = `
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+		secrets = {
+			"foo" = "bar",
+			"bar" = "baz",
+		}
+	}
+`
+
+const testAccResourceHandler_secrets_3 = `
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+		secrets = {
+			"foo" = "barr",
+			"bar" = "baz",
+		}
+	}
+`
+
+const testAccResourceHandler_secrets_4 = `
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+		secrets = {
+			"foo" = "barr",
+		}
+	}
+`
+
+const testAccResourceHandler_secrets_5 = `
+  resource "sensu_handler" "handler_1" {
+    name = "handler_1"
+    type = "pipe"
+    command = "/bin/foo"
+	}
+`

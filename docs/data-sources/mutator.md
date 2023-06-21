@@ -27,3 +27,5 @@ data "sensu_mutator" "mutator_1" {
 * `timeout` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-transform/mutators/#mutator-specification).
 
 * `env_vars` - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-transform/mutators/#mutator-specification).
+
+* `secrets` - *Optional* - See the [Sensu mutator reference](https://docs.sensu.io/sensu-go/latest/observability-pipeline/observe-transform/mutators/#mutator-specification).

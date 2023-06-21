@@ -74,62 +74,62 @@ func TestAccResourceFilter_runtimeAssets(t *testing.T) {
 }
 
 const testAccResourceFilter_basic = `
-  resource "sensu_filter" "filter_1" {
-    name = "filter_1"
-    action = "allow"
-    expressions = [
-      "event.Check.Team == 'ops'",
-    ]
+	resource "sensu_filter" "filter_1" {
+		name = "filter_1"
+		action = "allow"
+		expressions = [
+			"event.Check.Team == 'ops'",
+		]
 
-    when {
-      day = "monday"
-      begin = "09:00AM"
-      end = "05:00PM"
-    }
-  }
+		when {
+			day = "monday"
+			begin = "09:00AM"
+			end = "05:00PM"
+		}
+	}
 `
 
 const testAccResourceFilter_update = `
-  resource "sensu_filter" "filter_1" {
-    name = "filter_1"
-    action = "deny"
-    expressions = [
-      "event.Check.Team == 'ops'",
-      "event.Check.Team == 'dev'",
-    ]
+	resource "sensu_filter" "filter_1" {
+		name = "filter_1"
+		action = "deny"
+		expressions = [
+			"event.Check.Team == 'ops'",
+			"event.Check.Team == 'dev'",
+		]
 
-    when {
-      day = "tuesday"
-      begin = "09:00AM"
-      end = "05:00PM"
-    }
-  }
+		when {
+			day = "tuesday"
+			begin = "09:00AM"
+			end = "05:00PM"
+		}
+	}
 `
 
 var testAccResourceFilter_runtimeAssets_1 = fmt.Sprintf(`
-  %s
+	%s
 
-  resource "sensu_filter" "filter_1" {
-    name = "filter_1"
-    action = "allow"
-    expressions = [
-      "event.Check.Team == 'ops'",
-    ]
-
-    runtime_assets = [
-      "${sensu_asset.asset_1.name}"
+	resource "sensu_filter" "filter_1" {
+		name = "filter_1"
+		action = "allow"
+		expressions = [
+			"event.Check.Team == 'ops'",
 		]
-  }
+
+		runtime_assets = [
+			"${sensu_asset.asset_1.name}"
+		]
+	}
 `, testAccResourceAsset_basic)
 
 var testAccResourceFilter_runtimeAssets_2 = fmt.Sprintf(`
-  %s
+	%s
 
-  resource "sensu_filter" "filter_1" {
-    name = "filter_1"
-    action = "allow"
-    expressions = [
-      "event.Check.Team == 'ops'",
-    ]
-  }
+	resource "sensu_filter" "filter_1" {
+		name = "filter_1"
+		action = "allow"
+		expressions = [
+			"event.Check.Team == 'ops'",
+		]
+	}
 `, testAccResourceAsset_basic)

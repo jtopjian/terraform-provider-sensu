@@ -26,10 +26,10 @@ func TestAccDataSourceSilenced_basic(t *testing.T) {
 }
 
 var testAccDataSourceSilenced_basic = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_silenced" "silenced_1" {
+	data "sensu_silenced" "silenced_1" {
 	check = "${sensu_silenced.silenced_1.check}"
-    subscription = "${sensu_silenced.silenced_1.subscription}"
-  }
+		subscription = "${sensu_silenced.silenced_1.subscription}"
+	}
 `, testAccResourceSilenced_basic)

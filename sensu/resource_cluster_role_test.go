@@ -45,18 +45,18 @@ func TestAccResourceClusterRole_basic(t *testing.T) {
 }
 
 const testAccResourceClusterRole_basic = `
-  resource "sensu_cluster_role" "cluster_role_1" {
-    name = "cluster_role_1"
+	resource "sensu_cluster_role" "cluster_role_1" {
+		name = "cluster_role_1"
 
-    rule {
-      verbs = ["*"]
-      resources = ["checks"]
-    }
+		rule {
+			verbs = ["*"]
+			resources = ["checks"]
+		}
 
-    rule {
-      verbs = ["get", "list"]
-      resources = ["assets", "filters"]
-    }
+		rule {
+			verbs = ["get", "list"]
+			resources = ["assets", "filters"]
+		}
 
-  }
+	}
 `

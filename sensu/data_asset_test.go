@@ -62,25 +62,25 @@ func TestAccDataSourceAsset_multipleBuild(t *testing.T) {
 }
 
 var testAccDataSourceAsset_basic = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_asset" "asset_1" {
-    name = "${sensu_asset.asset_1.name}"
-  }
+	data "sensu_asset" "asset_1" {
+		name = "${sensu_asset.asset_1.name}"
+	}
 `, testAccResourceAsset_basic)
 
 var testAccDataSourceAsset_headers = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_asset" "asset_1" {
-    name = "${sensu_asset.asset_1.name}"
-  }
+	data "sensu_asset" "asset_1" {
+		name = "${sensu_asset.asset_1.name}"
+	}
 `, testAccResourceAsset_headers_1)
 
 var testAccDataSourceAsset_multipleBuild = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_asset" "asset_1" {
-    name = "${sensu_asset.asset_1.name}"
-  }
+	data "sensu_asset" "asset_1" {
+		name = "${sensu_asset.asset_1.name}"
+	}
 `, testAccResourceAsset_createMultipleBuild_1)

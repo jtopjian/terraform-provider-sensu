@@ -100,35 +100,35 @@ func TestAccDataSourceCheck_proxyRequests(t *testing.T) {
 }
 
 var testAccDataSourceCheck_basic = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_check" "check_1" {
-    name = "${sensu_check.check_1.name}"
-  }
+	data "sensu_check" "check_1" {
+		name = "${sensu_check.check_1.name}"
+	}
 `, testAccResourceCheck_basic)
 
 var testAccDataSourceCheck_subdue = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_check" "check_1" {
-    name = "${sensu_check.check_1.name}"
-  }
+	data "sensu_check" "check_1" {
+		name = "${sensu_check.check_1.name}"
+	}
 `, testAccResourceCheck_subdue_1)
 
 var testAccDataSourceCheck_annotations = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_check" "check_1" {
-    name = "${sensu_check.check_1.name}"
-  }
+	data "sensu_check" "check_1" {
+		name = "${sensu_check.check_1.name}"
+	}
 `, testAccResourceCheck_annotations_1)
 
 var testAccDataSourceCheck_labels = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_check" "check_1" {
-    name = "${sensu_check.check_1.name}"
-  }
+	data "sensu_check" "check_1" {
+		name = "${sensu_check.check_1.name}"
+	}
 `, testAccResourceCheck_labels_1)
 
 var testAccDataSourceCheck_proxyRequests = fmt.Sprintf(`

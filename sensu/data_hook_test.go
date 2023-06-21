@@ -26,9 +26,9 @@ func TestAccDataSourceHook_basic(t *testing.T) {
 }
 
 var testAccDataSourceHook_basic = fmt.Sprintf(`
-  %s
+	%s
 
-  data "sensu_hook" "hook_1" {
-    name = "${sensu_hook.hook_1.name}"
-  }
+	data "sensu_hook" "hook_1" {
+		name = "${sensu_hook.hook_1.name}"
+	}
 `, testAccResourceHook_basic)

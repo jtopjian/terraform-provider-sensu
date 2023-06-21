@@ -76,6 +76,8 @@ func dataSourceHandler() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+
+			"secrets": dataSecretValuesSchema,
 		},
 	}
 }
@@ -110,6 +112,11 @@ func dataSourceHandlerRead(d *schema.ResourceData, meta interface{}) error {
 	envVars := flattenEnvVars(handler.EnvVars)
 	if err := d.Set("env_vars", envVars); err != nil {
 		return fmt.Errorf("Unable to set %s.env_vars: %s", name, err)
+	}
+
+	secretValues := flattenSecretValues(handler.Secrets)
+	if err := d.Set("secrets", secretValues); err != nil {
+		return fmt.Errorf("Unable to set %s.secrets: %s", name, err)
 	}
 
 	return nil

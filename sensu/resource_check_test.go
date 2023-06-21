@@ -255,6 +255,54 @@ func TestAccResourceCheck_envVars(t *testing.T) {
 	})
 }
 
+func TestAccResourceCheck_secrets(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_secrets_1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "secrets.foo", "bar"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_secrets_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "secrets.foo", "bar"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "secrets.bar", "baz"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_secrets_3,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "secrets.foo", "barr"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "secrets.bar", "baz"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_secrets_4,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "secrets.foo", "barr"),
+					resource.TestCheckNoResourceAttr("sensu_check.check_1", "secrets.bar"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_secrets_5,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("sensu_check.check_1", "secrets"),
+				),
+			},
+		},
+	})
+}
+
 const testAccResourceCheck_basic = `
 	resource "sensu_check" "check_1" {
 		name = "check_1"
@@ -615,6 +663,85 @@ const testAccResourceCheck_envvars_4 = `
 `
 
 const testAccResourceCheck_envvars_5 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+	}
+`
+
+const testAccResourceCheck_secrets_1 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		secrets = {
+			"foo" = "bar",
+		}
+	}
+`
+
+const testAccResourceCheck_secrets_2 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		secrets = {
+			"foo" = "bar",
+			"bar" = "baz",
+		}
+	}
+`
+
+const testAccResourceCheck_secrets_3 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		secrets = {
+			"foo" = "barr",
+			"bar" = "baz",
+		}
+	}
+`
+
+const testAccResourceCheck_secrets_4 = `
+	resource "sensu_check" "check_1" {
+		name = "check_1"
+		command = "/bin/foo"
+		interval = 60000
+		subscriptions = [
+			"foo",
+			"bar",
+			"baz",
+		]
+		secrets = {
+			"foo" = "barr",
+		}
+	}
+`
+
+const testAccResourceCheck_secrets_5 = `
 	resource "sensu_check" "check_1" {
 		name = "check_1"
 		command = "/bin/foo"
