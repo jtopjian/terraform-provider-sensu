@@ -1,4 +1,10 @@
-## 0.13.0 (Unreleased)
+## 0.14.0 (Unreleased)
+
+## 0.13.0 (June 21, 2023)
+
+IMPROVEMENTS
+
+* Added support for "secrets" [GH-57](https://github.com/jtopjian/terraform-provider-sensu/pull/57)
 
 ## 0.12.2 (February 26, 2023)
 
