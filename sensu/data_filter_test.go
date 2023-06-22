@@ -50,17 +50,17 @@ func TestAccDataSourceFilter_runtimeAssets(t *testing.T) {
 }
 
 var testAccDataSourceFilter_basic = fmt.Sprintf(`
-	%s
+  %s
 
-	data "sensu_filter" "filter_1" {
-		name = "${sensu_filter.filter_1.name}"
-	}
+  data "sensu_filter" "filter_1" {
+    name = "${sensu_filter.filter_1.name}"
+  }
 `, testAccResourceFilter_basic)
 
 var testAccDataSourceFilter_runtimeAssets = fmt.Sprintf(`
-	%s
+  %s
 
-	data "sensu_filter" "filter_1" {
-		name = "${sensu_filter.filter_1.name}"
-	}
+  data "sensu_filter" "filter_1" {
+    name = "${sensu_filter.filter_1.name}"
+  }
 `, testAccResourceFilter_runtimeAssets_1)

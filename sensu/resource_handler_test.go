@@ -169,9 +169,9 @@ const testAccResourceHandler_basicPipe = `
     type = "pipe"
     command = "/bin/foo"
 
-		env_vars = {
-			FOO = "bar"
-		}
+    env_vars = {
+      FOO = "bar"
+    }
   }
 `
 
@@ -240,7 +240,7 @@ var testAccResourceHandler_runtimeAssets_1 = fmt.Sprintf(`
 
     runtime_assets = [
       "${sensu_asset.asset_1.name}"
-		]
+    ]
   }
 `, testAccResourceAsset_basic)
 
@@ -259,10 +259,10 @@ const testAccResourceHandler_secrets_1 = `
     name = "handler_1"
     type = "pipe"
     command = "/bin/foo"
-		secrets = {
-			"foo" = "bar",
-		}
-	}
+    secrets = {
+      "foo" = "bar",
+    }
+  }
 `
 
 const testAccResourceHandler_secrets_2 = `
@@ -270,11 +270,11 @@ const testAccResourceHandler_secrets_2 = `
     name = "handler_1"
     type = "pipe"
     command = "/bin/foo"
-		secrets = {
-			"foo" = "bar",
-			"bar" = "baz",
-		}
-	}
+    secrets = {
+      "foo" = "bar",
+      "bar" = "baz",
+    }
+  }
 `
 
 const testAccResourceHandler_secrets_3 = `
@@ -282,11 +282,11 @@ const testAccResourceHandler_secrets_3 = `
     name = "handler_1"
     type = "pipe"
     command = "/bin/foo"
-		secrets = {
-			"foo" = "barr",
-			"bar" = "baz",
-		}
-	}
+    secrets = {
+      "foo" = "barr",
+      "bar" = "baz",
+    }
+  }
 `
 
 const testAccResourceHandler_secrets_4 = `
@@ -294,10 +294,10 @@ const testAccResourceHandler_secrets_4 = `
     name = "handler_1"
     type = "pipe"
     command = "/bin/foo"
-		secrets = {
-			"foo" = "barr",
-		}
-	}
+    secrets = {
+      "foo" = "barr",
+    }
+  }
 `
 
 const testAccResourceHandler_secrets_5 = `
@@ -305,5 +305,5 @@ const testAccResourceHandler_secrets_5 = `
     name = "handler_1"
     type = "pipe"
     command = "/bin/foo"
-	}
+  }
 `

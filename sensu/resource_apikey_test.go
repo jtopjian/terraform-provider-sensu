@@ -28,15 +28,15 @@ func TestAccResourceAPIKey_basic(t *testing.T) {
 
 func testAccResourceAPIKey_basic(username string) string {
 	return fmt.Sprintf(`
-		resource "sensu_user" "user_1" {
-			name = "%s"
-			password = "abcd1234"
-			groups = ["admin"]
-			disabled = false
-		}
+    resource "sensu_user" "user_1" {
+      name = "%s"
+      password = "abcd1234"
+      groups = ["admin"]
+      disabled = false
+    }
 
-		resource "sensu_apikey" "apikey_1" {
-			username = sensu_user.user_1.name
-		}
-	`, username)
+    resource "sensu_apikey" "apikey_1" {
+      username = sensu_user.user_1.name
+    }
+  `, username)
 }

@@ -59,53 +59,53 @@ func TestAccResourceEntity_basic(t *testing.T) {
 }
 
 const testAccResourceEntity_basic = `
-	resource "sensu_entity" "entity_1" {
-		name = "entity_1"
-		class = "proxy"
-		labels = {
-			foo = "bar"
-			password = "supersecret"
-		}
-		annotations = {
-			password = "supersecret"
-		}
-		subscriptions = [
-			"foo",
-			"bar",
-			"baz",
-		]
-		deregistration {
-			handler = "foo"
-		}
-	}
+  resource "sensu_entity" "entity_1" {
+    name = "entity_1"
+    class = "proxy"
+    labels = {
+      foo = "bar"
+      password = "supersecret"
+    }
+    annotations = {
+      password = "supersecret"
+    }
+    subscriptions = [
+      "foo",
+      "bar",
+      "baz",
+    ]
+    deregistration {
+      handler = "foo"
+    }
+  }
 `
 
 const testAccResourceEntity_update_1 = `
-	resource "sensu_entity" "entity_1" {
-		name = "entity_1"
-		class = "proxy"
-		labels = {
-			foo = "bar"
-			password = "supersecret"
-		}
-		subscriptions = [
-			"foo",
-			"baz",
-		]
-	}
+  resource "sensu_entity" "entity_1" {
+    name = "entity_1"
+    class = "proxy"
+    labels = {
+      foo = "bar"
+      password = "supersecret"
+    }
+    subscriptions = [
+      "foo",
+      "baz",
+    ]
+  }
 `
 
 const testAccResourceEntity_update_2 = `
-	resource "sensu_entity" "entity_1" {
-		name = "entity_1"
-		class = "proxy"
-		labels = {
-			foo = "baz"
-			password = "supersecret"
-		}
-		subscriptions = [
-			"foo",
-			"baz",
-		]
-	}
+  resource "sensu_entity" "entity_1" {
+    name = "entity_1"
+    class = "proxy"
+    labels = {
+      foo = "baz"
+      password = "supersecret"
+    }
+    subscriptions = [
+      "foo",
+      "baz",
+    ]
+  }
 `

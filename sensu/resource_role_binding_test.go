@@ -36,17 +36,17 @@ func testAccResourceRoleBinding_basic(username string) string {
 	userResource := testAccResourceUser_basic(username)
 
 	return fmt.Sprintf(`
-		%s
+    %s
 
-		%s
+    %s
 
-		resource "sensu_role_binding" "role_binding_1" {
-			name = "role_binding_1"
+    resource "sensu_role_binding" "role_binding_1" {
+      name = "role_binding_1"
 
-			binding_type = "role"
-			role = "${sensu_role.role_1.name}"
+      binding_type = "role"
+      role = "${sensu_role.role_1.name}"
 
-			users = ["${sensu_user.user_1.name}"]
-		}
-	`, testAccResourceRole_basic, userResource)
+      users = ["${sensu_user.user_1.name}"]
+    }
+  `, testAccResourceRole_basic, userResource)
 }

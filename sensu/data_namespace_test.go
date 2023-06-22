@@ -24,9 +24,9 @@ func TestAccDataSourceNamespace_basic(t *testing.T) {
 }
 
 var testAccDataSourceNamespace_basic = fmt.Sprintf(`
-	%s
+  %s
 
-	data "sensu_namespace" "namespace_1" {
-		name = "${sensu_namespace.namespace_1.name}"
-	}
+  data "sensu_namespace" "namespace_1" {
+    name = "${sensu_namespace.namespace_1.name}"
+  }
 `, testAccResourceNamespace_basic)

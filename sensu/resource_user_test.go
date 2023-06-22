@@ -86,55 +86,55 @@ func TestAccResourceUser_disabled(t *testing.T) {
 
 func testAccResourceUser_basic(username string) string {
 	return fmt.Sprintf(`
-		resource "sensu_user" "user_1" {
-			name = "%s"
-			password = "abcd1234"
-			groups = ["admin"]
-			disabled = false
-		}
-	`, username)
+    resource "sensu_user" "user_1" {
+      name = "%s"
+      password = "abcd1234"
+      groups = ["admin"]
+      disabled = false
+    }
+  `, username)
 }
 
 func testAccResourceUser_update(username string) string {
 	return fmt.Sprintf(`
-		resource "sensu_user" "user_1" {
-			name = "%s"
-			password = "abcd1234"
-			groups = ["admin", "read-only"]
-			disabled = false
-		}
-	`, username)
+    resource "sensu_user" "user_1" {
+      name = "%s"
+      password = "abcd1234"
+      groups = ["admin", "read-only"]
+      disabled = false
+    }
+  `, username)
 }
 
 func testAccResourceUser_password_1(username string) string {
 	return fmt.Sprintf(`
-		resource "sensu_user" "user_1" {
-			name = "%s"
-			password = "abcd1234"
-			groups = ["admin"]
-			disabled = false
-		}
-	`, username)
+    resource "sensu_user" "user_1" {
+      name = "%s"
+      password = "abcd1234"
+      groups = ["admin"]
+      disabled = false
+    }
+  `, username)
 }
 
 func testAccResourceUser_password_2(username string) string {
 	return fmt.Sprintf(`
-		resource "sensu_user" "user_1" {
-			name = "%s"
-			password = "1234abcd"
-			groups = ["admin"]
-			disabled = false
-		}
-	`, username)
+    resource "sensu_user" "user_1" {
+      name = "%s"
+      password = "1234abcd"
+      groups = ["admin"]
+      disabled = false
+    }
+  `, username)
 }
 
 func testAccResourceUser_disabled(username string) string {
 	return fmt.Sprintf(`
-		resource "sensu_user" "user_1" {
-			name = "%s"
-			password = "1234abcd"
-			groups = ["admin"]
-			disabled = true
-		}
-	`, username)
+    resource "sensu_user" "user_1" {
+      name = "%s"
+      password = "1234abcd"
+      groups = ["admin"]
+      disabled = true
+    }
+  `, username)
 }

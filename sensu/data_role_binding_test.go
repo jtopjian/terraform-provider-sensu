@@ -35,10 +35,10 @@ func TestAccDataSourceRoleBinding_basic(t *testing.T) {
 func testAccDataSourceRoleBinding_basic(username string) string {
 	roleBindingResource := testAccResourceRoleBinding_basic(username)
 	return fmt.Sprintf(`
-		%s
+    %s
 
-		data "sensu_role_binding" "role_binding_1" {
-			name = "${sensu_role_binding.role_binding_1.name}"
-		}
-	`, roleBindingResource)
+    data "sensu_role_binding" "role_binding_1" {
+      name = "${sensu_role_binding.role_binding_1.name}"
+    }
+  `, roleBindingResource)
 }
