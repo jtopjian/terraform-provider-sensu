@@ -40,15 +40,15 @@ func testAccResourceClusterRoleBinding_basic(username string) string {
 	userResource := testAccResourceUser_basic(username)
 
 	return fmt.Sprintf(`
-		%s
+    %s
 
-		%s
+    %s
 
-		resource "sensu_cluster_role_binding" "cluster_role_binding_1" {
-			name = "cluster_role_binding_1"
-			cluster_role = "${sensu_cluster_role.cluster_role_1.name}"
-			users = ["${sensu_user.user_1.name}"]
-						groups = ["group_0", "group_1"]
-		}
-	`, testAccResourceClusterRole_basic, userResource)
+    resource "sensu_cluster_role_binding" "cluster_role_binding_1" {
+      name = "cluster_role_binding_1"
+      cluster_role = "${sensu_cluster_role.cluster_role_1.name}"
+      users = ["${sensu_user.user_1.name}"]
+            groups = ["group_0", "group_1"]
+    }
+  `, testAccResourceClusterRole_basic, userResource)
 }

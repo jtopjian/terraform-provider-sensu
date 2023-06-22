@@ -24,9 +24,9 @@ func TestAccDataSourceEntity_basic(t *testing.T) {
 }
 
 var testAccDataSourceEntity_basic = fmt.Sprintf(`
-	%s
+  %s
 
-	data "sensu_entity" "entity_1" {
-		name = "${sensu_entity.entity_1.name}"
-	}
+  data "sensu_entity" "entity_1" {
+    name = "${sensu_entity.entity_1.name}"
+  }
 `, testAccResourceEntity_basic)

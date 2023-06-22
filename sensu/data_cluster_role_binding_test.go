@@ -39,10 +39,10 @@ func TestAccDataSourceClusterRoleBinding_basic(t *testing.T) {
 func testAccDataSourceClusterRoleBinding_basic(username string) string {
 	clusterRoleBindingResource := testAccResourceClusterRoleBinding_basic(username)
 	return fmt.Sprintf(`
-		%s
+  %s
 
-		data "sensu_cluster_role_binding" "cluster_role_binding_1" {
-			name = "${sensu_cluster_role_binding.cluster_role_binding_1.name}"
-		}
+  data "sensu_cluster_role_binding" "cluster_role_binding_1" {
+    name = "${sensu_cluster_role_binding.cluster_role_binding_1.name}"
+  }
 	`, clusterRoleBindingResource)
 }

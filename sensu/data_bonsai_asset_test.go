@@ -61,43 +61,43 @@ func TestAccDataSourceBonsaiAsset_createAssetFromBonsaiMultipleBuilds(t *testing
 }
 
 const testAccDataSourceBonsaiAsset_basic = `
-	data "sensu_bonsai_asset" "bonsai_asset_1" {
-		name = "sensu-plugins/sensu-plugins-cpu-checks"
-		version = "4.1.0"
-	}
+  data "sensu_bonsai_asset" "bonsai_asset_1" {
+    name = "sensu-plugins/sensu-plugins-cpu-checks"
+    version = "4.1.0"
+  }
 `
 
 const testAccDataSourceBonsaiAsset_createAssetFromBonsai = `
-	data "sensu_bonsai_asset" "bonsai_asset_1" {
-		name = "sensu-plugins/sensu-plugins-cpu-checks"
-		version = "4.1.0"
-	}
+  data "sensu_bonsai_asset" "bonsai_asset_1" {
+    name = "sensu-plugins/sensu-plugins-cpu-checks"
+    version = "4.1.0"
+  }
 
-	resource "sensu_asset" "asset_1" {
-		name = data.sensu_bonsai_asset.bonsai_asset_1.annotations["io.sensu.bonsai.name"]
-		sha512 = data.sensu_bonsai_asset.bonsai_asset_1.build.0.sha512
-		url = data.sensu_bonsai_asset.bonsai_asset_1.build.0.url
-		filters = data.sensu_bonsai_asset.bonsai_asset_1.build.0.filters
-	}
+  resource "sensu_asset" "asset_1" {
+    name = data.sensu_bonsai_asset.bonsai_asset_1.annotations["io.sensu.bonsai.name"]
+    sha512 = data.sensu_bonsai_asset.bonsai_asset_1.build.0.sha512
+    url = data.sensu_bonsai_asset.bonsai_asset_1.build.0.url
+    filters = data.sensu_bonsai_asset.bonsai_asset_1.build.0.filters
+  }
 `
 
 const testAccDataSourceBonsaiAsset_createAssetFromBonsaiMultipleBuilds = `
-	data "sensu_bonsai_asset" "bonsai_asset_1" {
-		name = "sensu-plugins/sensu-plugins-cpu-checks"
-		version = "4.1.0"
-	}
+  data "sensu_bonsai_asset" "bonsai_asset_1" {
+    name = "sensu-plugins/sensu-plugins-cpu-checks"
+    version = "4.1.0"
+  }
 
-	resource "sensu_asset" "asset_1" {
-		name = data.sensu_bonsai_asset.bonsai_asset_1.annotations["io.sensu.bonsai.name"]
+  resource "sensu_asset" "asset_1" {
+    name = data.sensu_bonsai_asset.bonsai_asset_1.annotations["io.sensu.bonsai.name"]
 
-		dynamic "build" {
-			for_each = data.sensu_bonsai_asset.bonsai_asset_1.build
-			content {
-				sha512 = build.value["sha512"]
-				url = build.value["url"]
-				filters = build.value["filters"]
-				headers = build.value["headers"]
-			}
-		}
-	}
+    dynamic "build" {
+      for_each = data.sensu_bonsai_asset.bonsai_asset_1.build
+      content {
+        sha512 = build.value["sha512"]
+        url = build.value["url"]
+        filters = build.value["filters"]
+        headers = build.value["headers"]
+      }
+    }
+  }
 `

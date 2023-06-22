@@ -38,16 +38,16 @@ func TestAccResourceHook_basic(t *testing.T) {
 }
 
 const testAccResourceHook_basic = `
-	resource "sensu_hook" "hook_1" {
-		name = "hook_1"
-		command = "/bin/foo"
-	}
+  resource "sensu_hook" "hook_1" {
+    name = "hook_1"
+    command = "/bin/foo"
+  }
 `
 
 const testAccResourceHook_update = `
-	resource "sensu_hook" "hook_1" {
-		name = "hook_1"
-		command = "/bin/foo"
-		stdin = "true"
-	}
+  resource "sensu_hook" "hook_1" {
+    name = "hook_1"
+    command = "/bin/foo"
+    stdin = "true"
+  }
 `
