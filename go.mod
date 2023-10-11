@@ -14,8 +14,7 @@ require (
 	github.com/sensu/sensu-go v0.0.0-20221027183945-cd8638430844
 	github.com/sensu/sensu-go/types v0.12.0-alpha7
 	go.uber.org/atomic v1.10.0 // indirect
-	golang.org/x/crypto v0.3.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
