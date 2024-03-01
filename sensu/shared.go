@@ -604,6 +604,47 @@ func flattenCheckProxyRequests(v *types.ProxyRequests) []map[string]interface{} 
 	return proxyRequests
 }
 
+func expandCheckPipelines(v []interface{}) []*v2.ResourceReference {
+	var pipelines []*v2.ResourceReference
+
+	for _, v := range v {
+		var resourceReference v2.ResourceReference
+		pipeline := v.(map[string]interface{})
+
+		// api_version
+		if raw, ok := pipeline["api_version"]; ok {
+			resourceReference.APIVersion = raw.(string)
+		}
+
+		// type
+		if raw, ok := pipeline["type"]; ok {
+			resourceReference.Type = raw.(string)
+		}
+
+		// name
+		if raw, ok := pipeline["name"]; ok {
+			resourceReference.Name = raw.(string)
+		}
+		pipelines = append(pipelines, &resourceReference)
+	}
+
+	return pipelines
+}
+
+func flattenCheckPipelines(v []*v2.ResourceReference) []map[string]interface{} {
+	var pipelines []map[string]interface{}
+
+	for _, v := range v {
+		rr := make(map[string]interface{})
+		rr["api_version"] = v.APIVersion
+		rr["type"] = v.Type
+		rr["name"] = v.Name
+		pipelines = append(pipelines, rr)
+	}
+
+	return pipelines
+}
+
 // Secret Values
 var resourceSecretValuesSchema = &schema.Schema{
 	Type:     schema.TypeMap,
