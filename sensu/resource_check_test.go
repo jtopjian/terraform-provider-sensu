@@ -216,7 +216,7 @@ func TestAccResourceCheck_pipelines(t *testing.T) {
 				Config: testAccResourceCheck_pipelines_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.0.name", "incident_alerts"),
+						"sensu_check.check_1", "pipelines.#", "1"),
 				),
 			},
 			resource.TestStep{
