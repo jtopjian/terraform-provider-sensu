@@ -20,7 +20,7 @@ jobs:
       SENSU_PASSWORD: "P@ssw0rd!"
       SENSU_ENVIRONMENT: "default"
       SENSU_ORGANIZATION: "default"
-      SENSU_VERSION: "5.21.0"
+      SENSU_VERSION: "6.11.0"
 
     steps:
       - name: Setup Go ${{ matrix.go-version }}

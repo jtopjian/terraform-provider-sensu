@@ -216,7 +216,11 @@ func TestAccResourceCheck_pipelines(t *testing.T) {
 				Config: testAccResourceCheck_pipelines_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.#", "1"),
+						"sensu_check.check_1", "pipelines.0.name", "incident_alerts"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "pipelines.1.name", "low_priority_alerts"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "pipelines.1.type", "Pipeline"),
 				),
 			},
 			resource.TestStep{
@@ -638,6 +642,11 @@ const testAccResourceCheck_pipelines_1 = `
 		api_version = "core/v2"
         type = "Pipeline"
         name = "incident_alerts"
+	}
+	pipelines {
+		api_version = "core/v2"
+        type = "Pipeline"
+        name = "low_priority_alerts"
 	}
     publish = true
     subscriptions = ["proxy"]
