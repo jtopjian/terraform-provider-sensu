@@ -207,6 +207,29 @@ func TestAccResourceCheck_proxyRequests(t *testing.T) {
 	})
 }
 
+func TestAccResourceCheck_pipelines(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_pipelines_1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "pipelines.0.name", "incident_alerts"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_pipelines_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "pipelines.#", "0"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccResourceCheck_envVars(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -577,6 +600,51 @@ const testAccResourceCheck_proxyRequests_1 = `
 `
 
 const testAccResourceCheck_proxyRequests_2 = `
+  resource "sensu_entity" "entities" {
+    count = 3
+    name = format("entity-%02d", count.index+1)
+    class = "proxy"
+    labels = {
+      "proxy_type" = "website"
+      "url" = format("http://example-%02d.com", count.index+1)
+    }
+  }
+
+  resource "sensu_check" "check_1" {
+    name = "check-http"
+    command = "check-http.rb -u {{ .labels url }}"
+    interval = 60
+    publish = true
+    subscriptions = ["proxy"]
+  }
+`
+
+const testAccResourceCheck_pipelines_1 = `
+  resource "sensu_entity" "entities" {
+    count = 3
+    name = format("entity-%02d", count.index+1)
+    class = "proxy"
+    labels = {
+      "proxy_type" = "website"
+      "url" = format("http://example-%02d.com", count.index+1)
+    }
+  }
+
+  resource "sensu_check" "check_1" {
+    name = "check-http"
+    command = "check-http.rb -u {{ .labels url }}"
+    interval = 60
+    pipelines {
+		api_version = "core/v2"
+  		type = "Pipeline"
+  		name = "incident_alerts"
+	}
+    publish = true
+    subscriptions = ["proxy"]
+  }
+`
+
+const testAccResourceCheck_pipelines_2 = `
   resource "sensu_entity" "entities" {
     count = 3
     name = format("entity-%02d", count.index+1)
