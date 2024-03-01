@@ -1,6 +1,6 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 TARGETS=darwin linux windows
-SENSU_VERSION=5.21.0
+SENSU_VERSION=6.11.0
 
 docker:
 	docker-compose down || true
