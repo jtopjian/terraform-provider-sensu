@@ -570,9 +570,11 @@ func resourceCheckDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to retrieve check %s: %s", name, err)
 	}
 
-	if err := config.client.DeleteCheck(config.namespace, name); err != nil {
-		return fmt.Errorf("Unable to delete check %s: %s", name, err)
-	}
+	/*
+		if err := config.client.DeleteCheck(config.namespace, name); err != nil {
+			return fmt.Errorf("Unable to delete check %s: %s", name, err)
+		}
+	*/
 
 	return nil
 }

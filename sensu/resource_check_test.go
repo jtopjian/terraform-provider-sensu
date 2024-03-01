@@ -636,8 +636,8 @@ const testAccResourceCheck_pipelines_1 = `
     interval = 60
     pipelines {
 		api_version = "core/v2"
-  		type = "Pipeline"
-  		name = "incident_alerts"
+        type = "Pipeline"
+        name = "incident_alerts"
 	}
     publish = true
     subscriptions = ["proxy"]
