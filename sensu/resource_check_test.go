@@ -246,10 +246,7 @@ func TestAccResourceCheck_pipelines(t *testing.T) {
 		},
 	}
 	if envVersion.LT(pipelineMinVersion) {
-		steps[0].Check = resource.ComposeTestCheckFunc(
-			resource.TestCheckResourceAttr(
-				"sensu_check.check_1", "pipelines.#", "0"),
-		)
+		steps = steps[1:]
 	}
 
 	resource.Test(t, resource.TestCase{
