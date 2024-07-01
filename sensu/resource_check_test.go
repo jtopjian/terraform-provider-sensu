@@ -225,38 +225,37 @@ func TestAccResourceCheck_pipelines(t *testing.T) {
 		return
 	}
 
-	index0PipelineName := ""
-	index1PipelineName := ""
-	index1PipelineType := ""
-	if envVersion.GTE(pipelineMinVersion) {
-		index0PipelineName = "incident_alerts"
-		index1PipelineName = "low_priority_alerts"
-		index1PipelineType = "Pipeline"
+	steps := []resource.TestStep{
+		resource.TestStep{
+			Config: testAccResourceCheck_pipelines_1,
+			Check: resource.ComposeTestCheckFunc(
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.0.name", "incident_alerts"),
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.1.name", "low_priority_alerts"),
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.1.type", "Pipeline"),
+			),
+		},
+		resource.TestStep{
+			Config: testAccResourceCheck_pipelines_2,
+			Check: resource.ComposeTestCheckFunc(
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.#", "0"),
+			),
+		},
+	}
+	if envVersion.LT(pipelineMinVersion) {
+		steps[0].Check = resource.ComposeTestCheckFunc(
+			resource.TestCheckResourceAttr(
+				"sensu_check.check_1", "pipelines.#", "0"),
+		)
 	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccResourceCheck_pipelines_1,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.0.name", index0PipelineName),
-					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.1.name", index1PipelineName),
-					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.1.type", index1PipelineType),
-				),
-			},
-			resource.TestStep{
-				Config: testAccResourceCheck_pipelines_2,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.#", "0"),
-				),
-			},
-		},
+		Steps:     steps,
 	})
 }
 
