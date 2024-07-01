@@ -1,8 +1,11 @@
 package sensu
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
+	"github.com/blang/semver/v4"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
@@ -208,6 +211,29 @@ func TestAccResourceCheck_proxyRequests(t *testing.T) {
 }
 
 func TestAccResourceCheck_pipelines(t *testing.T) {
+	sensuVersion := os.Getenv("SENSU_VERSION")
+
+	envVersion, err := semver.Parse(sensuVersion)
+	if err != nil {
+		fmt.Printf("Error parsing version: %v", err)
+		return
+	}
+
+	pipelineMinVersion, err := semver.Parse("6.5.0")
+	if err != nil {
+		fmt.Printf("Error parsing version: %v", err)
+		return
+	}
+
+	index0PipelineName := ""
+	index1PipelineName := ""
+	index1PipelineType := ""
+	if envVersion.GTE(pipelineMinVersion) {
+		index0PipelineName = "incident_alerts"
+		index1PipelineName = "low_priority_alerts"
+		index1PipelineType = "Pipeline"
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -216,11 +242,11 @@ func TestAccResourceCheck_pipelines(t *testing.T) {
 				Config: testAccResourceCheck_pipelines_1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.0.name", "incident_alerts"),
+						"sensu_check.check_1", "pipelines.0.name", index0PipelineName),
 					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.1.name", "low_priority_alerts"),
+						"sensu_check.check_1", "pipelines.1.name", index1PipelineName),
 					resource.TestCheckResourceAttr(
-						"sensu_check.check_1", "pipelines.1.type", "Pipeline"),
+						"sensu_check.check_1", "pipelines.1.type", index1PipelineType),
 				),
 			},
 			resource.TestStep{

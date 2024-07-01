@@ -1,7 +1,7 @@
 version: '3'
 services:
   backend1:
-    image: sensu/sensu:6.11.0
+    image: sensu/sensu:${SENSU_VERSION}
     command: sensu-backend start --log-level debug --debug
     hostname: backend1
     restart: always
@@ -13,7 +13,7 @@ services:
       - "6060:6060"
       - "3000:3000"
   agent1:
-    image: sensu/sensu:6.11.0
+    image: sensu/sensu:${SENSU_VERSION}
     command: sensu-agent start --backend-url ws://backend1:8081 --log-level warn --keepalive-interval 5 --keepalive-timeout 10
     hostname: agent1
     restart: always
