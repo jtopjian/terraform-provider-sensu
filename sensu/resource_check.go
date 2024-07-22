@@ -130,6 +130,27 @@ func resourceCheck() *schema.Resource {
 				},
 			},
 
+			"pipelines": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"api_version": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"type": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"name": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
+
 			"publish": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -232,6 +253,12 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 		check.ProxyRequests = &v
 	}
 
+	pipelines := d.Get("pipelines").([]interface{})
+	if len(pipelines) > 0 {
+		v := expandCheckPipelines(pipelines)
+		check.Pipelines = v
+	}
+
 	log.Printf("[DEBUG] Creating check %s: %#v", name, check)
 
 	if err := check.Validate(); err != nil {
@@ -259,6 +286,7 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("output_metric_handlers")
 	d.SetPartial("proxy_entity_name")
 	d.SetPartial("proxy_requests")
+	d.SetPartial("pipelines")
 	d.SetPartial("publish")
 	d.SetPartial("round_robin")
 	d.SetPartial("runtime_assets")
@@ -346,6 +374,11 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 	proxyRequests := flattenCheckProxyRequests(check.ProxyRequests)
 	if err := d.Set("proxy_requests", proxyRequests); err != nil {
 		return fmt.Errorf("Unable to set %s.proxy_requests: %s", name, err)
+	}
+
+	pipelines := flattenCheckPipelines(check.Pipelines)
+	if err := d.Set("pipelines", pipelines); err != nil {
+		return fmt.Errorf("Unable to set %s.pipelines: %s", name, err)
 	}
 
 	if err := d.Set("runtime_assets", check.RuntimeAssets); err != nil {
@@ -437,6 +470,16 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 			check.ProxyRequests = &v
 		} else {
 			check.ProxyRequests = nil
+		}
+	}
+
+	if d.HasChange("pipelines") {
+		pipelines := d.Get("pipelines").([]interface{})
+		if len(pipelines) > 0 {
+			v := expandCheckPipelines(pipelines)
+			check.Pipelines = v
+		} else {
+			check.Pipelines = nil
 		}
 	}
 

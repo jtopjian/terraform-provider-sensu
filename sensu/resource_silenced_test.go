@@ -41,6 +41,7 @@ const testAccResourceSilenced_basic = `
   resource "sensu_silenced" "silenced_1" {
     check = "check_1"
     subscription = "subscription_1"
+	expire = "-1"
   }
 `
 
@@ -49,5 +50,6 @@ const testAccResourceSilenced_update = `
     check = "check_1"
     subscription = "subscription_1"
     begin = "Jan 02 2020 3:04PM MST"
+	expire = "-1"
   }
 `

@@ -1,8 +1,11 @@
 package sensu
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
+	"github.com/blang/semver/v4"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
@@ -204,6 +207,52 @@ func TestAccResourceCheck_proxyRequests(t *testing.T) {
 				),
 			},
 		},
+	})
+}
+
+func TestAccResourceCheck_pipelines(t *testing.T) {
+	sensuVersion := os.Getenv("SENSU_VERSION")
+
+	envVersion, err := semver.Parse(sensuVersion)
+	if err != nil {
+		fmt.Printf("Error parsing version: %v", err)
+		return
+	}
+
+	pipelineMinVersion, err := semver.Parse("6.5.0")
+	if err != nil {
+		fmt.Printf("Error parsing version: %v", err)
+		return
+	}
+
+	steps := []resource.TestStep{
+		resource.TestStep{
+			Config: testAccResourceCheck_pipelines_1,
+			Check: resource.ComposeTestCheckFunc(
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.0.name", "incident_alerts"),
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.1.name", "low_priority_alerts"),
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.1.type", "Pipeline"),
+			),
+		},
+		resource.TestStep{
+			Config: testAccResourceCheck_pipelines_2,
+			Check: resource.ComposeTestCheckFunc(
+				resource.TestCheckResourceAttr(
+					"sensu_check.check_1", "pipelines.#", "0"),
+			),
+		},
+	}
+	if envVersion.LT(pipelineMinVersion) {
+		steps = steps[1:]
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps:     steps,
 	})
 }
 
@@ -577,6 +626,56 @@ const testAccResourceCheck_proxyRequests_1 = `
 `
 
 const testAccResourceCheck_proxyRequests_2 = `
+  resource "sensu_entity" "entities" {
+    count = 3
+    name = format("entity-%02d", count.index+1)
+    class = "proxy"
+    labels = {
+      "proxy_type" = "website"
+      "url" = format("http://example-%02d.com", count.index+1)
+    }
+  }
+
+  resource "sensu_check" "check_1" {
+    name = "check-http"
+    command = "check-http.rb -u {{ .labels url }}"
+    interval = 60
+    publish = true
+    subscriptions = ["proxy"]
+  }
+`
+
+const testAccResourceCheck_pipelines_1 = `
+  resource "sensu_entity" "entities" {
+    count = 3
+    name = format("entity-%02d", count.index+1)
+    class = "proxy"
+    labels = {
+      "proxy_type" = "website"
+      "url" = format("http://example-%02d.com", count.index+1)
+    }
+  }
+
+  resource "sensu_check" "check_1" {
+    name = "check-http"
+    command = "check-http.rb -u {{ .labels url }}"
+    interval = 60
+    pipelines {
+		api_version = "core/v2"
+        type = "Pipeline"
+        name = "incident_alerts"
+	}
+	pipelines {
+		api_version = "core/v2"
+        type = "Pipeline"
+        name = "low_priority_alerts"
+	}
+    publish = true
+    subscriptions = ["proxy"]
+  }
+`
+
+const testAccResourceCheck_pipelines_2 = `
   resource "sensu_entity" "entities" {
     count = 3
     name = format("entity-%02d", count.index+1)
