@@ -1,4 +1,6 @@
-## 0.14.0 (Unreleased)
+## 0.15.0 (Unreleased)
+
+## 0.14.0 (July 22, 2024)
 
 IMPROVEMENTS
 
