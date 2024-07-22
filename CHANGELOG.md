@@ -1,5 +1,9 @@
 ## 0.14.0 (Unreleased)
 
+IMPROVEMENTS
+
+* Added support for "pipelines" to the `check` resource [GH-63](https://github.com/jtopjian/terraform-provider-sensu/pull/63)
+
 ## 0.13.0 (June 21, 2023)
 
 IMPROVEMENTS
