@@ -3,6 +3,7 @@ module github.com/jtopjian/terraform-provider-sensu
 go 1.14
 
 require (
+	github.com/blang/semver/v4 v4.0.0
 	github.com/hashicorp/go-getter v1.7.0 // indirect
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/terraform-plugin-sdk v1.16.0
