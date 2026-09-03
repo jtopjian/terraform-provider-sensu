@@ -256,6 +256,75 @@ func TestAccResourceCheck_pipelines(t *testing.T) {
 	})
 }
 
+func TestAccResourceCheck_outputMetrics(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccResourceCheck_outputMetrics_1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_format", "prometheus_text"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_tags.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_tags.0.name", "entity"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_tags.0.value", "{{ .name }}"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.name", "cert_days_left"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.null_status", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.0.min", "30.0"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.0.max", ""),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.0.status", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.1.min", "14.0"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.1.max", ""),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.1.status", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "runtime_assets.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "runtime_assets.0", "sensu/cert-checks"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccResourceCheck_outputMetrics_2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_format", "prometheus_text"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_tags.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_tags.0.name", "entity"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_tags.0.value", "{{ .labels.hostname }}"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.0.min", "20.0"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.0.status", "1"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.1.min", "10.0"),
+					resource.TestCheckResourceAttr(
+						"sensu_check.check_1", "output_metric_thresholds.0.thresholds.1.status", "2"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccResourceCheck_envVars(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -849,6 +918,84 @@ const testAccResourceCheck_secrets_5 = `
       "foo",
       "bar",
       "baz",
+    ]
+  }
+`
+
+const testAccResourceCheck_outputMetrics_1 = `
+  resource "sensu_check" "check_1" {
+    name = "check-metrics"
+    command = "cert-checks -c https://example.com/certificate | grep cert_days_left"
+    interval = 60000
+    timeout = 30
+    publish = true
+    subscriptions = ["system"]
+
+    output_metric_format = "prometheus_text"
+
+    output_metric_tags {
+      name  = "entity"
+      value = "{{ .name }}"
+    }
+
+    output_metric_thresholds {
+      name        = "cert_days_left"
+      null_status = 1
+
+      thresholds {
+        min    = "30.0"
+        max    = ""
+        status = 1
+      }
+
+      thresholds {
+        min    = "14.0"
+        max    = ""
+        status = 2
+      }
+    }
+
+    runtime_assets = [
+      "sensu/cert-checks"
+    ]
+  }
+`
+
+const testAccResourceCheck_outputMetrics_2 = `
+  resource "sensu_check" "check_1" {
+    name = "check-metrics"
+    command = "cert-checks -c https://example.com/certificate | grep cert_days_left"
+    interval = 60000
+    timeout = 30
+    publish = true
+    subscriptions = ["system"]
+
+    output_metric_format = "prometheus_text"
+
+    output_metric_tags {
+      name  = "entity"
+      value = "{{ .labels.hostname }}"
+    }
+
+    output_metric_thresholds {
+      name        = "cert_days_left"
+      null_status = 1
+
+      thresholds {
+        min    = "20.0"
+        max    = ""
+        status = 1
+      }
+
+      thresholds {
+        min    = "10.0"
+        max    = ""
+        status = 2
+      }
+    }
+
+    runtime_assets = [
+      "sensu/cert-checks"
     ]
   }
 `

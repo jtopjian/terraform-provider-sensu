@@ -96,6 +96,76 @@ func resourceCheck() *schema.Resource {
 				Optional: true,
 			},
 
+			"output_metric_tags": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"value": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
+
+			"output_metric_thresholds": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"null_status": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+						},
+						"tags": &schema.Schema{
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"name": &schema.Schema{
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"value": &schema.Schema{
+										Type:     schema.TypeString,
+										Required: true,
+									},
+								},
+							},
+						},
+						"thresholds": &schema.Schema{
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"min": &schema.Schema{
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"max": &schema.Schema{
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"status": &schema.Schema{
+										Type:     schema.TypeInt,
+										Required: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
 			"output_metric_handlers": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
@@ -209,6 +279,14 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	outputMetricHandlers := expandStringList(d.Get("output_metric_handlers").([]interface{}))
 	runtimeAssets := expandStringList(d.Get("runtime_assets").([]interface{}))
 
+	// metric configuration
+	outputMetricTags := expandOutputMetricTags(
+		d.Get("output_metric_tags").([]interface{}),
+	)
+	outputMetricThresholds := expandOutputMetricThresholds(
+		d.Get("output_metric_thresholds").([]interface{}),
+	)
+
 	// detailed structures
 	envVars := expandEnvVars(d.Get("env_vars").(map[string]interface{}))
 	subdues := expandTimeWindows(d.Get("subdue").(*schema.Set).List())
@@ -226,25 +304,27 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 			Annotations: annotations,
 			Labels:      labels,
 		},
-		Command:              d.Get("command").(string),
-		Subscriptions:        subscriptions,
-		Cron:                 cron,
-		EnvVars:              envVars,
-		Handlers:             handlers,
-		HighFlapThreshold:    uint32(d.Get("high_flap_threshold").(int)),
-		Interval:             uint32(interval),
-		LowFlapThreshold:     uint32(d.Get("low_flap_threshold").(int)),
-		OutputMetricFormat:   d.Get("output_metric_format").(string),
-		OutputMetricHandlers: outputMetricHandlers,
-		ProxyEntityName:      d.Get("proxy_entity_name").(string),
-		Publish:              d.Get("publish").(bool),
-		RoundRobin:           d.Get("round_robin").(bool),
-		RuntimeAssets:        runtimeAssets,
-		Stdin:                d.Get("stdin").(bool),
-		Subdue:               &subdues,
-		Timeout:              uint32(d.Get("timeout").(int)),
-		Ttl:                  int64(d.Get("ttl").(int)),
-		Secrets:              secrets,
+		Command:                d.Get("command").(string),
+		Subscriptions:          subscriptions,
+		Cron:                   cron,
+		EnvVars:                envVars,
+		Handlers:               handlers,
+		HighFlapThreshold:      uint32(d.Get("high_flap_threshold").(int)),
+		Interval:               uint32(interval),
+		LowFlapThreshold:       uint32(d.Get("low_flap_threshold").(int)),
+		OutputMetricFormat:     d.Get("output_metric_format").(string),
+		OutputMetricHandlers:   outputMetricHandlers,
+		OutputMetricTags:       outputMetricTags,
+		OutputMetricThresholds: outputMetricThresholds,
+		ProxyEntityName:        d.Get("proxy_entity_name").(string),
+		Publish:                d.Get("publish").(bool),
+		RoundRobin:             d.Get("round_robin").(bool),
+		RuntimeAssets:          runtimeAssets,
+		Stdin:                  d.Get("stdin").(bool),
+		Subdue:                 &subdues,
+		Timeout:                uint32(d.Get("timeout").(int)),
+		Ttl:                    int64(d.Get("ttl").(int)),
+		Secrets:                secrets,
 	}
 
 	proxyRequests := d.Get("proxy_requests").([]interface{})
@@ -284,6 +364,8 @@ func resourceCheckCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("low_flap_threshold")
 	d.SetPartial("output_metric_format")
 	d.SetPartial("output_metric_handlers")
+	d.SetPartial("output_metric_tags")
+	d.SetPartial("output_metric_thresholds")
 	d.SetPartial("proxy_entity_name")
 	d.SetPartial("proxy_requests")
 	d.SetPartial("pipelines")
@@ -369,6 +451,14 @@ func resourceCheckRead(d *schema.ResourceData, meta interface{}) error {
 
 	if err := d.Set("output_metric_handlers", check.OutputMetricHandlers); err != nil {
 		return fmt.Errorf("Unable to set %s.output_metric_handlers: %s", name, err)
+	}
+
+	if err := d.Set("output_metric_tags", flattenOutputMetricTags(check.OutputMetricTags)); err != nil {
+		return fmt.Errorf("Unable to set %s.output_metric_tags: %s", name, err)
+	}
+
+	if err := d.Set("output_metric_thresholds", flattenOutputMetricThresholds(check.OutputMetricThresholds)); err != nil {
+		return fmt.Errorf("Unable to set %s.output_metric_thresholds: %s", name, err)
 	}
 
 	proxyRequests := flattenCheckProxyRequests(check.ProxyRequests)
@@ -457,6 +547,20 @@ func resourceCheckUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("output_metric_handlers") {
 		metricHandlers := expandStringList(d.Get("output_metric_handlers").([]interface{}))
 		check.OutputMetricHandlers = metricHandlers
+	}
+
+	if d.HasChange("output_metric_tags") {
+		outputMetricTags := expandOutputMetricTags(
+			d.Get("output_metric_tags").([]interface{}),
+		)
+		check.OutputMetricTags = outputMetricTags
+	}
+
+	if d.HasChange("output_metric_thresholds") {
+		outputMetricThresholds := expandOutputMetricThresholds(
+			d.Get("output_metric_thresholds").([]interface{}),
+		)
+		check.OutputMetricThresholds = outputMetricThresholds
 	}
 
 	if d.HasChange("proxy_entity_name") {
@@ -598,6 +702,65 @@ func expandCheckHooks(v []interface{}) []types.HookList {
 	return hookLists
 }
 
+func expandOutputMetricTags(v []interface{}) []*types.MetricTag {
+	var tags []*types.MetricTag
+
+	for _, v := range v {
+		tagData := v.(map[string]interface{})
+
+		tag := &types.MetricTag{
+			Name:  tagData["name"].(string),
+			Value: tagData["value"].(string),
+		}
+
+		tags = append(tags, tag)
+	}
+
+	return tags
+}
+
+func expandOutputMetricThresholds(v []interface{}) []*types.MetricThreshold {
+	var thresholds []*types.MetricThreshold
+
+	for _, v := range v {
+		thresholdData := v.(map[string]interface{})
+
+		threshold := &types.MetricThreshold{
+			Name:       thresholdData["name"].(string),
+			NullStatus: uint32(thresholdData["null_status"].(int)),
+		}
+
+		tags := thresholdData["tags"].([]interface{})
+		for _, t := range tags {
+			tagData := t.(map[string]interface{})
+
+			tag := &types.MetricThresholdTag{
+				Name:  tagData["name"].(string),
+				Value: tagData["value"].(string),
+			}
+
+			threshold.Tags = append(threshold.Tags, tag)
+		}
+
+		rules := thresholdData["thresholds"].([]interface{})
+		for _, r := range rules {
+			ruleData := r.(map[string]interface{})
+
+			rule := &types.MetricThresholdRule{
+				Min:    ruleData["min"].(string),
+				Max:    ruleData["max"].(string),
+				Status: uint32(ruleData["status"].(int)),
+			}
+
+			threshold.Thresholds = append(threshold.Thresholds, rule)
+		}
+
+		thresholds = append(thresholds, threshold)
+	}
+
+	return thresholds
+}
+
 func flattenCheckHooks(v []types.HookList) []map[string]interface{} {
 	var hookLists []map[string]interface{}
 
@@ -613,4 +776,53 @@ func flattenCheckHooks(v []types.HookList) []map[string]interface{} {
 	}
 
 	return hookLists
+}
+
+func flattenOutputMetricTags(v []*types.MetricTag) []map[string]interface{} {
+	var tags []map[string]interface{}
+
+	for _, tag := range v {
+		tags = append(tags, map[string]interface{}{
+			"name":  tag.Name,
+			"value": tag.Value,
+		})
+	}
+
+	return tags
+}
+
+func flattenOutputMetricThresholds(v []*types.MetricThreshold) []map[string]interface{} {
+	var thresholds []map[string]interface{}
+
+	for _, threshold := range v {
+		thresholdData := map[string]interface{}{
+			"name":        threshold.Name,
+			"null_status": int(threshold.NullStatus),
+		}
+
+		var tags []map[string]interface{}
+		for _, tag := range threshold.Tags {
+			tags = append(tags, map[string]interface{}{
+				"name":  tag.Name,
+				"value": tag.Value,
+			})
+		}
+
+		thresholdData["tags"] = tags
+
+		var rules []map[string]interface{}
+		for _, rule := range threshold.Thresholds {
+			rules = append(rules, map[string]interface{}{
+				"min":    rule.Min,
+				"max":    rule.Max,
+				"status": int(rule.Status),
+			})
+		}
+
+		thresholdData["thresholds"] = rules
+
+		thresholds = append(thresholds, thresholdData)
+	}
+
+	return thresholds
 }
